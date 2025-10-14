@@ -110,14 +110,6 @@ const MAPS = {
     bg: "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=09b8022a2b6622c1f2d2d6f7f9b9b9b9", // modifie ici
     width: 2000,  // largeur de la map (px) -> utile pour coordonnées
     height: 1200
-  },
-  "quartier-nord": {
-    id: "quartier-nord",
-    name: "Quartier Nord",
-    bg: "https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=7e4c1b2b9b3a6b7c8d9e0f1a2b3c4d5e",
-    width: 1600,
-    height: 1000
-  }
 };
 
 // choisi la map de départ ici (ID doit exister dans MAPS)
@@ -137,7 +129,7 @@ const LOCATION_TEMPLATES = {
 };
 
 let LOCATIONS = [
-  { x: 500, y: 350, img: LOCATION_TEMPLATES.defaultMarker, type: "image", link: "https://images.unsplash.com/photo-1519999482648-25049ddd37b1?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=abcdef", label:"Parc" },
+  { x: 500, y: 350, img: LOCATION_TEMPLATES.defaultMarker, type: "image", link: "map2.html", label:"Philo-map" },
   { x: 900, y: 450, img: LOCATION_TEMPLATES.defaultMarker, type: "document", link: "docs/plan-parc.pdf", label:"Plan du parc" },
   { x: 1200, y: 300, img: LOCATION_TEMPLATES.defaultMarker, type: "map", link: "quartier-nord", label:"Quartier Nord" }
 ];
