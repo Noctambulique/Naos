@@ -13,7 +13,6 @@
   }
   html,body{height:100%;margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;}
   #app{height:100vh;display:flex;flex-direction:column;}
-  /* HUD */
   #hud{
     position:fixed; left:10px; top:10px; z-index:30;
     background:var(--ui-bg); color:var(--ui-color); padding:8px 12px;border-radius:8px;
@@ -21,17 +20,13 @@
     user-select:none;
   }
   #hud b{display:inline-block; min-width:80px;}
-  /* Map viewport */
   #viewport{
     position:relative; flex:1; overflow:hidden; background:#222;
   }
-  /* The actual map (big area) */
   #map{
     position:absolute; left:0; top:0;
     transform-origin:0 0;
-    /* background set dynamically */
   }
-  /* Player cursor */
   #player{
     position:absolute;
     width:var(--player-size); height:var(--player-size);
@@ -42,7 +37,6 @@
     transition: transform .03s linear;
   }
   #player:active{cursor:grabbing;}
-  /* marker images placed on the map */
   .marker{
     position:absolute;
     width:var(--marker-size); height:var(--marker-size);
@@ -52,7 +46,6 @@
     pointer-events:auto;
     user-select:none;
   }
-  /* popup modal for image preview */
   #modal{
     display:none; position:fixed; inset:0; z-index:100; background: rgba(0,0,0,.7);
     align-items:center; justify-content:center; padding:20px;
@@ -63,7 +56,6 @@
     background:var(--ui-bg); color:var(--ui-color); padding:8px 12px;border-radius:8px;
     font-size:13px; max-width:220px;
   }
-  /* simple responsive */
   @media (max-width:600px){
     #hud {font-size:12px}
     :root{--player-size:28px; --marker-size:28px;}
@@ -85,46 +77,31 @@
 
   <div id="viewport">
     <div id="map">
-      <!-- markers and player inserted dynamically -->
       <img id="player" src="data:image/svg+xml;utf8,
         <svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 24 24' fill='none' stroke='%23ffcc00' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='10' r='3.2' /><path d='M12 2v3M12 21v-3M20 12h-3M7 12H4M17.5 6.5L15.5 8.5M8.5 15.5L6.5 17.5M17.5 17.5L15.5 15.5M8.5 8.5L6.5 6.5' /></svg>" alt="player" draggable="false">
     </div>
   </div>
 
-  <!-- modal for image previews -->
   <div id="modal" onclick="hideModal()"><img id="modalImg" src="" alt="preview"></div>
 </div>
 
 <script>
 /* ==========================
-   CONFIGURATION / facile à éditer
-   - CHANGE_MONITOR: définit l'image de fond, taille de la map (en px),
-     listes d'emplacements (x,y en pixels), image du marker et lien.
-   - Pour lier vers une autre map, le champ type='map' et link = mapId d'une entrée MAPS.
+   CONFIGURATION
    ========================== */
 const MAPS = {
-  // clefs simples pour charger différentes maps depuis le même fichier
   "ville-centre": {
     id: "ville-centre",
     name: "Ville - Centre",
-    bg: "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=09b8022a2b6622c1f2d2d6f7f9b9b9b9", // modifie ici
-    width: 2000,  // largeur de la map (px) -> utile pour coordonnées
+    bg: "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=09b8022a2b6622c1f2d2d6f7f9b9b9b9",
+    width: 2000,
     height: 1200
-    }
+  }
 };
 
-// choisi la map de départ ici (ID doit exister dans MAPS)
+// Map de départ
 let CURRENT_MAP_ID = "ville-centre";
 
-/* Liste simple d'emplacements à éditer :
-   x,y : coordonnées en pixels (par rapport au coin supérieur gauche de la map)
-   img : url de la petite icône à afficher
-   type : 'image' | 'document' | 'map' | 'external'
-   link : pour 'image' -> image url (sera affichée en modal)
-          pour 'document'|'external' -> url (ou chemin relatif)
-          pour 'map' -> mapId (une clé du MAPS)
-   label : texte optionnel
-*/
 const LOCATION_TEMPLATES = {
   defaultMarker: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='%23007acc' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s-4.6-4.35-6.5-7.5A6.5 6.5 0 1 1 18.5 13.5C16.6 16.65 12 21 12 21z'/><circle cx='12' cy='10' r='2.5'/></svg>"
 };
@@ -135,16 +112,10 @@ let LOCATIONS = [
   { x: 1200, y: 300, img: LOCATION_TEMPLATES.defaultMarker, type: "map", link: "quartier-nord", label:"Quartier Nord" }
 ];
 
-/* paramètres simples */
-const PLAYER_SPEED = 300; // pixels par seconde (clavier)
-const CLICK_RADIUS = 40;  // distance en px pour considérer un "clic proche" d'un marker
+const PLAYER_SPEED = 300;
+const CLICK_RADIUS = 40;
 
-/* ==========================
-   Fin de la zone d'édition simple
-   (plus bas, le code s'occupe de tout)
-   ========================== */
-
-/* state */
+/* ========================== */
 let state = {
   mapObj: null,
   player: { x: 100, y: 100 },
@@ -153,7 +124,7 @@ let state = {
   dragging: false
 };
 
-/* éléments DOM */
+/* DOM elements */
 const viewport = document.getElementById('viewport');
 const mapEl = document.getElementById('map');
 const playerEl = document.getElementById('player');
@@ -162,7 +133,7 @@ const mapNameEl = document.getElementById('mapName');
 const modal = document.getElementById('modal');
 const modalImg = document.getElementById('modalImg');
 
-/* helper : charger une map depuis MAPS (ou depuis URL si besoin) */
+/* Charger une map */
 function loadMap(mapIdOrObj){
   const mapObj = (typeof mapIdOrObj === 'string') ? MAPS[mapIdOrObj] : mapIdOrObj;
   if(!mapObj){
@@ -175,16 +146,13 @@ function loadMap(mapIdOrObj){
   mapEl.style.backgroundImage = `url("${mapObj.bg}")`;
   mapEl.style.backgroundSize = "cover";
   mapNameEl.textContent = mapObj.name || mapObj.id || "";
-  // repaint markers
   renderMarkers();
-  // clamp player inside map
   clampPlayer();
   centerOnPlayer();
 }
 
-/* ajoute les marqueurs DOM */
+/* Rendu des marqueurs */
 function renderMarkers(){
-  // nettoyer anciens
   const old = mapEl.querySelectorAll('.marker');
   old.forEach(n => n.remove());
   LOCATIONS.forEach((loc, idx) => {
@@ -195,7 +163,6 @@ function renderMarkers(){
     i.style.top = loc.y + 'px';
     i.alt = loc.label || ("loc"+idx);
     i.dataset.idx = idx;
-    // optionally clicking directly on the marker will also trigger
     i.addEventListener('click', (ev) => {
       ev.stopPropagation();
       handleLocationClick(loc);
@@ -204,13 +171,11 @@ function renderMarkers(){
   });
 }
 
-/* gérer clic 'proche' sur la map (distance) */
+/* Click sur la map */
 function handleMapClick(clientX, clientY){
-  // compute map-relative coords
   const mapRect = mapEl.getBoundingClientRect();
   const mx = (clientX - mapRect.left);
   const my = (clientY - mapRect.top);
-  // find nearest location within CLICK_RADIUS
   let best = null; let bestDist = Infinity;
   LOCATIONS.forEach(loc => {
     const d = Math.hypot(mx - loc.x, my - loc.y);
@@ -221,7 +186,7 @@ function handleMapClick(clientX, clientY){
   }
 }
 
-/* action selon le type */
+/* Action selon le type */
 function handleLocationClick(loc){
   if(!loc) return;
   switch(loc.type){
@@ -229,71 +194,55 @@ function handleLocationClick(loc){
       showModal(loc.link);
       break;
     case 'document':
-      // open in new tab: can be a pdf or any document; if relative path, GitHub pages can serve it
-      window.open(loc.link, '_blank');
-      break;
     case 'external':
       window.open(loc.link, '_blank');
       break;
     case 'map':
-      // load another map defined in MAPS by id
-      if(MAPS[loc.link]) loadMap(loc.link);
-      else console.warn("Map cible introuvable :", loc.link);
+      if(MAPS[loc.link]) {
+        loadMap(loc.link);
+      } else if (loc.link.endsWith('.html')) {
+        // 🔥 ouverture d’un autre fichier de carte
+        window.location.href = loc.link;
+      } else {
+        console.warn("Map cible introuvable :", loc.link);
+      }
       break;
     default:
       console.warn("Type non géré:", loc.type);
   }
 }
 
-/* modal preview */
-function showModal(url){
-  modalImg.src = url;
-  modal.style.display = 'flex';
-}
-function hideModal(){
-  modal.style.display = 'none';
-  modalImg.src = '';
-}
+/* Modal */
+function showModal(url){ modalImg.src = url; modal.style.display = 'flex'; }
+function hideModal(){ modal.style.display = 'none'; modalImg.src = ''; }
 
-/* center map so player is visually centered */
+/* Centrage */
 function centerOnPlayer(){
   const vpW = viewport.clientWidth;
   const vpH = viewport.clientHeight;
   const mapW = mapEl.clientWidth;
   const mapH = mapEl.clientHeight;
-
-  // want player at center of viewport:
   let offsetX = vpW/2 - state.player.x;
   let offsetY = vpH/2 - state.player.y;
-
-  // clamp so map doesn't show beyond edges
   offsetX = Math.min(0, Math.max(vpW - mapW, offsetX));
   offsetY = Math.min(0, Math.max(vpH - mapH, offsetY));
-
   mapEl.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-  // position player inside map (absolute on map)
   playerEl.style.left = state.player.x + 'px';
   playerEl.style.top = state.player.y + 'px';
 }
 
-/* clamp player position to map bounds */
+/* Limiter le joueur */
 function clampPlayer(){
   if(!state.mapObj) return;
   state.player.x = Math.max(0, Math.min(state.mapObj.width, state.player.x));
   state.player.y = Math.max(0, Math.min(state.mapObj.height, state.player.y));
 }
 
-/* input: keyboard movement */
-window.addEventListener('keydown', (e)=>{
-  const k = e.key.toLowerCase();
-  state.keys[k] = true;
-});
-window.addEventListener('keyup', (e)=>{
-  const k = e.key.toLowerCase();
-  state.keys[k] = false;
-});
+/* Déplacement clavier */
+window.addEventListener('keydown', (e)=> state.keys[e.key.toLowerCase()] = true);
+window.addEventListener('keyup', (e)=> state.keys[e.key.toLowerCase()] = false);
 
-/* dragging the player */
+/* Drag */
 let dragOffset = {x:0,y:0};
 playerEl.addEventListener('pointerdown', (ev)=>{
   ev.preventDefault();
@@ -304,11 +253,8 @@ playerEl.addEventListener('pointerdown', (ev)=>{
 });
 playerEl.addEventListener('pointermove', (ev)=>{
   if(!state.dragging) return;
-  // calculate movement in map coordinates (consider map transform)
-  const mapRect = mapEl.getBoundingClientRect();
   const dx = ev.clientX - dragOffset.x;
   const dy = ev.clientY - dragOffset.y;
-  // move player by delta relative to map's offset
   state.player.x += dx;
   state.player.y += dy;
   dragOffset.x = ev.clientX;
@@ -322,26 +268,19 @@ playerEl.addEventListener('pointerup', (ev)=>{
   try{ playerEl.releasePointerCapture(ev.pointerId);}catch(e){}
 });
 
-/* click on map to trigger near-marker opens */
-mapEl.addEventListener('click', (ev)=>{
-  // If clicked directly on marker, its handler already fired (stopPropagation used).
-  handleMapClick(ev.clientX, ev.clientY);
-});
+mapEl.addEventListener('click', (ev)=> handleMapClick(ev.clientX, ev.clientY));
 
-/* main loop for keyboard movement */
+/* Boucle principale */
 function loop(ts){
   if(!state.lastTs) state.lastTs = ts;
   const dt = (ts - state.lastTs) / 1000;
   state.lastTs = ts;
-
-  // keyboard: arrows or wasd
   let dx = 0, dy = 0;
   if(state.keys['arrowup'] || state.keys['w']) dy -= 1;
   if(state.keys['arrowdown'] || state.keys['s']) dy += 1;
   if(state.keys['arrowleft'] || state.keys['a']) dx -= 1;
   if(state.keys['arrowright'] || state.keys['d']) dx += 1;
-  if(dx !== 0 || dy !== 0){
-    // normalize
+  if(dx || dy){
     const len = Math.hypot(dx,dy) || 1;
     state.player.x += (dx/len) * PLAYER_SPEED * dt;
     state.player.y += (dy/len) * PLAYER_SPEED * dt;
@@ -349,57 +288,24 @@ function loop(ts){
     centerOnPlayer();
     updateHUD();
   }
-
   requestAnimationFrame(loop);
 }
 
-/* update HUD */
+/* HUD */
 function updateHUD(){
   posEl.textContent = `x:${Math.round(state.player.x)} y:${Math.round(state.player.y)}`;
 }
 
-/* expose a helper to programmatically add a location (for future UI) */
-function addLocation(loc){
-  LOCATIONS.push(loc);
-  renderMarkers();
-}
-
-/* initialize */
+/* Init */
 function init(){
   loadMap(CURRENT_MAP_ID);
-  // start centered
-  state.player.x = Math.min( Math.max(100, state.mapObj.width/2), state.mapObj.width - 50 );
-  state.player.y = Math.min( Math.max(100, state.mapObj.height/2), state.mapObj.height - 50 );
+  state.player.x = state.mapObj.width/2;
+  state.player.y = state.mapObj.height/2;
   centerOnPlayer();
   updateHUD();
   requestAnimationFrame(loop);
 }
-
-/* make available in console for quick edits */
-window.MAPS = MAPS;
-window.LOCATIONS = LOCATIONS;
-window.loadMap = loadMap;
-window.addLocation = addLocation;
-window.CLICK_RADIUS = CLICK_RADIUS;
-
-/* start */
 init();
-
-/* ================
-   Notes / Conseils d'utilisation :
-   - Pour personnaliser la map : édite MAPS['ville-centre'].bg (URL), width et height.
-     width/height doivent correspondre aux pixels réels que tu veux utiliser comme système de coordonnées.
-   - Pour ajouter un emplacement : ajoute un objet dans LOCATIONS avec {x,y,img,type,link,label}
-   - types :
-       'image' : ouvrira l'image dans une modal (utile pour photos).
-       'document' : ouvrira le lien (pdf, doc) dans un nouvel onglet.
-       'external' : ouvrira le lien externe.
-       'map' : chargera la map dont l'id = link (doit exister dans MAPS).
-   - Si tu veux stocker des maps séparées, tu peux créer plusieurs fichiers HTML et utiliser type 'map' avec link pointant vers l'URL de la nouvelle page,
-     ou référencer d'autres entrées MAPS dans le même fichier (comme démontré).
-   - Coordonnées : (0,0) = coin haut-gauche de la map. x croît vers la droite, y vers le bas.
-   - Pour le déploiement sur GitHub Pages : pousse ce fichier et les assets (docs/plan-parc.pdf si tu l'utilises).
-   ================ */
 </script>
 </body>
 </html>
