@@ -65,7 +65,7 @@
 <body>
 <div id="app">
   <div id="hud">
-    <div><b>Position</b><span id="pos">x:0, y:0</span></div>
+    <div><b>Position</b> <span id="pos">x:0, y:0</span></div>
     <div style="margin-top:6px"><b>Map</b> <span id="mapName"></span></div>
     <div style="margin-top:6px"><b>Lieu</b> <span id="locLabel"></span></div>
   </div>
@@ -97,10 +97,6 @@ const MAPS = {
 // Map de départ
 let CURRENT_MAP_ID = "ville-centre";
 
-const LOCATION_TEMPLATES = {
-  defaultMarker: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='%23007acc' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 21s-4.6-4.35-6.5-7.5A6.5 6.5 0 1 1 18.5 13.5C16.6 16.65 12 21 12 21z'/><circle cx='12' cy='10' r='2.5'/></svg>"
-};
-
 let LOCATIONS = [
   { x: 700, y: 1070, img: "Map/QGPhilosophe.png", type: "map", link: "map2.html", label:"Philo-map" },
   { x: 1222, y: 960, img: "Map/CentredesLubies.png", type: "document", link: "Document/Lubies.pdf", label:"Lubies, Valet de Coeur" },
@@ -112,6 +108,7 @@ let LOCATIONS = [
 
 const PLAYER_SPEED = 300;
 const CLICK_RADIUS = 40;
+const DETECTION_RADIUS = 60; // distance à laquelle le label apparaît
 
 /* ========================== */
 let state = {
@@ -128,6 +125,7 @@ const mapEl = document.getElementById('map');
 const playerEl = document.getElementById('player');
 const posEl = document.getElementById('pos');
 const mapNameEl = document.getElementById('mapName');
+const locLabelEl = document.getElementById('locLabel');
 const modal = document.getElementById('modal');
 const modalImg = document.getElementById('modalImg');
 
@@ -165,6 +163,9 @@ function renderMarkers(){
       ev.stopPropagation();
       handleLocationClick(loc);
     });
+    // 🔹 Affiche le label au survol
+    i.addEventListener('mouseenter', () => locLabelEl.textContent = loc.label);
+    i.addEventListener('mouseleave', () => locLabelEl.textContent = "");
     mapEl.appendChild(i);
   });
 }
@@ -199,7 +200,6 @@ function handleLocationClick(loc){
       if(MAPS[loc.link]) {
         loadMap(loc.link);
       } else if (loc.link.endsWith('.html')) {
-        // 🔥 ouverture d’un autre fichier de carte
         window.location.href = loc.link;
       } else {
         console.warn("Map cible introuvable :", loc.link);
@@ -285,16 +285,38 @@ function loop(ts){
     clampPlayer();
     centerOnPlayer();
     updateHUD();
+  } else {
+    // même sans déplacement, le label doit suivre la position
+    updateHUD();
   }
   requestAnimationFrame(loop);
 }
 
-/* HUD */
+/* HUD dynamique */
 function updateHUD(){
   posEl.textContent = `x:${Math.round(state.player.x)} y:${Math.round(state.player.y)}`;
+  
+  // Trouver le lieu le plus proche
+  let nearest = null;
+  let bestDist = Infinity;
+  LOCATIONS.forEach(loc => {
+    const d = Math.hypot(state.player.x - loc.x, state.player.y - loc.y);
+    if (d < bestDist) {
+      bestDist = d;
+      nearest = loc;
+    }
+  });
+
+  // Affichage du label si assez proche
+  if (nearest && bestDist < DETECTION_RADIUS) {
+    locLabelEl.textContent = nearest.label;
+  } else if (!state.dragging) {
+    // On efface seulement si le joueur ne traîne pas un marker
+    locLabelEl.textContent = "";
+  }
 }
 
-/* Init */
+/* Initialisation */
 function init(){
   loadMap(CURRENT_MAP_ID);
   state.player.x = state.mapObj.width/2;
