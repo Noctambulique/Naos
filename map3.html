@@ -331,12 +331,18 @@ function loop(ts){
 /* Initialisation */
 function init(){
   loadMap(CURRENT_MAP_ID);
-  state.player.x = state.mapObj.width/2;
-  state.player.y = state.mapObj.height/2;
-  centerOnPlayer();
-  updateHUD();
-  requestAnimationFrame(loop);
+  // On centre le joueur au milieu de la carte
+  state.player.x = state.mapObj.width / 2;
+  state.player.y = state.mapObj.height / 2;
+
+  // On attend que la map soit bien rendue avant de centrer
+  requestAnimationFrame(() => {
+    centerOnPlayer();
+    updateHUD();
+    requestAnimationFrame(loop);
+  });
 }
+
 init();
 </script>
 </body>
