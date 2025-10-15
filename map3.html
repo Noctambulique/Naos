@@ -175,15 +175,39 @@ const modalText = document.getElementById('modalText');
 function loadMap(mapIdOrObj){
   const mapObj = (typeof mapIdOrObj === 'string') ? MAPS[mapIdOrObj] : mapIdOrObj;
   if(!mapObj){ console.error("Map introuvable :", mapIdOrObj); return; }
+
   state.mapObj = mapObj;
   mapEl.style.width = mapObj.width + "px";
   mapEl.style.height = mapObj.height + "px";
   mapEl.style.backgroundImage = `url("${mapObj.bg}")`;
   mapEl.style.backgroundSize = "cover";
+  mapEl.style.backgroundPosition = "center center"; // <-- ajout important
+
   mapNameEl.textContent = mapObj.name || mapObj.id || "";
-  renderMarkers();
-  clampPlayer();
-  centerOnPlayer();
+
+  // Attendre que l’image soit bien chargée avant de centrer
+  const img = new Image();
+  img.onload = () => {
+    renderMarkers();
+    clampPlayer();
+    centerOnPlayer();
+  };
+  img.src = mapObj.bg;
+}
+
+/* Initialisation */
+function init(){
+  loadMap(CURRENT_MAP_ID);
+  // Placer le joueur au centre logique de la map
+  state.player.x = MAPS[CURRENT_MAP_ID].width / 2;
+  state.player.y = MAPS[CURRENT_MAP_ID].height / 2;
+
+  // Centrage après rendu complet
+  window.addEventListener("load", () => {
+    centerOnPlayer();
+    updateHUD();
+    requestAnimationFrame(loop);
+  });
 }
 
 /* Rendu des marqueurs */
