@@ -161,7 +161,6 @@ function loadMap(mapIdOrObj){
   centerOnPlayer();
 }
 
-/* Rendu des marqueurs */
 function renderMarkers(){
   const old = mapEl.querySelectorAll('.marker');
   old.forEach(n => n.remove());
@@ -169,15 +168,23 @@ function renderMarkers(){
     const i = document.createElement('img');
     i.src = loc.img;
     i.className = 'marker';
+
+    // ✅ Gestion taille individuelle ou par défaut
+    const size = loc.size || getComputedStyle(document.documentElement).getPropertyValue('--marker-size');
+    i.style.width = size + 'px';
+    i.style.height = size + 'px';
+    i.style.marginLeft = `calc(${size}px / -2)`;
+    i.style.marginTop = `calc(${size}px / -2)`;
+
     i.style.left = loc.x + 'px';
     i.style.top = loc.y + 'px';
     i.alt = loc.label || ("loc"+idx);
     i.dataset.idx = idx;
-    i.addEventListener('click', (ev) => {
+
+    i.addEventListener('click', ev => {
       ev.stopPropagation();
       handleLocationClick(loc);
     });
-    // 🔹 Affiche le label au survol
     i.addEventListener('mouseenter', () => locLabelEl.textContent = loc.label);
     i.addEventListener('mouseleave', () => locLabelEl.textContent = "");
     mapEl.appendChild(i);
