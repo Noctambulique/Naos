@@ -37,15 +37,17 @@
     transition: transform .03s linear;
   }
   #player:active{cursor:grabbing;}
-  .marker{
-    position:absolute;
-    width:var(--marker-size); height:var(--marker-size);
-    margin-left: calc(var(--marker-size) / -2);
-    margin-top: calc(var(--marker-size) / -2);
-    z-index:35;
-    pointer-events:auto;
-    user-select:none;
-  }
+.marker{
+  position:absolute;
+  width:var(--marker-size); 
+  height:var(--marker-size);
+  margin-left: calc(var(--marker-size) / -2);
+  margin-top: calc(var(--marker-size) / -2);
+  z-index:35;
+  pointer-events:auto;
+  user-select:none;
+  object-fit: contain; /* ✅ Ajout important : garde le format original de l’image */
+}
   #modal{
     display:none; position:fixed; inset:0; z-index:100; background: rgba(0,0,0,.7);
     align-items:center; justify-content:center; padding:20px;
