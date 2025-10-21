@@ -227,12 +227,12 @@ function renderMarkers(){
     // Appliquer une taille personnalisée si définie dans l'objet LOCATIONS
 if (loc.size) {
   i.style.width = loc.size + "px";
-  i.style.height = loc.size + "px";
+  i.style.height = "auto";
 } else {
-  // Taille par défaut si aucune taille n'est spécifiée
   i.style.width = "50px";
-  i.style.height = "50px";
+  i.style.height = "auto";
 }
+i.style.objectFit = "contain"; // évite les déformations
 
     i.alt = loc.label || ("loc"+idx);
     i.dataset.idx = idx;
