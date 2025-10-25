@@ -27,14 +27,15 @@
     position:absolute; left:0; top:0;
     transform-origin:0 0;
   }
-  #player{
-    position:absolute;
-    width:var(--player-size); height:var(--player-size);
-    margin-left: calc(var(--player-size) / -2);
-    margin-top: calc(var(--player-size) / -2);
-    z-index:40;
-    cursor:grab;
-    transition: transform .03s linear;
+#player{
+  position:absolute;
+  width:var(--player-size); height:var(--player-size);
+  margin-left: calc(var(--player-size) / -2);
+  margin-top: calc(var(--player-size) / -2);
+  z-index:40;
+  cursor:grab;
+  transition: transform .03s linear;
+  display:none; /* 👈 ajouté : le curseur est caché au départ */
   }
   #player:active{cursor:grabbing;}
 .marker{
@@ -294,11 +295,15 @@ window.addEventListener('keydown', (e) => {
   const key = e.key.toLowerCase();
 
   // 🔄 Toggle mode déplacement
-  if (key === 'a') {
-    modeDeplacement = !modeDeplacement;
-    console.log("Mode déplacement :", modeDeplacement);
-    return; // On stoppe ici pour ne pas activer une touche de déplacement
-  }
+if (key === 'a') {
+  modeDeplacement = !modeDeplacement;
+  console.log("Mode déplacement :", modeDeplacement);
+
+  // 👇 Ajout : afficher / cacher le curseur
+  playerEl.style.display = modeDeplacement ? 'block' : 'none';
+
+  return; // On stoppe ici pour ne pas activer une touche de déplacement
+}
 
   // 🔄 Toggle mode affichage des labels
   if (key === 'b') {
@@ -357,17 +362,24 @@ function loop(ts){
   if(state.keys['arrowdown'] || state.keys['s']) dy += 1;
   if(state.keys['arrowleft'] || state.keys['a']) dx -= 1;
   if(state.keys['arrowright'] || state.keys['d']) dx += 1;
-  if(dx || dy){
-    const len = Math.hypot(dx,dy) || 1;
-    state.player.x += (dx/len) * PLAYER_SPEED * dt;
-    state.player.y += (dy/len) * PLAYER_SPEED * dt;
-    clampPlayer();
-    centerOnPlayer();
-    updateHUD();
+
+  if(modeDeplacement) {
+    // 👉 Curseur visible en mode déplacement
+    playerEl.style.display = 'block';
+
+    if(dx || dy){
+      const len = Math.hypot(dx,dy) || 1;
+      state.player.x += (dx/len) * PLAYER_SPEED * dt;
+      state.player.y += (dy/len) * PLAYER_SPEED * dt;
+      clampPlayer();
+      centerOnPlayer();
+    }
   } else {
-    // même sans déplacement, le label doit suivre la position
-    updateHUD();
+    // 👇 Curseur caché en mode exploration libre
+    playerEl.style.display = 'none';
   }
+
+  updateHUD();
   requestAnimationFrame(loop);
 }
 
