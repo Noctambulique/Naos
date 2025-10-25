@@ -141,6 +141,9 @@ let state = {
   dragging: false
 };
 
+let modeDeplacement = true;  // Touche A : active/désactive le déplacement
+let modeLabel = false;       // Touche B : affiche texte à la place des icônes
+  
 /* DOM elements */
 const viewport = document.getElementById('viewport');
 const mapEl = document.getElementById('map');
@@ -170,32 +173,53 @@ function loadMap(mapIdOrObj){
 }
 
 function renderMarkers(){
-  const old = mapEl.querySelectorAll('.marker');
+  // On supprime les anciens marqueurs
+  const old = mapEl.querySelectorAll('.marker, .label-marker');
   old.forEach(n => n.remove());
+
   LOCATIONS.forEach((loc, idx) => {
-    const i = document.createElement('img');
-    i.src = loc.img;
-    i.className = 'marker';
+    let element;
 
-    // ✅ Gestion taille individuelle ou par défaut
-    const size = loc.size || getComputedStyle(document.documentElement).getPropertyValue('--marker-size');
-    i.style.width = size + 'px';
-    i.style.height = size + 'px';
-    i.style.marginLeft = `calc(${size}px / -2)`;
-    i.style.marginTop = `calc(${size}px / -2)`;
+    if(modeLabel) {
+      // 🏷️ Mode Label : afficher le texte
+      element = document.createElement('div');
+      element.className = 'label-marker';
+      element.textContent = loc.label;
+      element.style.position = 'absolute';
+      element.style.transform = 'translate(-50%, -50%)';
+      element.style.padding = '4px 8px';
+      element.style.borderRadius = '6px';
+      element.style.background = 'rgba(0,0,0,0.6)';
+      element.style.color = 'white';
+      element.style.fontSize = '14px';
+      element.style.whiteSpace = 'nowrap';
+    } else {
+      // 🏠 Mode normal : afficher l'image
+      element = document.createElement('img');
+      element.src = loc.img;
+      element.className = 'marker';
+      const size = loc.size || getComputedStyle(document.documentElement).getPropertyValue('--marker-size');
+      element.style.width = size + 'px';
+      element.style.height = size + 'px';
+      element.style.marginLeft = `calc(${size}px / -2)`;
+      element.style.marginTop = `calc(${size}px / -2)`;
+      element.style.objectFit = 'contain';
+    }
 
-    i.style.left = loc.x + 'px';
-    i.style.top = loc.y + 'px';
-    i.alt = loc.label || ("loc"+idx);
-    i.dataset.idx = idx;
+    // Positionnement
+    element.style.left = loc.x + 'px';
+    element.style.top = loc.y + 'px';
+    element.dataset.idx = idx;
 
-    i.addEventListener('click', ev => {
+    // Interaction
+    element.addEventListener('click', ev => {
       ev.stopPropagation();
       handleLocationClick(loc);
     });
-    i.addEventListener('mouseenter', () => locLabelEl.textContent = loc.label);
-    i.addEventListener('mouseleave', () => locLabelEl.textContent = "");
-    mapEl.appendChild(i);
+    element.addEventListener('mouseenter', () => locLabelEl.textContent = loc.label);
+    element.addEventListener('mouseleave', () => locLabelEl.textContent = "");
+
+    mapEl.appendChild(element);
   });
 }
 
@@ -266,8 +290,34 @@ function clampPlayer(){
 }
 
 /* Déplacement clavier */
-window.addEventListener('keydown', (e)=> state.keys[e.key.toLowerCase()] = true);
-window.addEventListener('keyup', (e)=> state.keys[e.key.toLowerCase()] = false);
+window.addEventListener('keydown', (e) => {
+  const key = e.key.toLowerCase();
+
+  // 🔄 Toggle mode déplacement
+  if (key === 'a') {
+    modeDeplacement = !modeDeplacement;
+    console.log("Mode déplacement :", modeDeplacement);
+    return; // On stoppe ici pour ne pas activer une touche de déplacement
+  }
+
+  // 🔄 Toggle mode affichage des labels
+  if (key === 'b') {
+    modeLabel = !modeLabel;
+    renderMarkers();
+    console.log("Mode labels :", modeLabel);
+    return;
+  }
+
+  // ✅ Activer les touches de déplacement uniquement si le mode est actif
+  if (modeDeplacement) {
+    state.keys[key] = true;
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  const key = e.key.toLowerCase();
+  state.keys[key] = false;
+});
 
 /* Drag */
 let dragOffset = {x:0,y:0};
