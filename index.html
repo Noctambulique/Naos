@@ -142,7 +142,8 @@ let state = {
   dragging: false
 };
 
-let modeDeplacement = true;  // Touche A : active/désactive le déplacement
+let modeDeplacement = false; // 👈 au départ le déplacement est désactivé
+playerEl.style.display = 'none'; // 👈 le curseur est caché au lancement
 let modeLabel = false;       // Touche B : affiche texte à la place des icônes
   
 /* DOM elements */
@@ -365,7 +366,6 @@ function loop(ts){
 
   if(modeDeplacement) {
     // 👉 Curseur visible en mode déplacement
-    playerEl.style.display = 'block';
 
     if(dx || dy){
       const len = Math.hypot(dx,dy) || 1;
@@ -376,7 +376,6 @@ function loop(ts){
     }
   } else {
     // 👇 Curseur caché en mode exploration libre
-    playerEl.style.display = 'none';
   }
 
   updateHUD();
