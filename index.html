@@ -143,7 +143,6 @@ let state = {
 };
 
 let modeDeplacement = false; // 👈 au départ le déplacement est désactivé
-playerEl.style.display = 'none'; // 👈 le curseur est caché au lancement
 let modeLabel = false;       // Touche B : affiche texte à la place des icônes
   
 /* DOM elements */
@@ -155,6 +154,7 @@ const mapNameEl = document.getElementById('mapName');
 const locLabelEl = document.getElementById('locLabel');
 const modal = document.getElementById('modal');
 const modalImg = document.getElementById('modalImg');
+playerEl.style.display = 'none';
 
 /* Charger une map */
 function loadMap(mapIdOrObj){
