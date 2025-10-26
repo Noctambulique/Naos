@@ -144,7 +144,12 @@ let state = {
 
 let modeDeplacement = false; // 👈 au départ le déplacement est désactivé
 let modeLabel = false;       // Touche B : affiche texte à la place des icônes
-  
+
+// 🔎 Filtrage par symboles (touche C)
+let filterStep = -1; // -1 = aucun filtre actif
+const SUITS = ["♦️", "♠️", "♣️", "❤️"];
+
+
 /* DOM elements */
 const viewport = document.getElementById('viewport');
 const mapEl = document.getElementById('map');
@@ -179,7 +184,14 @@ function renderMarkers(){
   const old = mapEl.querySelectorAll('.marker, .label-marker');
   old.forEach(n => n.remove());
 
-  LOCATIONS.forEach((loc, idx) => {
+    // 🎯 Appliquer le filtrage en fonction du symbole sélectionné
+  let filteredLocations = LOCATIONS;
+  if (filterStep >= 0) {
+    const suit = SUITS[filterStep];
+    filteredLocations = LOCATIONS.filter(loc => loc.label.includes(suit));
+  }
+
+  filteredLocations.forEach((loc, idx) => {
     let element;
 
     if(modeLabel) {
@@ -313,6 +325,18 @@ if (key === 'a') {
     console.log("Mode labels :", modeLabel);
     return;
   }
+if (key === 'c') {
+  filterStep = (filterStep + 1) % (SUITS.length + 1); // cycle à travers les filtres
+  if (filterStep === SUITS.length) {
+    filterStep = -1; // revenir à affichage complet
+    console.log("Filtre désactivé, affichage de tous les bâtiments");
+  } else {
+    console.log("Filtre actif :", SUITS[filterStep]);
+  }
+  renderMarkers();
+  return;
+}
+
 
   // ✅ Activer les touches de déplacement uniquement si le mode est actif
   if (modeDeplacement) {
