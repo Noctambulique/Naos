@@ -154,6 +154,11 @@ let LOCATIONS = [
     label:"Regis Debray",
     contentImg:"Regis Debray",
     contentText:"Régis Debray est un penseur français né en 1940, connu pour avoir développé une approche originale des phénomènes culturels : la médiologie. Son idée centrale est que les idées, les croyances ou les savoirs ne se propagent pas par leur seule force intellectuelle, mais grâce à des moyens matériels et sociaux de transmission. Autrement dit, il ne suffit pas qu’une idée soit vraie ou séduisante pour se répandre : elle doit pouvoir s’appuyer sur des supports techniques (écriture, imprimerie, numérique…) et sur des institutions (Église, école, médias, réseaux). Debray cherche ainsi à comprendre comment une idée devient une force historique.\n \n Une religion, une idéologie, un savoir ou une œuvre d’art n’existent et ne survivent que s’ils trouvent des supports matériels et des structures organisationnelles qui en assurent la diffusion et la continuité. Par exemple, le christianisme s’est transmis grâce à l’écriture des Évangiles, à l’institution ecclésiale et à la diffusion d’images et d’édifices religieux.\n \n Debray distingue trois grandes médiasphères successives. La logosphère, d’abord, correspond à l’Antiquité et au Moyen Âge : c’est l’ère de la parole et de l’écriture manuscrite, dominée par la religion et la tradition orale. Ensuite vient la graphosphère, qui émerge avec l’invention de l’imprimerie à la Renaissance. L’écrit imprimé devient le vecteur principal du savoir : c’est l’époque des livres, des journaux, de l’école, de la raison et des États-nations. Enfin, au XXᵉ siècle, s’impose la vidéosphère, dominée par l’image et les médias audiovisuels (cinéma, télévision, publicité), qui façonnent une culture de masse centrée sur le spectacle et la consommation.",
+  },
+  { x: 600, y: 150, img: "Biblio/Biblio/JuergenHabermas_retouched.jpg.jpeg", type: "info", 
+    label:"Habermas",
+    contentImg:"Habermas",
+    contentText:"Habermas développe ce concept pour comprendre comment les sociétés modernes se sont dotées d’un lieu symbolique de délibération entre citoyens, distinct de l’État et du marché.\n \n L’espace public est un espace de discussion rationnelle, accessible à tous, dans lequel les citoyens débattent des affaires communes afin de former une opinion publique. Il ne s’agit pas d’un lieu physique, mais d’un espace de communication.\n \n Habermas situe la naissance de l’espace public au XVIIIe siècle, notamment dans :\n \n Les salons littéraires français\n Les cafés anglais\n La presse bourgeoise\n \n C’est là que la bourgeoisie éclairée débat des affaires politiques, critiquant le pouvoir royal à partir d’un usage public de la raison.\n \n Caractéristiques de l’espace public idéal :\n Accès ouvert à tous (principe d’égalité)\n Délibération rationnelle fondée sur les arguments, non sur la coercition\n Indépendance vis-à-vis de l’État\n Formation de l’opinion et de la volonté collective\n \n Habermas souligne qu’à partir du XXe siècle :\n Les médias de masse (radio, télévision, réseaux sociaux) transforment les citoyens en spectateurs passifs.\n La publicité, les relations publiques et le marketing politique colonisent l’espace public.\n L’opinion publique n’est plus produite par la délibération, mais fabriquée.\n \n C’est ce qu’il appelle : la « refeudalisation de l’espace public », c’est-à-dire son retour à une forme de domination symbolique, où quelques acteurs influents contrôlent l’information.",
   }
 ];
 
@@ -285,7 +290,7 @@ function hideModal(){
 function formatText(str){
   return str
     .replace(/\n\s*\n/g, '<br><br>')
-    .replace(/\\n/g, '<br>');
+    .replace(/\n/g, '<br>');
 }
 
 /* Centrage sur le joueur */
