@@ -250,6 +250,8 @@ let state = {
   dragging: false
 };
 
+  let showLabels = false; // false = images, true = labels
+
 /* DOM elements */
 const viewport = document.getElementById('viewport');
 const mapEl = document.getElementById('map');
@@ -304,30 +306,37 @@ function init(){
 function renderMarkers(){
   mapEl.querySelectorAll('.marker').forEach(n => n.remove());
   LOCATIONS.forEach((loc, idx) => {
-    const i = document.createElement('img');
-    i.src = loc.img;
-    i.className = 'marker';
-    i.style.left = loc.x + 'px';
-    i.style.top = loc.y + 'px';
-    // Appliquer une taille personnalisée si définie dans l'objet LOCATIONS
-if (loc.size) {
-  i.style.width = loc.size + "px";
-  i.style.height = "auto";
+let el;
+if (showLabels) {
+  // Affiche le label (texte)
+  el = document.createElement('div');
+  el.textContent = loc.label;
+  el.style.color = "white";
+  el.style.background = "rgba(0,0,0,0.6)";
+  el.style.padding = "2px 6px";
+  el.style.borderRadius = "4px";
+  el.style.fontSize = "14px";
+  el.style.whiteSpace = "nowrap";
 } else {
-  i.style.width = "50px";
-  i.style.height = "auto";
+  // Affiche l'image
+  el = document.createElement('img');
+  el.src = loc.img;
+  el.style.width = loc.size ? loc.size + "px" : "50px";
+  el.style.height = "auto";
+  el.style.objectFit = "contain";
 }
-i.style.objectFit = "contain"; // évite les déformations
 
-    i.alt = loc.label || ("loc"+idx);
-    i.dataset.idx = idx;
-    i.addEventListener('click', (ev) => {
-      ev.stopPropagation();
-      handleLocationClick(loc);
-    });
-    i.addEventListener('mouseenter', () => locLabelEl.textContent = loc.label);
-    i.addEventListener('mouseleave', () => locLabelEl.textContent = "");
-    mapEl.appendChild(i);
+el.className = 'marker';
+el.style.left = loc.x + 'px';
+el.style.top = loc.y + 'px';
+el.dataset.idx = idx;
+el.addEventListener('click', (ev) => {
+  ev.stopPropagation();
+  handleLocationClick(loc);
+});
+el.addEventListener('mouseenter', () => locLabelEl.textContent = loc.label);
+el.addEventListener('mouseleave', () => locLabelEl.textContent = "");
+mapEl.appendChild(el);
   });
 }
 
@@ -394,6 +403,15 @@ function clampPlayer(){
 window.addEventListener('keydown', (e)=> state.keys[e.key.toLowerCase()] = true);
 window.addEventListener('keyup', (e)=> state.keys[e.key.toLowerCase()] = false);
 
+// Toggle affichage labels / images avec la touche 'a'
+window.addEventListener('keydown', (e) => {
+  const key = e.key.toLowerCase();
+  if (key === 'a') {
+    showLabels = !showLabels; // On bascule l'état
+    renderMarkers();          // On rerend les markers
+  }
+});
+  
 /* Drag */
 let dragOffset = {x:0,y:0};
 playerEl.addEventListener('pointerdown', (ev)=>{
