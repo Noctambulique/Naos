@@ -50,34 +50,24 @@
   <div id="infoBox"></div>
 
   <script>
-    // Configuration des cellules
+    // Configuration des cellules (personnalise ici)
     const cellsData = [
-      { text: "Zone 1 : Information détaillée.", color: "#ffcccc" },
-      { text: "Zone 2 : Description unique.", color: "#ccffcc" },
-      { text: "Zone 3 : Données utiles.", color: "#ccccff" },
-      { text: "Zone 4 : Autre info.", color: "#ffffcc" },
-      { text: "Zone 5 : À compléter.", color: "#ffccff" },
-      { text: "Zone 1 : Information détaillée.", color: "#ffcccc" },
-      { text: "Zone 2 : Description unique.", color: "#ccffcc" },
-      { text: "Zone 3 : Données utiles.", color: "#ccccff" },
-      { text: "Zone 4 : Autre info.", color: "#ffffcc" },
-      { text: "Zone 5 : À compléter.", color: "#ffccff" },
-      { text: "Zone 1 : Information détaillée.", color: "#ffcccc" },
-      { text: "Zone 2 : Description unique.", color: "#ccffcc" },
-      { text: "Zone 3 : Données utiles.", color: "#ccccff" },
-      { text: "Zone 4 : Autre info.", color: "#ffffcc" },
-      { text: "Zone 5 : À compléter.", color: "#ffccff" },
-      // Ajouter d'autres zones ici
+      { label: "Forêt", text: "Grande forêt pleine de mystères.", color: "#cfe0c3" },
+      { label: "Lac", text: "Un lac calme et profond.", color: "#a3c4dc" },
+      { label: "Montagne", text: "Montagne enneigée.", color: "#d8cfc4" },
+      { label: "Village", text: "Petit village paisible.", color: "#f1e1b0" },
+      { label: "Désert", text: "Étendue de sable sans fin.", color: "#f3d7a7" },
+      // Ajoute d'autres zones ici
     ];
 
     const map = document.getElementById("map");
     const infoBox = document.getElementById("infoBox");
 
-    cellsData.forEach((cell, index) => {
+    cellsData.forEach((cell) => {
       const div = document.createElement("div");
       div.className = "cell";
       div.style.backgroundColor = cell.color;
-      div.textContent = `Case ${index + 1}`;
+      div.textContent = cell.label;
       div.onclick = () => {
         infoBox.textContent = cell.text;
         infoBox.style.display = "block";
