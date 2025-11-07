@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Échelle qualitative</title>
+<style>
+  /* hyper minimaliste */
+  :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; font-size:16px}
+  html,body{height:100%; margin:0; display:flex; align-items:center; justify-content:center; background:#fff; color:#111}
+  .container{width:min(520px,92vw); padding:20px; box-sizing:border-box; display:grid; gap:12px; align-items:center}
+  .row{display:flex; justify-content:space-between; align-items:center; gap:12px}
+  .labels{display:flex; justify-content:space-between; font-size:0.85rem; opacity:0.85; user-select:none}
+  input[type="range"]{width:100%; appearance:none; height:28px; background:transparent; margin:6px 0}
+  input[type="range"]::-webkit-slider-runnable-track{height:6px; background:#e6e6e6; border-radius:6px}
+  input[type="range"]::-webkit-slider-thumb{appearance:none; margin-top:-8px; width:20px; height:20px; border-radius:50%; background:#111; cursor:pointer}
+  input[type="range"]::-moz-range-track{height:6px; background:#e6e6e6; border-radius:6px}
+  input[type="range"]::-moz-range-thumb{width:20px; height:20px; border-radius:50%; background:#111; border:0}
+  .current-label{font-weight:600; text-align:center; min-height:1.2em}
+  .message{min-height:3.4em; font-size:0.95rem; line-height:1.3; text-align:center; padding:8px 10px}
+  .sr-only{position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden}
+  small{display:block; text-align:center; opacity:0.6; font-size:0.8rem}
+</style>
+</head>
+<body>
+  <main class="container" aria-labelledby="title">
+    <h1 id="title" style="font-size:1rem; margin:0; text-align:center">Échelle de satisfaction</h1>
+
+    <div class="row" role="group" aria-label="Sélection qualitatives">
+      <div style="flex:1">
+        <!-- curseur discret -->
+        <input id="slider" type="range" min="0" max="3" step="1" value="2" aria-valuemin="0" aria-valuemax="3" aria-valuenow="2" aria-labelledby="currentLabel" />
+        <div class="labels" aria-hidden="true">
+          <span>très décevant</span>
+          <span>décevant</span>
+          <span>bien</span>
+          <span>merveilleux</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div id="currentLabel" class="current-label" aria-live="polite">Bien</div>
+      <div id="message" class="message" aria-live="polite">Tout est correct : expérience satisfaisante.</div>
+    </div>
+
+    <small>Utilisez les flèches gauche/droite pour ajuster — le texte change en direct.</small>
+
+    <p class="sr-only" id="instructions">Déplacez le curseur pour choisir entre très décevant, décevant, bien et merveilleux.</p>
+  </main>
+
+<script>
+/*
+  Personnalisez ici les textes affichés pour chaque position.
+  Indices: 0 -> très décevant, 1 -> décevant, 2 -> bien, 3 -> merveilleux
+*/
+const labels = ["MISANTHROPE", "BANAL", "bien", "TRIADIQUE"];
+
+/* Texte principal affiché pour chaque position — modifiez librement. */
+const messages = [
+  "MISANTHROPE : J’ai tendance à penser ma vie comme un cycle de renaissances, marqué par des interruptions, des moments de rupture et des phases où tout recommence avec un nouveau paradigme, de nouvelles règles, de nouveaux comportements et des attitudes totalement différentes. D’une manière générale, ce qui est resté toutefois invariable au cours de ces derniers cycles, c’est une forme d’ingratitude et de manque d’efficacité chez les gens. D’une part, mes investissements n’ont pas toujours mené à une simple reconnaissance, et là où j’imaginais les relations sociales comme une sorte de pot commun dans lequel chacun donnerait sans trop regarder, je me suis souvent aperçu que j’étais le seul à y contribuer. Pourtant, je pense qu’il est important de garder espoir en l’humanité autant que possible, et de toujours partir en quête d’un cercle social au sein duquel nos aspirations peuvent se réaliser, même si cela est difficile. Ce n’est pas simplement une recherche, mais aussi un travail de réflexion sur soi et sur les autres. Toutefois, il existe selon moi des constantes : cette forme de générosité naturelle devrait être indispensable au sein d’un cercle d’amis. Ainsi, bien que le pot se brise régulièrement, j’ai toujours tenu à le reconstruire et à y remettre des pièces, à renaître sous des formes plus adaptées et plus justes, afin de mieux correspondre aux aspirations sociales qui étaient les miennes. Mais il est fort probable qu’un jour je n’aie plus l’énergie de reconstruire ce pot, et que je préfère alors l’isolement. Il existe également un problème d’efficacité qui me détachera probablement de l’humanité et me poussera vers la misanthropie : c’est le manque d’efficacité des gens. D’une manière générale, nous nous engageons dans certaines tâches parce que des pulsions, des émotions ou des sentiments nous poussent à nous réaliser à travers des objectifs personnels. Cela signifie que nous prenons rarement les choses extérieures à nous véritablement au sérieux. Le plus souvent, nous ne les considérons que sous l’angle de ce qu’elles reflètent de nous ou de ce que nous y avons investi. Cela révèle un manque de sérieux et d’efficacité qui semble isoler chacun dans sa propre subjectivité, enfermé en lui-même ; dans cette perspective, les relations sociales ne seraient alors que de simples malentendus.",
+  "BANAL : On passe notre temps à rêver que des choses extraordinaires pourraient nous arriver ; on imagine des futurs possibles, des scénarios grandioses. On se projette ici et là, et les circonstances de la vie nous poussent parfois à revoir nos ambitions à la hausse, comme si tout était sur le point de basculer en notre faveur. Mais il arrive aussi que l’on se retrouve seul, dans un square ou chez soi, avec l’impression que le monde avance sans nous. Comme si l’on était devenu un esprit, un fantôme, observant la vie défiler sans pouvoir y exercer la moindre influence. Alors, tous les rêves qu’on avait construits se désagrègent sous nos yeux. Par rapport à tout ce que l’on avait imaginé, la réalité se révèle profondément différente : on voit le temps passer, sans évoluer, sans atteindre ce que l’on avait espéré. Et l’on comprend que tout cela n’était peut-être qu’une belle illusion.",
+  "Tout est correct : expérience satisfaisante.",
+  "TRIADIQUE : Je rencontrerai enfin les gens que je dois rencontrer. Nos talents s'uniraient pour n'en former qu'un, et réaliser la palingénésie."
+];
+
+const shortLabels = ["MISANTHROPE", "BANAL", "Bien", "Merveilleux"]; // version courte pour l'en-tête si souhaité
+
+const slider = document.getElementById("slider");
+const currentLabel = document.getElementById("currentLabel");
+const message = document.getElementById("message");
+
+// Initialise l'affichage en fonction de la valeur initiale
+function updateDisplay(value){
+  const v = Number(value);
+  currentLabel.textContent = shortLabels[v] || labels[v] || v;
+  message.textContent = messages[v] || "";
+  slider.setAttribute("aria-valuenow", String(v));
+}
+
+// Événements : mise à jour en direct (input) et au changement (change)
+slider.addEventListener("input", e => updateDisplay(e.target.value));
+slider.addEventListener("change", e => updateDisplay(e.target.value));
+
+// Accessibilité : permettre sauts (si l'utilisateur souhaite) via touches +/- (optionnel)
+slider.addEventListener("keydown", e => {
+  if (e.key === "+" || e.key === "=") {
+    e.preventDefault();
+    slider.stepUp();
+    updateDisplay(slider.value);
+  } else if (e.key === "-" || e.key === "_") {
+    e.preventDefault();
+    slider.stepDown();
+    updateDisplay(slider.value);
+  }
+});
+
+// initial
+updateDisplay(slider.value);
+</script>
+</body>
+</html>
