@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mini Jardin</title>
+  <title>Mini Jardin Auto</title>
   <style>
     body {
       font-family: sans-serif;
@@ -16,17 +16,12 @@
       background: #f0f6f0;
       color: #234;
     }
-    select, button {
-      margin: 6px;
+    select {
+      margin: 10px;
       padding: 8px 12px;
       border-radius: 8px;
       border: none;
       font-size: 1em;
-    }
-    button {
-      background: #2b9348;
-      color: white;
-      cursor: pointer;
     }
     #pot {
       width: 200px;
@@ -60,13 +55,8 @@
   </style>
 </head>
 <body>
-  <h2>Mini Jardin</h2>
+  <h2>Mini Jardin Auto</h2>
   <select id="seedSelect"></select>
-  <div>
-    <button id="plantBtn">Planter</button>
-    <button id="waterBtn" disabled>Arroser</button>
-    <button id="startBtn" disabled>Démarrer</button>
-  </div>
   <div id="pot">
     <img id="plantImg" src="" alt="plant" />
   </div>
@@ -74,68 +64,58 @@
   <p id="timer">--:--</p>
 
   <script>
+    // 🪴 Personnalisez ici vos plantes :
+    // Ajoutez, supprimez ou modifiez simplement les objets ci-dessous.
+    // Vous pouvez fournir une image personnalisée (chemin ou URL), sinon une version SVG simplifiée sera utilisée.
     const PLANTS = [
-      {id:'sunflower', name:'Tournesol', growTime:15, color:'#f5c22b'},
-      {id:'herb', name:'Herbe', growTime:10, color:'#6cbf6c'},
-      {id:'tomato', name:'Tomate', growTime:20, color:'#d84d4d'}
+      {name: 'Tournesol', growTime: 15, color: '#f5c22b', image: ''},
+      {name: 'Herbe', growTime: 10, color: '#6cbf6c', image: ''},
+      {name: 'Tomate', growTime: 20, color: '#d84d4d', image: ''}
     ];
 
     const seedSelect = document.getElementById('seedSelect');
-    const plantBtn = document.getElementById('plantBtn');
-    const waterBtn = document.getElementById('waterBtn');
-    const startBtn = document.getElementById('startBtn');
     const plantImg = document.getElementById('plantImg');
     const bar = document.getElementById('bar');
     const timerEl = document.getElementById('timer');
 
-    PLANTS.forEach(p => {
+    PLANTS.forEach((p, i) => {
       const opt = document.createElement('option');
-      opt.value = p.id;
+      opt.value = i;
       opt.textContent = p.name;
       seedSelect.appendChild(opt);
     });
 
-    let selected = PLANTS[0];
-    let elapsed = 0;
     let timer = null;
-    let hydration = 0;
 
-    seedSelect.addEventListener('change', e => {
-      selected = PLANTS.find(p => p.id === e.target.value);
+    seedSelect.addEventListener('change', (e) => {
+      const plant = PLANTS[e.target.value];
+      startGrowth(plant);
     });
 
-    plantBtn.addEventListener('click', () => {
-      plantImg.src = makeSeed(selected.color);
-      plantImg.style.opacity = 1;
-      waterBtn.disabled = false;
-      startBtn.disabled = false;
+    function startGrowth(plant) {
+      clearInterval(timer);
       bar.style.width = '0%';
-      elapsed = 0;
-      hydration = 0;
-    });
+      plantImg.style.opacity = 0;
+      plantImg.src = plant.image || makeSeed(plant.color);
+      const total = plant.growTime;
+      let elapsed = 0;
 
-    waterBtn.addEventListener('click', () => {
-      hydration++;
-    });
+      setTimeout(() => plantImg.style.opacity = 1, 200);
 
-    startBtn.addEventListener('click', () => {
-      if (timer) return;
-      const total = selected.growTime;
       timer = setInterval(() => {
-        const boost = 1 + hydration * 0.2;
-        elapsed += 0.2 * boost;
+        elapsed += 0.2;
         const pct = Math.min(1, elapsed / total);
         bar.style.width = pct * 100 + '%';
         timerEl.textContent = formatTime(total - elapsed);
 
-        if (pct > 0.5 && pct < 1) plantImg.src = makeGrowing(selected.color);
+        if (pct > 0.5 && pct < 1) plantImg.src = plant.image || makeGrowing(plant.color);
         if (pct >= 1) {
-          plantImg.src = makeFinal(selected.color);
           clearInterval(timer);
-          timer = null;
+          plantImg.src = plant.image || makeFinal(plant.color);
+          timerEl.textContent = '00:00';
         }
       }, 200);
-    });
+    }
 
     function makeSeed(c) {
       return `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><ellipse cx='50' cy='60' rx='10' ry='6' fill='${c}' /></svg>`)}`;
@@ -153,6 +133,9 @@
       const s = Math.floor(sec % 60).toString().padStart(2, '0');
       return `${m}:${s}`;
     }
+
+    // Lance automatiquement la première plante par défaut
+    startGrowth(PLANTS[0]);
   </script>
 </body>
 </html>
