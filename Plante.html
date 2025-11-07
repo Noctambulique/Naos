@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Petite jardinerie interactive</title>
+  <style>
+    :root{
+      --bg:#f3f7ef; --card:#ffffff; --accent:#2b9348; --muted:#6c6c6c;
+      --glass: rgba(255,255,255,0.7);
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background: linear-gradient(180deg,#eaf6ea 0%, #f7fcf7 100%); color:#213;}
+    .wrap{max-width:1100px;margin:28px auto;padding:20px;display:grid;grid-template-columns:360px 1fr;gap:22px}
+    .card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 24px rgba(20,30,20,0.06)}
+
+    /* panneau de sélection */
+    .seed-list{display:flex;flex-direction:column;gap:12px}
+    .seed{display:flex;align-items:center;gap:12px;padding:8px;border-radius:10px;cursor:pointer;border:1px solid transparent}
+    .seed:hover{border-color:#e0efe0;background:var(--glass)}
+    .seed img{width:56px;height:56px;object-fit:contain;border-radius:8px}
+    .meta{flex:1}
+    .name{font-weight:600}
+    .sub{font-size:13px;color:var(--muted)}
+
+    /* jardin */
+    .garden{display:flex;flex-direction:column;align-items:center;gap:18px;padding:20px}
+    .pot{width:320px;height:320px;border-radius:18px;background:linear-gradient(180deg,#dbe8d7,#cde2c7);display:flex;align-items:flex-end;justify-content:center;position:relative;box-shadow:inset 0 -12px 30px rgba(20,40,20,0.06)}
+    .soil{width:88%;height:28%;background:#6b4b2f;border-radius:10px 10px 24px 24px;position:absolute;bottom:32px}
+    .seed-img{position:absolute;bottom:90px;transition:all 0.6s ease;filter:drop-shadow(0 6px 14px rgba(30,40,30,0.15))}
+    .controls{display:flex;gap:10px;align-items:center}
+    button{background:var(--accent);border:none;color:white;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
+    button.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+    .progress-wrap{width:100%;background:#e9efe9;height:18px;border-radius:12px;overflow:hidden}
+    .progress{height:100%;width:0%;background:linear-gradient(90deg,#73c267,#2b9348);transition:width 0.3s linear}
+    .hud{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:8px}
+
+    /* mini HUD */
+    .hud .stat{font-size:13px;color:var(--muted)}
+
+    /* responsive */
+    @media (max-width:900px){.wrap{grid-template-columns:1fr;}}
+
+    /* petites animations */
+    .wobble{animation:wobble 1s ease-in-out}
+    @keyframes wobble{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h2>Sélectionner une graine</h2>
+      <p style="color:var(--muted);margin:6px 0 14px">Choisissez une graine. Vous pouvez personnaliser facilement la liste des plantes dans le script (variable <code>PLANTS</code>).</p>
+      <div class="seed-list" id="seedList"></div>
+
+      <hr style="margin:18px 0;opacity:0.6">
+      <h3>Personnalisation rapide</h3>
+      <p style="color:var(--muted);margin:6px 0 10px">Pour ajouter/modifier une plante : éditez la constante <code>PLANTS</code> (en haut du script). Chaque plante a <code>id</code>, <code>name</code>, <code>growTime</code> (sec), et <code>images</code> (seed/growing/final) ou vous pouvez fournir une couleur.</p>
+    </div>
+
+    <div class="card garden">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+        <div>
+          <h2 id="selectedName">Aucune plante sélectionnée</h2>
+          <div class="sub" id="selectedInfo">Choisissez une graine à gauche pour commencer</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="text-align:right">
+            <div style="font-weight:700" id="timerDisplay">--:--</div>
+            <div class="sub">Temps restant</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pot" id="pot">
+        <div class="soil"></div>
+        <!-- zone où l'image du végétal apparaîtra -->
+        <img id="plantImg" class="seed-img" src="" alt="plant" style="width:140px;opacity:0" />
+      </div>
+
+      <div style="width:100%;max-width:720px">
+        <div class="controls" style="justify-content:space-between">
+          <div style="display:flex;gap:10px">
+            <button id="plantBtn" class="ghost" disabled>Planter</button>
+            <button id="waterBtn" disabled>Arroser 💧</button>
+            <button id="startBtn" disabled>Démarrer le chrono ▶</button>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <label class="sub">Vitesse de croissance</label>
+            <input id="speedRange" type="range" min="0.4" max="2" step="0.1" value="1" />
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="progress-wrap"><div id="progress" class="progress"></div></div>
+          <div class="hud">
+            <div class="stat" id="waterStat">Hydratation: 0</div>
+            <div class="stat" id="growStat">État: inactif</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /************************************************************************
+     * CONFIGURATION
+     * Editez la liste PLANTS pour ajouter/supprimer/modifier vos graines.
+     * Chaque objet:
+     *  - id: identifiant unique
+     *  - name: nom affiché
+     *  - growTime: durée de croissance en secondes
+     *  - images: {seed, growing, final} - URL ou null pour utiliser l'icône SVG par défaut
+     *  - color (optionnel): couleur de base si pas d'images
+     *
+     * Exemple: {id:'tom', name:'Tomate', growTime:20, images:{seed:'url',growing:'url',final:'url'}}
+     ************************************************************************/
+
+    const PLANTS = [
+      {
+        id: 'sunflower',
+        name: 'Tournesol',
+        growTime: 25, // secondes
+        images: {
+          seed: null,
+          growing: null,
+          final: null
+        },
+        color: '#f5c22b'
+      },
+      {
+        id: 'herb',
+        name: 'Herbe',
+        growTime: 12,
+        images: {seed: null, growing: null, final: null},
+        color: '#6cbf6c'
+      },
+      {
+        id: 'tomato',
+        name: 'Tomate',
+        growTime: 30,
+        images: {seed: null, growing: null, final: null},
+        color: '#d84d4d'
+      }
+    ];
+
+    // ---- icônes SVG par défaut (utilisées si images.* == null) ----
+    const svgSeed = (c='#6c6') => `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 100 100'>
+        <g>
+          <ellipse cx='50' cy='58' rx='12' ry='8' fill='${c}' />
+          <ellipse cx='50' cy='58' rx='6' ry='3' fill='rgba(0,0,0,0.12)' />
+        </g>
+      </svg>
+    `)}`;
+
+    const svgGrowing = (c='#6c6') => `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 200 200'>
+        <g>
+          <path d='M100 160 C95 130 110 100 100 80 C90 100 105 130 100 160' fill='${c}' />
+          <rect x='92' y='70' width='16' height='40' rx='6' fill='${c}' opacity='0.95'/>
+        </g>
+      </svg>
+    `)}`;
+
+    const svgFinal = (c='#6c6') => `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 200 200'>
+        <g>
+          <ellipse cx='100' cy='120' rx='36' ry='24' fill='${c}' />
+          <path d='M80 90 C90 60 110 60 120 90 C140 70 160 70 150 90 C170 90 170 110 140 110 C110 110 100 140 80 120' fill='${c}' stroke='rgba(0,0,0,0.06)' />
+        </g>
+      </svg>
+    `)}`;
+
+    // ---- logique d'interface ----
+    const seedListEl = document.getElementById('seedList');
+    const selectedName = document.getElementById('selectedName');
+    const selectedInfo = document.getElementById('selectedInfo');
+    const plantBtn = document.getElementById('plantBtn');
+    const waterBtn = document.getElementById('waterBtn');
+    const startBtn = document.getElementById('startBtn');
+    const plantImg = document.getElementById('plantImg');
+    const progressEl = document.getElementById('progress');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const waterStat = document.getElementById('waterStat');
+    const growStat = document.getElementById('growStat');
+    const speedRange = document.getElementById('speedRange');
+
+    let selectedPlant = null;
+    let planted = false;
+    let elapsed = 0;
+    let timer = null;
+    let hydration = 0; // compteur d'arrosages récents
+    let lastWaterAt = 0;
+
+    function formatTime(sec){
+      if(sec<0) sec=0;
+      const m = Math.floor(sec/60).toString().padStart(2,'0');
+      const s = Math.floor(sec%60).toString().padStart(2,'0');
+      return `${m}:${s}`;
+    }
+
+    function renderSeedList(){
+      seedListEl.innerHTML = '';
+      PLANTS.forEach(p =>{
+        const el = document.createElement('div'); el.className='seed';
+        el.innerHTML = `
+          <img src="${p.images.seed || svgSeed(p.color||'#7fc97f')}" alt="${p.name}" />
+          <div class="meta">
+            <div class="name">${p.name}</div>
+            <div class="sub">Durée: ${p.growTime}s — id: ${p.id}</div>
+          </div>
+        `;
+        el.addEventListener('click',()=>selectPlant(p));
+        seedListEl.appendChild(el);
+      });
+    }
+
+    function selectPlant(p){
+      selectedPlant = JSON.parse(JSON.stringify(p)); // clone pour sécurité
+      selectedName.textContent = p.name;
+      selectedInfo.textContent = `Temps de croissance: ${p.growTime} secondes • modifiable dans PLANTS`;
+      plantBtn.disabled = false;
+      startBtn.disabled = true;
+      waterBtn.disabled = true;
+      planted = false; elapsed=0; hydration=0; lastWaterAt=0; updateHUD();
+      plantImg.style.opacity = 0; plantImg.style.transform='translateY(0)';
+    }
+
+    plantBtn.addEventListener('click',()=>{
+      if(!selectedPlant) return;
+      // planter
+      planted = true; elapsed = 0; hydration = 0; lastWaterAt = Date.now();
+      startBtn.disabled = false; waterBtn.disabled = false;
+      plantImg.src = selectedPlant.images.seed || svgSeed(selectedPlant.color||'#7fc97f');
+      plantImg.style.width = '120px'; plantImg.style.opacity = 1; plantImg.classList.add('wobble');
+      setTimeout(()=>plantImg.classList.remove('wobble'),900);
+      growStat.textContent = 'État : planté';
+      updateHUD();
+    });
+
+    waterBtn.addEventListener('click',()=>{
+      if(!planted) return;
+      hydration += 1; lastWaterAt = Date.now();
+      waterStat.textContent = `Hydratation: ${hydration}`;
+      plantImg.classList.add('wobble'); setTimeout(()=>plantImg.classList.remove('wobble'),800);
+    });
+
+    startBtn.addEventListener('click',()=>{
+      if(!planted || timer) return;
+      const total = selectedPlant.growTime;
+      const start = Date.now();
+      timer = setInterval(()=>{
+        // main loop : avancée en fonction du temps, de l'arrosage, et de la vitesse choisie
+        const now = Date.now();
+        const baseDelta = (now - start)/1000; // seconds since start
+        // compute effective elapsed influenced by hydration: each water gives a growth boost
+        const speed = parseFloat(speedRange.value) || 1;
+        // hydration effect: small bonus per water (cumulative but with diminishing returns)
+        const hydBonus = 1 + Math.min(0.6, hydration * 0.12);
+        elapsed = baseDelta * speed * hydBonus;
+        const pct = Math.min(1, elapsed/total);
+        progressEl.style.width = (pct*100) + '%';
+        // swap images at thresholds
+        if(pct>0.6){
+          plantImg.src = selectedPlant.images.final || svgFinal(selectedPlant.color||'#7fc97f');
+          plantImg.style.width = '220px';
+        } else if(pct>0.25){
+          plantImg.src = selectedPlant.images.growing || svgGrowing(selectedPlant.color||'#7fc97f');
+          plantImg.style.width = '160px';
+        }
+        const remaining = Math.ceil(Math.max(0, total - (elapsed)));
+        timerDisplay.textContent = formatTime(remaining);
+        growStat.textContent = pct>=1 ? 'État : arrivé à maturité 🎉' : 'État : en croissance';
+        if(pct>=1){
+          clearInterval(timer); timer = null; onComplete();
+        }
+      },250);
+      startBtn.disabled = true;
+    });
+
+    function onComplete(){
+      // affiche la grande image finale, petite confetti simple
+      plantImg.src = selectedPlant.images.final || svgFinal(selectedPlant.color||'#7fc97f');
+      plantImg.style.width = '260px';
+      progressEl.style.width = '100%';
+      timerDisplay.textContent = '00:00';
+      growStat.textContent = 'Terminé — récoltez !';
+      // animation visuelle simple: petite pluie de points
+      for(let i=0;i<12;i++){
+        const c = document.createElement('div');
+        c.style.position='absolute'; c.style.width='8px'; c.style.height='8px'; c.style.borderRadius='50%';
+        c.style.left=(50+Math.random()*30-15)+'%'; c.style.bottom=(60+Math.random()*60)+'px';
+        c.style.background=(Math.random()>0.5?'#ffe27a':'#ffd1d1'); c.style.opacity='0.95';
+        c.style.transform='translateY(0)'; c.style.transition='transform 900ms cubic-bezier(.2,.9,.3,1),opacity 900ms';
+        document.getElementById('pot').appendChild(c);
+        setTimeout(()=>{c.style.transform='translateY(80px)'; c.style.opacity='0'},300 + i*30);
+        setTimeout(()=>c.remove(),1400 + i*30);
+      }
+    }
+
+    function updateHUD(){
+      waterStat.textContent = `Hydratation: ${hydration}`;
+      progressEl.style.width = '0%';
+      timerDisplay.textContent = '--:--';
+      growStat.textContent = planted ? 'Prêt à démarrer' : 'Inactif';
+    }
+
+    // initial render
+    renderSeedList(); updateHUD();
+
+    // conseils pour personnalisation (affichés dans la console pour développeur)
+    console.info('Jeu de plantes initialisé. Pour ajouter une plante, modifiez la constante PLANTS en haut du script.');
+  </script>
+</body>
+</html>
