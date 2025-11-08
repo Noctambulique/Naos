@@ -3,154 +3,78 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Rectangles empilés — Minimal</title>
+  <title>Rectangles empilés</title>
   <style>
-    :root{
-      --bg: #f7f7f8;
-      --card: #ffffff;
-      --accent: #111111;
-      --muted: #6b6b6b;
-      --gap: 18px; /* espacement entre cartes (valeur positive réduit le recouvrement) */
-      --card-w: min(460px, 88vw);
-      --card-h: 92px;
-      --overlap: -24px; /* valeur négative = recouvrement; positive = espacement simple */
-      --radius: 14px;
-      --shadow: 0 8px 20px rgba(15,15,15,0.06);
-      --font: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      --transition: 280ms cubic-bezier(.2,.9,.25,1);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:var(--font);
-      background:var(--bg);
-      color:var(--accent);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:40px 20px;
+    body {
+      background: #fafafa;
+      color: #333;
+      font-family: Georgia, serif;
+      margin: 0;
+      padding: 40px 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
     }
 
-    /* Conteneur central */
-    .stack{
-      width:var(--card-w);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      position:relative;
-      padding-top:80px; /* donne de l'air au dessus de la pile */
-      padding-bottom:80px;
+    .stack {
+      width: 400px;
     }
 
-    /* Carte */
-    .card{
-      width:100%;
-      height:var(--card-h);
-      background:var(--card);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      display:flex;
-      align-items:center;
-      padding:18px 20px;
-      gap:12px;
-      cursor:pointer;
-      user-select:none;
-      position:relative;
-      transition:transform var(--transition), box-shadow var(--transition), height var(--transition);
-      overflow:hidden;
-      border:1px solid rgba(0,0,0,0.04);
-    }
-    /* Empilement: chaque carte est remontée pour recouvrir la précédente */
-    .card:not(:first-child){
-      margin-top:var(--overlap);
+    .card {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-top: -15px;
+      padding: 15px;
+      cursor: pointer;
+      transition: background 0.2s;
     }
 
-    .card .meta{
-      flex:1 1 auto;
-      min-width:0;
-    }
-    .title{
-      font-weight:600;
-      font-size:16px;
-      line-height:1.1;
-      color:var(--accent);
-      margin:0 0 6px 0;
-      white-space:nowrap;
-      text-overflow:ellipsis;
-      overflow:hidden;\    }
-    .subtitle{
-      margin:0;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.2;
-      opacity:0.95;
+    .card:hover {
+      background: #f2f2f2;
     }
 
-    /* zone de contenu révélée */
-    .content{
-      width:100%;
-      padding:18px 20px;
-      box-sizing:border-box;
-      font-size:14px;
-      line-height:1.5;
-      color:var(--accent);
-      margin-top:12px;
-      display:block;
+    .title {
+      font-weight: bold;
+      font-size: 16px;
+      margin: 0 0 5px;
     }
 
-    /* état ouvert */
-    .card.open{
-      height:auto; /* laisse le contenu définir la hauteur */
-      transform:translateY(-6px) scale(1.01);
-      box-shadow:0 18px 50px rgba(12,12,12,0.09);
+    .subtitle {
+      font-size: 13px;
+      color: #777;
+      margin: 0 0 10px;
     }
 
-    /* Indicateur discret */
-    .chev{
-      font-size:12px;
-      color:var(--muted);
-      transform-origin:center;
-      transition:transform var(--transition);
-    }
-    .card.open .chev{transform:rotate(180deg)}
-
-    /* Minimal responsive */
-    @media (max-width:520px){
-      :root{--card-h:84px; --radius:12px}
-      .title{font-size:15px}
+    .content {
+      display: none;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-top: 10px;
     }
 
-    /* petits helpers pour paragraphes */
-    .content p{margin:0 0 12px 0}
-    .content p:last-child{margin-bottom:0}
+    .card.open .content {
+      display: block;
+    }
+
+    .chev {
+      float: right;
+      font-size: 12px;
+      color: #777;
+    }
   </style>
 </head>
 <body>
-
   <main class="stack" id="stack"></main>
-
   <script>
-    /*
-      -- Instructions de personnalisation (modifiez ci-dessous) --
-      items: tableau d'objets {title, text}
-      text doit contenir des séquences littérales "\\n" pour un saut de ligne et "\\n\\n" pour un saut de paragraphe.
-      Variables CSS en haut du fichier pour couleurs / taille / recouvrement.
-    */
-
     const items = [
-      { title: 'Barthes', text: 'L’autre est en état de perpétuel départ, de voyage ; il est, par vocation, migrateur, fuyant ; je suis, moi qui aime, par vocation inverse, sédentaire, immobile, à disposition, en attente, tassé sur place, en souffrance, comme un paquet dans un coin perdu de gare. \n \n Je tiens sans fin à l’absent le discours de son absence ; situation en somme inouïe ; l’autre est absent comme référent, présent comme allocutaire. De cette distorsion singulière, naît une sorte de présent insoutenable ; je suis coincé entre deux temps, le temps de la référence et le temps de l’allocution : tu es parti (de quoi je me plains), tu es là (puisque je m’adresse à toi). Je sais alors ce qu’est le présent, ce temps difficile : un pur morceau d’angoisse\n \n Je m’installe seul, dans un café ; on vient m’y saluer ; je me sens entouré, demandé, flatté. Mais l’autre est absent ; je le convoque en moi même pour qu’il me retienne au bord de cette complaisance mondaine, qui me guette. J’en appelle à sa « vérité » (la vérité dont il me donne la sensation) contre l’hystérie de séduction où je me sens glisser. Je rends l’absence de l’autre responsable de ma mondanité : j’invoque sa protection, son retour : que l’autre apparaisse, qu’il me retire' },
-      { title: 'Carte 2 — Détails', text: 'Une deuxième carte — cliquez pour développer.\nUtilisez \\\n pour revenir à la ligne simple.' },
-      { title: 'Carte 3 — Minimal', text: 'Minimalisme.\n\nSimple, épuré, et personnalisable.' }
+      { title: 'Carte 1 — Intro', text: 'Ceci est un texte de démonstration.\nIl contient plusieurs lignes.\n\nEt un saut de paragraphe après.' },
+      { title: 'Carte 2 — Détails', text: 'Une deuxième carte — cliquez pour développer.\nUtilisez \\n pour revenir à la ligne simple.' },
+      { title: 'Carte 3 — Simple', text: 'Un style plus classique, moins moderne.\n\nFacile à modifier.' }
     ];
 
-    /* Fonction qui convertit une chaîne avec \n et \n\n en HTML avec <p> et <br> */
     function formatText(raw){
-      // On se protège si l'utilisateur passe autre chose que string
       raw = String(raw || '');
-      // Séparer par double saut de ligne pour faire des paragraphes
       const pars = raw.split('\n\n').map(p => p.replace(/\n/g, '<br>'));
       return pars.map(p => `<p>${p}</p>`).join('');
     }
@@ -160,57 +84,34 @@
     items.forEach((it, idx) => {
       const card = document.createElement('article');
       card.className = 'card';
-      card.setAttribute('role','button');
-      card.setAttribute('aria-expanded','false');
-      card.tabIndex = 0;
 
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      const h = document.createElement('h3');
-      h.className = 'title';
-      h.textContent = it.title || `Carte ${idx+1}`;
-      const sub = document.createElement('p');
-      sub.className = 'subtitle';
-      sub.textContent = (it.subtitle !== undefined) ? it.subtitle : ' ';
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = it.title || `Carte ${idx+1}`;
 
-      meta.appendChild(h);
-      meta.appendChild(sub);
-
-      const chev = document.createElement('div');
+      const chev = document.createElement('span');
       chev.className = 'chev';
-      chev.innerHTML = '\u25BE'; // petite flèche
+      chev.textContent = '▼';
+      title.appendChild(chev);
 
-      card.appendChild(meta);
-      card.appendChild(chev);
+      const sub = document.createElement('div');
+      sub.className = 'subtitle';
+      sub.textContent = 'Cliquez pour développer';
 
-      // zone de contenu (masquée par défaut)
       const content = document.createElement('div');
       content.className = 'content';
-      content.innerHTML = formatText(it.text || '');
-      content.style.display = 'none';
+      content.innerHTML = formatText(it.text);
+
+      card.appendChild(title);
+      card.appendChild(sub);
       card.appendChild(content);
 
-      // Toggle ouverture/fermeture
-      function toggle(){
-        const open = card.classList.toggle('open');
-        card.setAttribute('aria-expanded', String(open));
-        content.style.display = open ? 'block' : 'none';
-        // Scroll léger pour que la carte ouverte soit bien visible
-        if(open){
-          setTimeout(()=>card.scrollIntoView({behavior:'smooth', block:'center'}), 40);
-        }
-      }
-
-      card.addEventListener('click', toggle);
-      card.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+      card.addEventListener('click', () => {
+        card.classList.toggle('open');
+      });
 
       stack.appendChild(card);
     });
-
-    /* Pour faciliter la personnalisation :
-       - modifiez 'items' ci-dessus
-       - ou changez les variables CSS : couleurs, --overlap, --card-w, --card-h, etc.
-    */
   </script>
 </body>
 </html>
