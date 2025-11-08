@@ -37,13 +37,7 @@
     .title {
       font-weight: bold;
       font-size: 16px;
-      margin: 0 0 5px;
-    }
-
-    .subtitle {
-      font-size: 13px;
-      color: #777;
-      margin: 0 0 10px;
+      margin: 0;
     }
 
     .content {
@@ -94,16 +88,11 @@
       chev.textContent = '▼';
       title.appendChild(chev);
 
-      const sub = document.createElement('div');
-      sub.className = 'subtitle';
-      sub.textContent = 'Cliquez pour développer';
-
       const content = document.createElement('div');
       content.className = 'content';
       content.innerHTML = formatText(it.text);
 
       card.appendChild(title);
-      card.appendChild(sub);
       card.appendChild(content);
 
       card.addEventListener('click', () => {
