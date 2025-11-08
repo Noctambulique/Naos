@@ -17,15 +17,15 @@
     }
 
     .stack {
-      width: 400px;
+      width: 420px;
     }
 
     .card {
       background: white;
       border: 1px solid #ccc;
       border-radius: 4px;
-      margin-top: -15px;
-      padding: 15px;
+      margin-top: -18px;
+      padding: 20px 18px 24px 18px;
       cursor: pointer;
       transition: background 0.2s;
     }
@@ -50,12 +50,6 @@
     .card.open .content {
       display: block;
     }
-
-    .chev {
-      float: right;
-      font-size: 12px;
-      color: #777;
-    }
   </style>
 </head>
 <body>
@@ -63,7 +57,7 @@
   <script>
     const items = [
       { title: 'Carte 1 — Intro', text: 'Ceci est un texte de démonstration.\nIl contient plusieurs lignes.\n\nEt un saut de paragraphe après.' },
-      { title: 'Carte 2 — Détails', text: 'Une deuxième carte — cliquez pour développer.\nUtilisez \\n pour revenir à la ligne simple.' },
+      { title: 'Carte 2 — Détails', text: 'Une deuxième carte.\nUtilisez \\n pour revenir à la ligne simple.' },
       { title: 'Carte 3 — Simple', text: 'Un style plus classique, moins moderne.\n\nFacile à modifier.' }
     ];
 
@@ -82,11 +76,6 @@
       const title = document.createElement('div');
       title.className = 'title';
       title.textContent = it.title || `Carte ${idx+1}`;
-
-      const chev = document.createElement('span');
-      chev.className = 'chev';
-      chev.textContent = '▼';
-      title.appendChild(chev);
 
       const content = document.createElement('div');
       content.className = 'content';
