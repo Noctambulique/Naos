@@ -43,37 +43,13 @@
 </head>
 <body>
   <h1>Deux titres par ligne</h1>
-  <div class="grid" id="grid">
+  <div class="grid">
     <a class="item" href="https://example.com/page1">Titre 1</a>
     <a class="item" href="https://example.com/page2">Titre 2</a>
     <a class="item" href="https://example.com/page3">Titre 3</a>
     <a class="item" href="https://example.com/page4">Titre 4</a>
+    <a class="item" href="https://example.com/page5">Titre 5</a>
+    <a class="item" href="https://example.com/page6">Titre 6</a>
   </div>
-
-  <div style="text-align:center; margin-top:20px;">
-    <input id="title1" placeholder="Titre gauche"> 
-    <input id="link1" placeholder="Lien gauche"> 
-    <input id="title2" placeholder="Titre droite"> 
-    <input id="link2" placeholder="Lien droite"> 
-    <button id="add">Ajouter</button>
-  </div>
-
-  <script>
-    const grid = document.getElementById('grid');
-    document.getElementById('add').onclick = () => {
-      const t1 = document.getElementById('title1').value;
-      const l1 = document.getElementById('link1').value;
-      const t2 = document.getElementById('title2').value;
-      const l2 = document.getElementById('link2').value;
-
-      if (t1 && l1) grid.innerHTML += `<a class='item' href='${l1}' target='_blank'>${t1}</a>`;
-      if (t2 && l2) grid.innerHTML += `<a class='item' href='${l2}' target='_blank'>${t2}</a>`;
-
-      document.getElementById('title1').value = '';
-      document.getElementById('link1').value = '';
-      document.getElementById('title2').value = '';
-      document.getElementById('link2').value = '';
-    };
-  </script>
 </body>
 </html>
