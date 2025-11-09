@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galerie d'images pleine largeur</title>
+  <style>
+    /* --- Variables faciles à personnaliser --- */
+    :root{
+      --gap: 0.75rem;          /* espace entre les images */
+      --max-image-height: 80vh;/* hauteur max d'une image (ajuster si besoin) */
+      --caption-bg: rgba(0,0,0,0.45);
+      --caption-color: #fff;
+      --caption-padding: 0.5rem 0.75rem;
+      --page-bg: #111;
+    }
+
+    /* --- Reset & base --- */
+    html,body{
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: var(--page-bg);
+      color: #fff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-x: hidden; /* empêche le scroll horizontal quand l'image est 100vw */
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    /* Gallery wrapper */
+    .gallery{
+      display: grid;
+      gap: var(--gap);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Chaque "ligne" est une figure qui contient l'image et éventuellement une légende */
+    figure{
+      margin: 0; /* important pour coller les images les unes aux autres comme vous voulez */
+      position: relative;
+      display: block;
+      width: 100vw; /* occupe toute la largeur de la fenêtre */
+      transform: translateX(calc((100% - 100vw) / 2));
+      /* translateX centre le contenu si le body a padding ou scrollbar ; conserve largeur pleine page */
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* Images : pleine largeur, coupe propre si nécessaire */
+    figure img{
+      display: block;
+      width: 100vw;       /* prend toute la largeur de la fenêtre */
+      height: auto;       /* la hauteur suit le ratio naturel */
+      max-height: var(--max-image-height);
+      object-fit: cover;  /* coupe les bords si l'image est trop haute pour garder l'esthétique */
+      object-position: center center;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    /* Légende optionnelle positionnée en bas de chaque image */
+    figcaption{
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: var(--caption-padding);
+      background: var(--caption-bg);
+      color: var(--caption-color);
+      font-size: 0.95rem;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Responsive : sur petits écrans, réduire la hauteur max pour éviter d'écraser le contenu */
+    @media (max-width: 600px){
+      :root{ --max-image-height: 55vh; }
+      figcaption{ font-size: 0.9rem; }
+    }
+
+    /* Utilitaires : container centré pour ajout de contenu au-dessus/en-dessous de la galerie */
+    .page-inner{
+      max-width: 1100px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Exemple d'en-tête : facultatif -->
+  <header class="page-inner">
+    <h1 style="margin:0 0 0.5rem 0;">Galerie — images pleine largeur</h1>
+    <p style="margin:0 0 1rem 0; opacity:0.8;">Remplacez les URLs par les vôtres. Code conçu pour être facile à personnaliser.</p>
+  </header>
+
+  <!-- Galerie : remplacez, dupliquez ou supprimez des <figure> selon vos besoins -->
+  <main class="gallery" aria-label="Galerie d'images">
+
+    <figure>
+      <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1920&q=80" alt="Exemple 1" loading="lazy">
+      <figcaption>Exemple de légende (image 1) — changez ou supprimez la balise figcaption si vous n'en voulez pas.</figcaption>
+    </figure>
+
+    <figure>
+      <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80" alt="Exemple 2" loading="lazy">
+      <figcaption>Exemple de légende (image 2)</figcaption>
+    </figure>
+
+    <figure>
+      <img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=1920&q=80" alt="Exemple 3" loading="lazy">
+      <!-- figcaption optionnel -->
+    </figure>
+
+    <!-- Ajoutez autant de figures que nécessaire -->
+  </main>
+
+  <!-- Pied de page facultatif -->
+  <footer class="page-inner">
+    <p style="opacity:0.7; margin-top:1.25rem;">Personnalisation rapide : modifiez les variables CSS en haut (&lt;:root&gt;) pour espacement, hauteur, couleurs, etc.</p>
+  </footer>
+
+</body>
+</html>
