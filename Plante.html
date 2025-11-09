@@ -6,7 +6,6 @@
   <title>Galerie pleine largeur</title>
   <style>
     :root {
-      --gap: 0.75rem;
       --max-image-height: 80vh;
       --page-bg: #000;
     }
@@ -20,7 +19,7 @@
 
     .gallery {
       display: grid;
-      gap: var(--gap);
+      gap: 0; /* aucun espace entre les images */
     }
 
     figure {
@@ -48,7 +47,7 @@
       <img src="plante/Diapositive2.PNG" alt="Image 2" loading="lazy">
     </figure>
     <figure>
-      <img src="plante/Diapositive2.PNG" alt="Image 3" loading="lazy">
+      <img src="plante/Diapositive3.PNG" alt="Image 3" loading="lazy">
     </figure>
   </main>
 </body>
