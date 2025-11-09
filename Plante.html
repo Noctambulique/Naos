@@ -1,141 +1,125 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mini Jardin Auto</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galerie d'images pleine largeur</title>
   <style>
-    body {
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+    /* --- Variables faciles à personnaliser --- */
+    :root{
+      --gap: 0.75rem;          /* espace entre les images */
+      --max-image-height: 80vh;/* hauteur max d'une image (ajuster si besoin) */
+      --caption-bg: rgba(0,0,0,0.45);
+      --caption-color: #fff;
+      --caption-padding: 0.5rem 0.75rem;
+      --page-bg: #111;
+    }
+
+    /* --- Reset & base --- */
+    html,body{
+      height: 100%;
       margin: 0;
-      background: #f0f6f0;
-      color: #234;
+      padding: 0;
+      background: var(--page-bg);
+      color: #fff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-x: hidden; /* empêche le scroll horizontal quand l'image est 100vw */
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     }
-    select {
-      margin: 10px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: none;
-      font-size: 1em;
+
+    /* Gallery wrapper */
+    .gallery{
+      display: grid;
+      gap: var(--gap);
+      width: 100%;
+      box-sizing: border-box;
     }
-    #pot {
-      width: 200px;
-      height: 200px;
-      background: #cfe5cf;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 20px;
+
+    /* Chaque "ligne" est une figure qui contient l'image et éventuellement une légende */
+    figure{
+      margin: 0; /* important pour coller les images les unes aux autres comme vous voulez */
       position: relative;
-    }
-    img {
-      width: 100px;
-      transition: all 1s ease;
-      opacity: 0;
-    }
-    #progress {
-      width: 200px;
-      height: 10px;
-      background: #d9e9d9;
-      border-radius: 10px;
+      display: block;
+      width: 100vw; /* occupe toute la largeur de la fenêtre */
+      transform: translateX(calc((100% - 100vw) / 2));
+      /* translateX centre le contenu si le body a padding ou scrollbar ; conserve largeur pleine page */
+      box-sizing: border-box;
       overflow: hidden;
     }
-    #bar {
-      width: 0%;
-      height: 100%;
-      background: #2b9348;
-      transition: width 0.2s linear;
+
+    /* Images : pleine largeur, coupe propre si nécessaire */
+    figure img{
+      display: block;
+      width: 100vw;       /* prend toute la largeur de la fenêtre */
+      height: auto;       /* la hauteur suit le ratio naturel */
+      max-height: var(--max-image-height);
+      object-fit: cover;  /* coupe les bords si l'image est trop haute pour garder l'esthétique */
+      object-position: center center;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    /* Légende optionnelle positionnée en bas de chaque image */
+    figcaption{
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: var(--caption-padding);
+      background: var(--caption-bg);
+      color: var(--caption-color);
+      font-size: 0.95rem;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Responsive : sur petits écrans, réduire la hauteur max pour éviter d'écraser le contenu */
+    @media (max-width: 600px){
+      :root{ --max-image-height: 55vh; }
+      figcaption{ font-size: 0.9rem; }
+    }
+
+    /* Utilitaires : container centré pour ajout de contenu au-dessus/en-dessous de la galerie */
+    .page-inner{
+      max-width: 1100px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
     }
   </style>
 </head>
 <body>
-  <h2>Mini Jardin Auto</h2>
-  <select id="seedSelect"></select>
-  <div id="pot">
-    <img id="plantImg" src="" alt="plant" />
-  </div>
-  <div id="progress"><div id="bar"></div></div>
-  <p id="timer">--:--</p>
 
-  <script>
-    // 🪴 Personnalisez ici vos plantes :
-    // Ajoutez, supprimez ou modifiez simplement les objets ci-dessous.
-    // Vous pouvez fournir une image personnalisée (chemin ou URL), sinon une version SVG simplifiée sera utilisée.
-    const PLANTS = [
-      {name: 'Tournesol', growTime: 15, color: '#f5c22b', image: ''},
-      {name: 'Herbe', growTime: 10, color: '#6cbf6c', image: ''},
-      {name: 'Tomate', growTime: 20, color: '#d84d4d', image: ''}
-    ];
+  <!-- Exemple d'en-tête : facultatif -->
+  <header class="page-inner">
+    <h1 style="margin:0 0 0.5rem 0;">Galerie — images pleine largeur</h1>
+    <p style="margin:0 0 1rem 0; opacity:0.8;">Remplacez les URLs par les vôtres. Code conçu pour être facile à personnaliser.</p>
+  </header>
 
-    const seedSelect = document.getElementById('seedSelect');
-    const plantImg = document.getElementById('plantImg');
-    const bar = document.getElementById('bar');
-    const timerEl = document.getElementById('timer');
+  <!-- Galerie : remplacez, dupliquez ou supprimez des <figure> selon vos besoins -->
+  <main class="gallery" aria-label="Galerie d'images">
 
-    PLANTS.forEach((p, i) => {
-      const opt = document.createElement('option');
-      opt.value = i;
-      opt.textContent = p.name;
-      seedSelect.appendChild(opt);
-    });
+    <figure>
+      <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1920&q=80" alt="Exemple 1" loading="lazy">
+      <figcaption>Exemple de légende (image 1) — changez ou supprimez la balise figcaption si vous n'en voulez pas.</figcaption>
+    </figure>
 
-    let timer = null;
+    <figure>
+      <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80" alt="Exemple 2" loading="lazy">
+      <figcaption>Exemple de légende (image 2)</figcaption>
+    </figure>
 
-    seedSelect.addEventListener('change', (e) => {
-      const plant = PLANTS[e.target.value];
-      startGrowth(plant);
-    });
+    <figure>
+      <img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=1920&q=80" alt="Exemple 3" loading="lazy">
+      <!-- figcaption optionnel -->
+    </figure>
 
-    function startGrowth(plant) {
-      clearInterval(timer);
-      bar.style.width = '0%';
-      plantImg.style.opacity = 0;
-      plantImg.src = plant.image || makeSeed(plant.color);
-      const total = plant.growTime;
-      let elapsed = 0;
+    <!-- Ajoutez autant de figures que nécessaire -->
+  </main>
 
-      setTimeout(() => plantImg.style.opacity = 1, 200);
+  <!-- Pied de page facultatif -->
+  <footer class="page-inner">
+    <p style="opacity:0.7; margin-top:1.25rem;">Personnalisation rapide : modifiez les variables CSS en haut (&lt;:root&gt;) pour espacement, hauteur, couleurs, etc.</p>
+  </footer>
 
-      timer = setInterval(() => {
-        elapsed += 0.2;
-        const pct = Math.min(1, elapsed / total);
-        bar.style.width = pct * 100 + '%';
-        timerEl.textContent = formatTime(total - elapsed);
-
-        if (pct > 0.5 && pct < 1) plantImg.src = plant.image || makeGrowing(plant.color);
-        if (pct >= 1) {
-          clearInterval(timer);
-          plantImg.src = plant.image || makeFinal(plant.color);
-          timerEl.textContent = '00:00';
-        }
-      }, 200);
-    }
-
-    function makeSeed(c) {
-      return `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><ellipse cx='50' cy='60' rx='10' ry='6' fill='${c}' /></svg>`)}`;
-    }
-    function makeGrowing(c) {
-      return `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='48' y='40' width='4' height='30' fill='${c}' /><circle cx='50' cy='35' r='10' fill='${c}' /></svg>`)}`;
-    }
-    function makeFinal(c) {
-      return `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 70 L50 40 Q60 30 70 40 Q60 20 50 30 Q40 20 30 40 Q40 30 50 40 Z' fill='${c}' /></svg>`)}`;
-    }
-
-    function formatTime(sec) {
-      sec = Math.max(0, sec);
-      const m = Math.floor(sec / 60).toString().padStart(2, '0');
-      const s = Math.floor(sec % 60).toString().padStart(2, '0');
-      return `${m}:${s}`;
-    }
-
-    // Lance automatiquement la première plante par défaut
-    startGrowth(PLANTS[0]);
-  </script>
 </body>
 </html>
