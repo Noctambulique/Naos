@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galerie pleine largeur</title>
+  <style>
+    :root {
+      --max-image-height: 80vh;
+      --page-bg: #000;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--page-bg);
+      overflow-x: hidden;
+    }
+
+    .gallery {
+      display: grid;
+      gap: 0; /* aucun espace entre les images */
+    }
+
+    figure {
+      margin: 0;
+      width: 100vw;
+      transform: translateX(calc((100% - 100vw) / 2));
+    }
+
+    img {
+      display: block;
+      width: 100vw;
+      height: auto;
+      max-height: var(--max-image-height);
+      object-fit: cover;
+      object-position: center;
+    }
+  </style>
+</head>
+<body>
+  <main class="gallery">
+    <figure>
+      <img src="Triade/Diapositive1.PNG" alt="Image 1" loading="lazy">
+    </figure>
+    <figure>
+      <img src="Triade/Diapositive2.PNG" alt="Image 2" loading="lazy">
+    </figure>
+    <figure>
+      <img src="Triade/Diapositive3.PNG" alt="Image 3" loading="lazy">
+          </figure>
+    <figure>
+      <img src="Triade/Diapositive4.PNG" alt="Image 2" loading="lazy">
+    </figure>
+    <figure>
+      <img src="Triade/Diapositive5.PNG" alt="Image 3" loading="lazy">
+          </figure>
+    <figure>
+      <img src="Triade/Diapositive6.PNG" alt="Image 2" loading="lazy">
+    </figure>
+    <figure>
+      <img src="Triade/Diapositive7.PNG" alt="Image 3" loading="lazy">
+    </figure>
+  </main>
+</body>
+</html>
