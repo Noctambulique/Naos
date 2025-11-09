@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galerie pleine largeur</title>
+  <style>
+    :root {
+      --page-bg: #000;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--page-bg);
+      overflow-x: hidden;
+    }
+
+    .gallery {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    figure {
+      margin: 0;
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain; /* montre toute l’image sans la couper */
+    }
+  </style>
+</head>
+<body>
+  <main class="gallery">
+    <figure><img src="Culture/Diapositive1.PNG" alt="Image 1" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive2.PNG" alt="Image 2" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive3.PNG" alt="Image 3" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive4.PNG" alt="Image 4" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive5.PNG" alt="Image 5" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive6.PNG" alt="Image 6" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive7.PNG" alt="Image 7" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive1.PNG" alt="Image 8" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive2.PNG" alt="Image 9" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive3.PNG" alt="Image 10" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive4.PNG" alt="Image 11" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive5.PNG" alt="Image 12" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive6.PNG" alt="Image 13" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive7.PNG" alt="Image 14" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive6.PNG" alt="Image 15" loading="lazy"></figure>
+    <figure><img src="Culture/Diapositive7.PNG" alt="Image 16" loading="lazy"></figure>
+  </main>
+</body>
+</html>
