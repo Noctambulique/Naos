@@ -2,53 +2,49 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Deux titres par ligne</title>
+  <title>Mots en duo</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #ffffff;
-      margin: 20px;
+      font-family: "Georgia", serif;
+      background: #faf8f5;
+      color: #222;
+      margin: 0;
+      padding: 5vh 10vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
-    h1 {
-      text-align: center;
-      font-size: 20px;
-    }
+
     .grid {
-      display: table;
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .row {
-      display: table-row;
-    }
-    .item {
-      display: table-cell;
-      border: 1px solid #ccc;
-      padding: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem 4rem;
       text-align: center;
     }
-    .item a {
+
+    a {
       text-decoration: none;
-      color: #000;
+      color: #3b2e1a;
+      font-size: 1.5rem;
+      letter-spacing: 0.05em;
+      transition: color 0.3s ease, transform 0.3s ease;
     }
-    .item a:hover {
-      text-decoration: underline;
+
+    a:hover {
+      color: #9c6b3e;
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
 
   <div class="grid">
-    <div class="row">
-      <div class="item"><a href="Psy/Triade">Triade</a></div>
-      <div class="item"><a href="Psy/Angoisse.html">Angoisse</a></div>
-    </div>
-    <div class="row">
-      <div class="item"><a href="Psy/Névrose.html">Névrose</a></div>
-      <div class="item"><a href="Psy/Poétique.html">Poétique</a></div>
-    </div>
+    <a href="Psy/Triade">Triade</a>
+    <a href="Psy/Angoisse.html">Angoisse</a>
+    <a href="Psy/Névrose.html">Névrose</a>
+    <a href="Psy/Poétique.html">Poétique</a>
   </div>
 
-  <!-- Pour ajouter des lignes, copier une <div class="row"> et modifier les liens/titres -->
 </body>
 </html>
