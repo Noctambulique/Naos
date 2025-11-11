@@ -6,7 +6,6 @@
   <title>Galerie pleine largeur</title>
   <style>
     :root {
-      --max-image-height: 80vh;
       --page-bg: #000;
     }
 
@@ -18,37 +17,30 @@
     }
 
     .gallery {
-      display: grid;
-      gap: 0; /* aucun espace entre les images */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     figure {
       margin: 0;
       width: 100vw;
-      transform: translateX(calc((100% - 100vw) / 2));
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     img {
       display: block;
-      width: 100vw;
+      width: 100%;
       height: auto;
-      max-height: var(--max-image-height);
-      object-fit: cover;
-      object-position: center;
+      object-fit: contain; /* montre toute l’image sans la couper */
     }
   </style>
 </head>
 <body>
   <main class="gallery">
-    <figure>
-      <img src="plante/Diapositive1.PNG" alt="Image 1" loading="lazy">
-    </figure>
-    <figure>
-      <img src="plante/Diapositive2.PNG" alt="Image 2" loading="lazy">
-    </figure>
-    <figure>
-      <img src="plante/Diapositive2.PNG" alt="Image 3" loading="lazy">
-    </figure>
+    <figure><img src="plante/Diapositive1.PNG" alt="Image 1" loading="lazy"></figure>
   </main>
 </body>
 </html>
