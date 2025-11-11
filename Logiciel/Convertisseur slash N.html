@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Convertisseur de sauts de ligne ↔ \n</title>
+  <style>
+    :root{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    body{max-width:900px;margin:28px auto;padding:18px;background:#fbfcfe;border-radius:12px;box-shadow:0 6px 30px rgba(20,30,60,.06)}
+    h1{font-size:20px;margin:0 0 8px}
+    p.lead{margin:0 0 18px;color:#334155}
+    textarea{width:100%;min-height:160px;padding:12px;border-radius:8px;border:1px solid #e6eef8;background:white;resize:vertical;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    button{padding:8px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;cursor:pointer}
+    button.primary{background:#0ea5a4;color:white;border:none}
+    .meta{font-size:13px;color:#64748b;margin-top:8px}
+    .footer{margin-top:14px;font-size:13px;color:#475569}
+    .small{font-size:13px;color:#64748b}
+    @media (max-width:700px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <h1>Convertisseur : retours à la ligne ↔ <code>\n</code></h1>
+  <p class="lead">Collez votre texte, puis utilisez <strong>Convertir</strong> pour transformer les retours à la ligne en <code>\n</code>, ou <strong>Inverser</strong> pour restaurer les retours à la ligne à partir d’un texte contenant des <code>\n</code>.</p>
+
+  <div>
+    <label class="small" for="input">Texte original ou à convertir</label>
+    <textarea id="input" placeholder="Collez ou tapez votre texte ici..."></textarea>
+    <div class="controls">
+      <button id="convert" class="primary">Convertir (→ \n)</button>
+      <button id="reverse">Inverser (← \n)</button>
+      <button id="clear">Effacer</button>
+      <button id="openWindow">Ouvrir dans une nouvelle fenêtre</button>
+    </div>
+  </div>
+
+  <div class="footer">Remarques :
+    <ul>
+      <li>Convertir remplace les retours simples par <code>\n</code> et les doubles par <code>\n \n</code>.</li>
+      <li>Inverser effectue l’opération inverse, restituant les retours de ligne réels.</li>
+      <li>Le bouton “Ouvrir dans une nouvelle fenêtre” affiche le texte converti dans une page dédiée, pour faciliter le copier/coller.</li>
+    </ul>
+  </div>
+
+  <script>
+    const input = document.getElementById('input');
+
+    function convertirTexte(texte){
+      if (!texte) return '';
+      let s = texte.replace(/\r\n/g, '\n');
+      s = s.replace(/\n{2,}/g, '\\n \\n ');
+      s = s.replace(/\n/g, '\\n ');
+      return s.trim();
+    }
+
+    function inverserTexte(texte){
+      if (!texte) return '';
+      let s = texte.replace(/\\n *\\n/g, '\n\n');
+      s = s.replace(/\\n/g, '\n');
+      return s.trim();
+    }
+
+    document.getElementById('convert').addEventListener('click', ()=>{
+      input.value = convertirTexte(input.value);
+    });
+
+    document.getElementById('reverse').addEventListener('click', ()=>{
+      input.value = inverserTexte(input.value);
+    });
+
+    document.getElementById('clear').addEventListener('click', ()=>{
+      input.value = '';
+    });
+
+    document.getElementById('openWindow').addEventListener('click', ()=>{
+      const newWin = window.open('', '_blank');
+      newWin.document.write('<pre style="white-space: pre-wrap; font-family: monospace;">' + input.value.replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])) + '</pre>');
+      newWin.document.title = 'Texte converti';
+    });
+  </script>
+</body>
+</html>
