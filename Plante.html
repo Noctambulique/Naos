@@ -7,39 +7,38 @@
   <style>
     :root{--cols:2}
     *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;font-family:"Georgia",serif;background:#fff;color:#111;display:flex;align-items:center;justify-content:center}
-    main{width:100%;padding:5vh 5vw}
+    html,body{height:100%;font-family:"Georgia",serif;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;transition:opacity .5s ease}
+    body.fade{opacity:0}
+    main{width:100%;padding:5vh 5vw;transition:opacity .5s ease}
     .grid{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:20px;text-align:center}
     .word{background:transparent;border:0;padding:20px;cursor:pointer;outline:none;font-size:1.2rem;transition:opacity .35s,transform .25s}
     .word:active{transform:scale(.97)}
     .word.fade{opacity:.4}
-    .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s}
-    .overlay.show{opacity:1;pointer-events:auto}
-    .card{max-width:92vw;max-height:86vh;background:#fff;padding:18px;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.25);overflow:auto;display:flex;flex-direction:column;gap:12px;text-align:center}
-    .card img{max-width:100%;max-height:60vh;object-fit:contain;border-radius:6px;margin:auto}
-    .card .text{white-space:pre-wrap;font-size:1rem;color:#111}
-    .close{align-self:center;background:#eee;border:0;padding:6px 10px;border-radius:6px;cursor:pointer}
+    #detail{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:5vh 10vw;animation:fadeIn .6s ease}
+    #detail img{max-width:100%;max-height:60vh;object-fit:contain;border-radius:6px;margin:20px 0}
+    #detail p{font-size:1.05rem;line-height:1.5}
+    #retour{margin-top:20px;padding:8px 14px;border:0;background:#eee;border-radius:6px;cursor:pointer;font-family:inherit;font-size:1rem}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   </style>
 </head>
 <body>
-  <main>
+  <main id="main">
     <div id="grid" class="grid" style="--cols:2"></div>
   </main>
 
-  <div id="overlay" class="overlay" aria-hidden="true">
-    <div class="card" role="dialog" aria-modal="true">
-      <button id="close" class="close">Fermer</button>
-      <div id="media"></div>
-      <div id="desc" class="text"></div>
-    </div>
-  </div>
+  <section id="detail">
+    <img id="imageDetail" src="" alt="" />
+    <p id="texteDetail"></p>
+    <button id="retour">Retour</button>
+  </section>
 
   <script>
     const grid = document.getElementById('grid');
-    const overlay = document.getElementById('overlay');
-    const media = document.getElementById('media');
-    const desc = document.getElementById('desc');
-    const close = document.getElementById('close');
+    const main = document.getElementById('main');
+    const detail = document.getElementById('detail');
+    const imgDetail = document.getElementById('imageDetail');
+    const texteDetail = document.getElementById('texteDetail');
+    const retour = document.getElementById('retour');
 
     const mots = [
       { mot: 'mot', texte: 'Texte pour le mot', image: '' },
@@ -72,39 +71,26 @@
       const text = btn.dataset.text || '';
       const image = btn.dataset.image || '';
 
-      if ((e.ctrlKey || e.metaKey) && image) {
-        window.open(image, '_blank');
-        return;
-      }
-
-      media.innerHTML = '';
-      desc.textContent = text;
-
-      if (image) {
-        const img = document.createElement('img');
-        img.src = image;
-        img.alt = text || btn.textContent || '';
-        media.appendChild(img);
-      }
-
-      overlay.classList.add('show');
-      overlay.setAttribute('aria-hidden', 'false');
+      main.style.opacity = 0;
+      setTimeout(() => {
+        main.style.display = 'none';
+        texteDetail.textContent = text;
+        if (image) {
+          imgDetail.src = image;
+          imgDetail.style.display = 'block';
+        } else {
+          imgDetail.style.display = 'none';
+        }
+        detail.style.display = 'flex';
+      }, 400);
     });
 
-    close.addEventListener('click', () => {
-      overlay.classList.remove('show');
-      overlay.setAttribute('aria-hidden', 'true');
-    });
-
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) {
-        overlay.classList.remove('show');
-        overlay.setAttribute('aria-hidden', 'true');
-      }
-    });
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') overlay.classList.remove('show');
+    retour.addEventListener('click', () => {
+      detail.style.display = 'none';
+      main.style.display = 'block';
+      setTimeout(() => {
+        main.style.opacity = 1;
+      }, 100);
     });
   </script>
 </body>
