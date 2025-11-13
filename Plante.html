@@ -1,46 +1,133 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Galerie pleine largeur</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Grille de mots — simple à personnaliser</title>
   <style>
-    :root {
-      --page-bg: #000;
-    }
+    :root{--cols:4}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    .top{padding:12px;display:flex;gap:12px;align-items:center}
+    label{font-size:0.9rem}
+    input[type=number]{width:4.2rem;padding:6px}
+    main{padding:12px;min-height:calc(100vh - 56px)}
+    .grid{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:8px;align-items:stretch}
+    .word{background:transparent;border:1px solid #ccc;padding:18px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;outline:none;font-size:1.05rem;transition:opacity .35s,transform .25s}
+    .word:hover{background:#f5f5f5}
+    .word:active{transform:scale(.97)}
+    .word.fade{opacity:.4}
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--page-bg);
-      overflow-x: hidden;
-    }
-
-    .gallery {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    figure {
-      margin: 0;
-      width: 100vw;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    img {
-      display: block;
-      width: 100%;
-      height: auto;
-      object-fit: contain; /* montre toute l’image sans la couper */
-    }
+    .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s}
+    .overlay.show{opacity:1;pointer-events:auto}
+    .card{max-width:92vw;max-height:86vh;background:#fff;padding:18px;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.25);overflow:auto;display:flex;flex-direction:column;gap:12px}
+    .card img{max-width:100%;max-height:60vh;object-fit:contain;border-radius:6px}
+    .card .text{white-space:pre-wrap;font-size:0.98rem;color:#111}
+    .close{align-self:flex-end;background:#eee;border:0;padding:6px 10px;border-radius:6px;cursor:pointer}
+    @media (max-width:520px){.word{padding:12px;font-size:0.95rem}}
   </style>
 </head>
 <body>
-  <main class="gallery">
-    <figure><img src="plante/Diapositive1.png" alt="Image 1" loading="lazy"></figure>
+  <div class="top">
+    <label for="cols">Colonnes</label>
+    <input id="cols" type="number" min="1" max="12" value="4" />
+  </div>
+
+  <main>
+    <div id="grid" class="grid" style="--cols:4"></div>
   </main>
+
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <div class="card" role="dialog" aria-modal="true">
+      <button id="close" class="close">Fermer</button>
+      <div id="media"></div>
+      <div id="desc" class="text"></div>
+    </div>
+  </div>
+
+  <script>
+    const grid = document.getElementById('grid');
+    const overlay = document.getElementById('overlay');
+    const media = document.getElementById('media');
+    const desc = document.getElementById('desc');
+    const close = document.getElementById('close');
+    const colsInput = document.getElementById('cols');
+
+    // --- Personnalisation facile ici ---
+    const mots = [
+      { mot: 'mot', texte: 'Texte pour le mot', image: '' },
+      { mot: 'autre', texte: 'Description du second mot', image: '' },
+      { mot: 'image', texte: 'Un mot qui mène à une image', image: 'https://picsum.photos/800/500?random=1' },
+      { mot: 'clique', texte: 'Message personnalisé', image: '' },
+      { mot: 'photo', texte: 'Un mot de démonstration', image: 'https://picsum.photos/800/600?random=2' }
+    ];
+    // Pour en rajouter, ajoutez simplement un nouvel objet dans ce tableau :
+    // { mot: 'votre mot', texte: 'votre texte', image: 'url de votre image' }
+
+    // Génération automatique des boutons
+    function genererMots() {
+      grid.innerHTML = '';
+      mots.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'word';
+        btn.textContent = item.mot;
+        btn.dataset.text = item.texte;
+        btn.dataset.image = item.image;
+        grid.appendChild(btn);
+      });
+    }
+    genererMots();
+
+    colsInput.addEventListener('input', e => {
+      const n = Math.max(1, Math.min(12, Number(e.target.value) || 1));
+      grid.style.setProperty('--cols', n);
+      colsInput.value = n;
+    });
+
+    grid.addEventListener('click', e => {
+      const btn = e.target.closest('.word');
+      if (!btn) return;
+
+      btn.classList.add('fade');
+      setTimeout(() => btn.classList.remove('fade'), 380);
+
+      const text = btn.dataset.text || '';
+      const image = btn.dataset.image || '';
+
+      if ((e.ctrlKey || e.metaKey) && image) {
+        window.open(image, '_blank');
+        return;
+      }
+
+      media.innerHTML = '';
+      desc.textContent = text;
+
+      if (image) {
+        const img = document.createElement('img');
+        img.src = image;
+        img.alt = text || btn.textContent || '';
+        media.appendChild(img);
+      }
+
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden', 'false');
+    });
+
+    close.addEventListener('click', () => {
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden', 'true');
+    });
+
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) {
+        overlay.classList.remove('show');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') overlay.classList.remove('show');
+    });
+  </script>
 </body>
 </html>
