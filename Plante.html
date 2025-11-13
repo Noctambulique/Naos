@@ -3,38 +3,27 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Grille de mots — simple à personnaliser</title>
+  <title>Grille de mots</title>
   <style>
-    :root{--cols:4}
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
-    .top{padding:12px;display:flex;gap:12px;align-items:center}
-    label{font-size:0.9rem}
-    input[type=number]{width:4.2rem;padding:6px}
-    main{padding:12px;min-height:calc(100vh - 56px)}
-    .grid{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:8px;align-items:stretch}
-    .word{background:transparent;border:1px solid #ccc;padding:18px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;outline:none;font-size:1.05rem;transition:opacity .35s,transform .25s}
-    .word:hover{background:#f5f5f5}
+    :root{--cols:2}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:"Georgia",serif;background:#fff;color:#111;display:flex;align-items:center;justify-content:center}
+    main{width:100%;padding:5vh 5vw}
+    .grid{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:20px;text-align:center}
+    .word{background:transparent;border:0;padding:20px;cursor:pointer;outline:none;font-size:1.2rem;transition:opacity .35s,transform .25s}
     .word:active{transform:scale(.97)}
     .word.fade{opacity:.4}
-
     .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s}
     .overlay.show{opacity:1;pointer-events:auto}
-    .card{max-width:92vw;max-height:86vh;background:#fff;padding:18px;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.25);overflow:auto;display:flex;flex-direction:column;gap:12px}
-    .card img{max-width:100%;max-height:60vh;object-fit:contain;border-radius:6px}
-    .card .text{white-space:pre-wrap;font-size:0.98rem;color:#111}
-    .close{align-self:flex-end;background:#eee;border:0;padding:6px 10px;border-radius:6px;cursor:pointer}
-    @media (max-width:520px){.word{padding:12px;font-size:0.95rem}}
+    .card{max-width:92vw;max-height:86vh;background:#fff;padding:18px;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.25);overflow:auto;display:flex;flex-direction:column;gap:12px;text-align:center}
+    .card img{max-width:100%;max-height:60vh;object-fit:contain;border-radius:6px;margin:auto}
+    .card .text{white-space:pre-wrap;font-size:1rem;color:#111}
+    .close{align-self:center;background:#eee;border:0;padding:6px 10px;border-radius:6px;cursor:pointer}
   </style>
 </head>
 <body>
-  <div class="top">
-    <label for="cols">Colonnes</label>
-    <input id="cols" type="number" min="1" max="12" value="4" />
-  </div>
-
   <main>
-    <div id="grid" class="grid" style="--cols:4"></div>
+    <div id="grid" class="grid" style="--cols:2"></div>
   </main>
 
   <div id="overlay" class="overlay" aria-hidden="true">
@@ -51,9 +40,7 @@
     const media = document.getElementById('media');
     const desc = document.getElementById('desc');
     const close = document.getElementById('close');
-    const colsInput = document.getElementById('cols');
 
-    // --- Personnalisation facile ici ---
     const mots = [
       { mot: 'mot', texte: 'Texte pour le mot', image: '' },
       { mot: 'autre', texte: 'Description du second mot', image: '' },
@@ -61,10 +48,7 @@
       { mot: 'clique', texte: 'Message personnalisé', image: '' },
       { mot: 'photo', texte: 'Un mot de démonstration', image: 'https://picsum.photos/800/600?random=2' }
     ];
-    // Pour en rajouter, ajoutez simplement un nouvel objet dans ce tableau :
-    // { mot: 'votre mot', texte: 'votre texte', image: 'url de votre image' }
 
-    // Génération automatique des boutons
     function genererMots() {
       grid.innerHTML = '';
       mots.forEach(item => {
@@ -77,12 +61,6 @@
       });
     }
     genererMots();
-
-    colsInput.addEventListener('input', e => {
-      const n = Math.max(1, Math.min(12, Number(e.target.value) || 1));
-      grid.style.setProperty('--cols', n);
-      colsInput.value = n;
-    });
 
     grid.addEventListener('click', e => {
       const btn = e.target.closest('.word');
