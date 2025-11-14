@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dressing de Basile</title>
+  <style>
+    :root {
+      --page-bg: #000;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: var(--page-bg);
+      overflow-x: auto; /* permet le défilement horizontal */
+      overflow-y: hidden; /* bloque le défilement vertical */
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    img {
+      display: block;
+      height: 100vh;        /* l’image prend toute la hauteur visible */
+      width: auto;          /* conserve les proportions */
+      object-fit: contain;  /* ne coupe jamais l’image */
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <img src="D hiver/Plan.png" alt="Image 1" loading="lazy">
+</body>
+</html>
