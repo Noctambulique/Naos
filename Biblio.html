@@ -12,12 +12,6 @@
     --ui-color: #fff;
     --player-size: 100px;
     --marker-size: 400px;
-  }
-  html, body {
-  margin:0;
-  padding:0;
-  height:100dvh; /* hauteur réelle visible sur mobile */
-  overflow:hidden; /* empêche le scroll vertical */
 }
 #app {
   height:100%;
@@ -27,12 +21,17 @@
 body, #viewport {
   overscroll-behavior: none;
 }
-  html {
-  height:100dvh; /* hauteur réelle disponible sur mobile */
-}
-body {
-  height:100%;
+html, body {
+  margin:0;
+  padding:0;
+  height:100dvh;
   overflow:hidden;
+  overscroll-behavior:none;
+}
+#app {
+  height:100%;
+  display:flex;
+  flex-direction:column;
 }
   #hud{
     position:fixed; left:10px; top:10px; z-index:30;
@@ -144,11 +143,6 @@ body {
   #toggleBtn{
     display:block;
   }
-}
-/* --- Carte responsive --- */
-#map {
-  width: 100%;
-  height: auto;
 }
   
 </style>
@@ -359,21 +353,6 @@ function loadMap(mapIdOrObj){
     centerOnPlayer();
   };
   img.src = mapObj.bg;
-}
-
-/* Initialisation */
-function init(){
-  loadMap(CURRENT_MAP_ID);
-  // Placer le joueur au centre logique de la map
-  state.player.x = MAPS[CURRENT_MAP_ID].width / 2;
-  state.player.y = MAPS[CURRENT_MAP_ID].height / 2;
-
-  // Centrage après rendu complet
-  window.addEventListener("load", () => {
-    centerOnPlayer();
-    updateHUD();
-    requestAnimationFrame(loop);
-  });
 }
 
 /* Rendu des marqueurs */
