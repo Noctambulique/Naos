@@ -2,7 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>Map interactive — fenêtres de contenu</title>
 <style>
@@ -12,8 +13,27 @@
     --player-size: 100px;
     --marker-size: 400px;
   }
-  html,body{height:100%;margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;}
-  #app{height:100vh;display:flex;flex-direction:column;}
+  html, body {
+  margin:0;
+  padding:0;
+  height:100dvh; /* hauteur réelle visible sur mobile */
+  overflow:hidden; /* empêche le scroll vertical */
+}
+#app {
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+body, #viewport {
+  overscroll-behavior: none;
+}
+  html {
+  height:100dvh; /* hauteur réelle disponible sur mobile */
+}
+body {
+  height:100%;
+  overflow:hidden;
+}
   #hud{
     position:fixed; left:10px; top:10px; z-index:30;
     background:var(--ui-bg); color:var(--ui-color); padding:8px 12px;border-radius:8px;
