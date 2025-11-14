@@ -56,13 +56,32 @@
   }
   #modalContent{
     background:#fff; color:#000;
-    max-width:600px; max-height:80vh;
     overflow-y:auto;
     border-radius:10px;
     padding:20px;
     box-shadow:0 10px 40px rgba(0,0,0,.5);
     text-align:center;
   }
+  @media (max-width:600px){
+  #hud {font-size:12px}
+  :root{--player-size:28px; --marker-size:28px;}
+
+  #hud {
+    padding: 6px 8px;
+    left: 6px;
+    top: 6px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+
+  #tips {
+    padding: 6px 8px;
+    right: 6px;
+    top: 6px;
+    font-size: 11px;
+    max-width: 150px;
+  }
+}
   #modalContent img{
     max-width:100%;
     height:auto;
@@ -106,6 +125,12 @@
     display:block;
   }
 }
+/* --- Carte responsive --- */
+#map {
+  width: 100%;
+  height: auto;
+}
+  
 </style>
 </head>
 <body>
