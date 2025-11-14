@@ -4,21 +4,26 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Jardin de Basile</title>
+
+  <!-- Police poétique -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+
   <style>
     :root{--cols:2}
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{
       height:100%;
-      font-family:"EB Garamond",serif;
+      font-family:"Cormorant Garamond", serif;
       background:#fff;
       color:#111;
       display:flex;
       align-items:center;
       justify-content:center;
       transition:opacity 1s ease;
-      letter-spacing:0.5px;
-      line-height:1.6;
+      letter-spacing:0.3px;
+      line-height:1.75;
       font-style:italic;
+      font-size:1.12rem;
     }
     body.fade{opacity:0}
 
@@ -35,8 +40,9 @@
       padding:20px;
       cursor:pointer;
       outline:none;
-      font-size:1.2rem;
+      font-size:1.35rem;
       transition:opacity .35s,transform .25s;
+      font-family:"Cormorant Garamond", serif;
     }
     .word:active{transform:scale(.97)}
     .word.fade{opacity:.4}
@@ -52,6 +58,7 @@
       position:relative;
       width:100%;
       height:100%;
+      font-family:"Cormorant Garamond", serif;
     }
 
     #detail img{
@@ -61,18 +68,17 @@
       border-radius:6px;
       margin:20px 0;
     }
-    #detail p{font-size:1.05rem;line-height:1.5}
+    #detail p{font-size:1.2rem;line-height:1.6}
 
-    /* Flèche retour en haut à gauche */
     #retour{
       position:absolute;
       top:20px;
       left:20px;
       background:transparent;
       border:none;
-      font-size:1.2rem;
+      font-size:1.25rem;
       cursor:pointer;
-      font-family:inherit;
+      font-family:"Cormorant Garamond", serif;
       color:#111;
       display:flex;
       align-items:center;
@@ -82,88 +88,10 @@
     #retour:hover{opacity:0.7}
     #retour::before{
       content:"←";
-      font-size:1.2rem;
+      font-size:1.25rem;
     }
 
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   </style>
 </head>
 <body>
-  <main id="main">
-    <div id="grid" class="grid" style="--cols:2"></div>
-  </main>
-
-  <section id="detail">
-    <button id="retour">Retour</button>
-    <img id="imageDetail" src="" alt="" />
-    <p id="texteDetail"></p>
-  </section>
-
-  <script>
-    const grid = document.getElementById('grid');
-    const main = document.getElementById('main');
-    const detail = document.getElementById('detail');
-    const imgDetail = document.getElementById('imageDetail');
-    const texteDetail = document.getElementById('texteDetail');
-    const retour = document.getElementById('retour');
-
-    const mots = [
-      { mot: 'Janvier', texte: 'Basilic Eternel', image: 'plante/Basilic.jpg' },
-      { mot: 'Février', texte: 'Ciboulette', image: 'plante/Ciboulette.jpg' },
-      { mot: 'Mars', texte: 'Salvina', image: 'plante/Salvina.jpg' },
-      { mot: 'Avril', texte: 'Trèfle Pourpre', image: 'plante/Trèfle Pourpre.jpg' },
-      { mot: 'Mai', texte: 'Basilic Eternel', image: 'plante/Basilic.jpg' },
-      { mot: 'Juin', texte: 'Ciboulette', image: 'plante/Ciboulette.jpg' },
-      { mot: 'Juillet', texte: 'Salvina', image: 'plante/Salvina.jpg' },
-      { mot: 'Octobre', texte: 'Trèfle Pourpre', image: 'plante/Trèfle Pourpre.jpg' },
-      { mot: 'Novembre', texte: 'Basilic Eternel', image: 'plante/Basilic.jpg' },
-      { mot: 'Décembre', texte: 'Ciboulette', image: 'plante/Ciboulette.jpg' },
-    ];
-
-    function genererMots() {
-      grid.innerHTML = '';
-      mots.forEach(item => {
-        const btn = document.createElement('button');
-        btn.className = 'word';
-        btn.textContent = item.mot;
-        btn.dataset.text = item.texte;
-        btn.dataset.image = item.image;
-        grid.appendChild(btn);
-      });
-    }
-    genererMots();
-
-    grid.addEventListener('click', e => {
-      const btn = e.target.closest('.word');
-      if (!btn) return;
-
-      btn.classList.add('fade');
-      setTimeout(() => btn.classList.remove('fade'), 380);
-
-      const text = btn.dataset.text || '';
-      const image = btn.dataset.image || '';
-
-      main.style.opacity = 0;
-      setTimeout(() => {
-        main.style.display = 'none';
-        texteDetail.textContent = text;
-        if (image) {
-          imgDetail.src = image;
-          imgDetail.style.display = 'block';
-        } else {
-          imgDetail.style.display = 'none';
-        }
-        detail.style.display = 'flex';
-      }, 400);
-    });
-
-    retour.addEventListener('click', () => {
-      detail.style.display = 'none';
-      main.style.display = 'block';
-      setTimeout(() => {
-        main.style.opacity = 1;
-      }, 100);
-    });
-  </script>
-</body>
-</html>
