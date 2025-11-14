@@ -61,6 +61,9 @@
     cursor:pointer;
     z-index:200;
   }
+.hidden{
+  display:none;
+}
 
 </style>
 </head>
@@ -193,11 +196,13 @@
 
   function openPanel(item){
     currentLabel = item.label;
-    document.getElementById("panelImg").src = item.contentImg;
     document.getElementById("panelText").innerHTML = item.contentText;
+    container.classList.add("hidden");
+
     panel.classList.add("open");
   }
   function closePanel(){ panel.classList.remove("open"); }
+  container.classList.remove("hidden");
 
   createMarkers();
 </script>
