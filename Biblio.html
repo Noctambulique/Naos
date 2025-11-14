@@ -201,8 +201,11 @@
 
     panel.classList.add("open");
   }
-  function closePanel(){ panel.classList.remove("open"); }
-  container.classList.remove("hidden");
+function closePanel(){
+  panel.classList.remove("open");
+  container.classList.remove("hidden"); // ← replacé au bon endroit
+}
+
 
   createMarkers();
 </script>
