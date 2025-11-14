@@ -2,202 +2,95 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#000">
-<title>Map interactive — fenêtres de contenu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Carte interactive mobile</title>
+
 <style>
-  :root{
-    --ui-bg: rgba(0,0,0,0.6);
-    --ui-color: #fff;
-    --player-size: 100px;
-    --marker-size: 400px;
-}
-#app {
-  height:100%;
-  display:flex;
-  flex-direction:column;
-}
-body, #viewport {
-  overscroll-behavior: none;
-}
-html, body {
-  margin:0;
-  padding:0;
-  height:100dvh;
-  overflow:hidden;
-  overscroll-behavior:none;
-}
-#app {
-  height:100%;
-  display:flex;
-  flex-direction:column;
-}
-  #hud{
-    position:fixed; left:10px; top:10px; z-index:30;
-    background:var(--ui-bg); color:var(--ui-color); padding:8px 12px;border-radius:8px;
-    font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,.4);
-    user-select:none;
+  body{
+    margin:0;
+    background:#f2f2f2;
+    overflow:hidden;
+    font-family:system-ui, sans-serif;
   }
-  #hud b{display:inline-block; min-width:80px;}
-  #viewport{
-    position:relative; flex:1; overflow:hidden; background:#222;
-  }
+
   #map{
-    position:absolute; left:0; top:0;
-    transform-origin:0 0;
-  }
-  #player{
-    position:absolute;
-    width:var(--player-size); height:var(--player-size);
-    margin-left: calc(var(--player-size) / -2);
-    margin-top: calc(var(--player-size) / -2);
-    z-index:40;
-    cursor:grab;
-    transition: transform .03s linear;
-  }
-  #player:active{cursor:grabbing;}
-  .marker{
-    position:absolute;
-    width:var(--marker-size); height:var(--marker-size);
-    margin-left: calc(var(--marker-size) / -2);
-    margin-top: calc(var(--marker-size) / -2);
-    z-index:35;
-    pointer-events:auto;
-    user-select:none;
-  }
-  /* ==================== MODALE ==================== */
-  #modal{
-    display:none; position:fixed; inset:0; z-index:100; 
-    background: rgba(0,0,0,.7);
-    align-items:center; justify-content:center;
-    padding:20px;
-  }
-  #modalContent{
-    background:#fff; color:#000;
-    overflow-y:auto;
-    border-radius:10px;
-    padding:20px;
-    box-shadow:0 10px 40px rgba(0,0,0,.5);
-    text-align:center;
-  }
-  @media (max-width:600px){
-  #hud {font-size:12px}
-  :root{--player-size:28px; --marker-size:28px;}
-
-  #hud {
-    padding: 6px 8px;
-    left: 6px;
-    top: 6px;
-    font-size: 11px;
-    border-radius: 6px;
+    position:relative;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
   }
 
-  #tips {
-    padding: 6px 8px;
-    right: 6px;
-    top: 6px;
-    font-size: 11px;
-    max-width: 150px;
-  }
-}
-  #modalContent img{
-    max-width:100%;
-    height:auto;
+  .point{
+    position:absolute;
+    width:60px;
+    height:60px;
     border-radius:8px;
-    margin-bottom:12px;
-  }
-  #closeBtn{
-    background:#222; color:#fff;
-    border:none;
-    padding:8px 16px;
-    border-radius:6px;
+    overflow:hidden;
+    box-shadow:0 3px 8px rgba(0,0,0,0.25);
     cursor:pointer;
-    margin-top:10px;
+    transition:transform .15s;
   }
-  #tips{
-    position:fixed; right:10px; top:10px; z-index:30;
-    background:var(--ui-bg); color:var(--ui-color); padding:8px 12px;border-radius:8px;
-    font-size:13px; max-width:220px;
+  .point:active{
+    transform:scale(0.95);
   }
-  @media (max-width:600px){
-    #hud {font-size:12px}
-    :root{--player-size:28px; --marker-size:28px;}
+  .point img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
   }
-#toggleBtn{
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:rgba(0,0,0,0.7);
-  color:white;
-  border:none;
-  padding:12px 20px;
-  border-radius:8px;
-  font-size:16px;
-  z-index:200;
-  display:none;
-}
 
-@media (max-width:600px){
-  #toggleBtn{
-    display:block;
+  /* Fenêtre qui s'ouvre en bas (bottom sheet) */
+  #modal{
+    position:fixed;
+    bottom:-100%;
+    left:0; right:0;
+    background:#fff;
+    border-radius:22px 22px 0 0;
+    box-shadow:0 -6px 20px rgba(0,0,0,0.25);
+    padding:20px;
+    transition:bottom .35s ease;
+    max-height:70vh;
+    overflow-y:auto;
   }
-}
-  
+  #modal.open{
+    bottom:0;
+  }
+
+  #modal img{
+    width:100%;
+    border-radius:14px;
+    margin-bottom:14px;
+  }
+
+  #closeBtn{
+    position:absolute;
+    top:10px;
+    right:16px;
+    font-size:22px;
+    cursor:pointer;
+  }
 </style>
 </head>
+
 <body>
-<div id="app">
-  <div id="hud">
-    <div><b>Position</b> <span id="pos">x:0, y:0</span></div>
-    <div style="margin-top:6px"><b>Map</b> <span id="mapName"></span></div>
-    <div style="margin-top:6px"><b>Lieu</b> <span id="locLabel"></span></div>
-  </div>
 
-  <div id="viewport">
-    <div id="map">
-      <img id="player" src="data:image/svg+xml;utf8,
-        <svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 24 24' fill='none' stroke='%23ffcc00' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='10' r='3.2' /><path d='M12 2v3M12 21v-3M20 12h-3M7 12H4M17.5 6.5L15.5 8.5M8.5 15.5L6.5 17.5M17.5 17.5L15.5 15.5M8.5 8.5L6.5 6.5' /></svg>" alt="player" draggable="false">
-    </div>
-  </div>
+<div id="map"></div>
 
-  <!-- Fenêtre modale -->
-  <div id="modal">
-    <div id="modalContent">
-      <img id="modalImg" src="" alt="">
-      <div id="modalText"></div>
-      <button id="closeBtn" onclick="hideModal()">Fermer</button>
-    </div>
-  </div>
-
-  <button id="toggleBtn" onclick="toggleMarkers()">Labels / Images</button>
-  
+<!-- Fenêtre de contenu -->
+<div id="modal">
+  <div id="closeBtn">✕</div>
+  <img id="modalImg" src="">
+  <h2 id="modalTitle"></h2>
+  <p id="modalText"></p>
 </div>
 
+
 <script>
-/* ==========================
-   CONFIGURATION
-   ========================== */
-const MAPS = {
-  "ville-centre": {
-    id: "ville-centre",
-    name: "Ville - Centre",
-    bg: "Biblio/Noir.png",
-    width: 1000,
-    height: 1500
-  }
-};
-
-// Map de départ
-let CURRENT_MAP_ID = "ville-centre";
-
-/* Exemple : chaque lieu peut maintenant avoir :
-   - type: 'info' → ouvrira une fenêtre dans la page
-   - img: image à afficher
-   - text: texte avec \n ou \n\n
-*/
-let LOCATIONS = [
+/* ---------------------------------------------------
+   LISTE DES ÉLÉMENTS À AFFICHER
+   Tu peux en ajouter autant que tu veux
+--------------------------------------------------- */
+const items = [
     { x: 200, y: 150, img: "Biblio/Adorno Theodor.jpg", type: "info", 
     label:"Adorno Theodor",
     contentImg:"Adorno Theodor",
@@ -300,245 +193,41 @@ let LOCATIONS = [
   }
 ];
 
-const PLAYER_SPEED = 600;
-const CLICK_RADIUS = 50;
-const DETECTION_RADIUS = 60;
 
-/* ========================== */
-let state = {
-  mapObj: null,
-  player: { x: 100, y: 100 },
-  keys: {},
-  lastTs: null,
-  dragging: false
+/* ---------------------------------------------------
+   GÉNÉRATION DES IMAGES SUR LA CARTE
+--------------------------------------------------- */
+const map = document.getElementById("map");
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modalImg");
+const modalTitle = document.getElementById("modalTitle");
+const modalText = document.getElementById("modalText");
+
+items.forEach(item => {
+  let el = document.createElement("div");
+  el.className = "point";
+  el.style.left = item.x + "px";
+  el.style.top = item.y + "px";
+  el.innerHTML = `<img src="${item.img}">`;
+
+  el.addEventListener("click", () => {
+    modalImg.src = item.contentImg;
+    modalTitle.textContent = item.label;
+    modalText.textContent = item.contentText;
+    modal.classList.add("open");
+  });
+
+  map.appendChild(el);
+});
+
+
+/* ---------------------------------------------------
+   BOUTON FERMETURE
+--------------------------------------------------- */
+document.getElementById("closeBtn").onclick = () => {
+  modal.classList.remove("open");
 };
-
-  let showLabels = false; // false = images, true = labels
-
-  function toggleMarkers(){
-  showLabels = !showLabels;
-  renderMarkers();
-}
-
-/* DOM elements */
-const viewport = document.getElementById('viewport');
-const mapEl = document.getElementById('map');
-const playerEl = document.getElementById('player');
-const posEl = document.getElementById('pos');
-const mapNameEl = document.getElementById('mapName');
-const locLabelEl = document.getElementById('locLabel');
-const modal = document.getElementById('modal');
-const modalImg = document.getElementById('modalImg');
-const modalText = document.getElementById('modalText');
-
-/* Charger une map */
-function loadMap(mapIdOrObj){
-  const mapObj = (typeof mapIdOrObj === 'string') ? MAPS[mapIdOrObj] : mapIdOrObj;
-  if(!mapObj){ console.error("Map introuvable :", mapIdOrObj); return; }
-
-  state.mapObj = mapObj;
-  mapEl.style.width = mapObj.width + "px";
-  mapEl.style.height = mapObj.height + "px";
-  mapEl.style.backgroundImage = `url("${mapObj.bg}")`;
-  mapEl.style.backgroundSize = "cover";
-  mapEl.style.backgroundPosition = "center center"; // <-- ajout important
-
-  mapNameEl.textContent = mapObj.name || mapObj.id || "";
-
-  // Attendre que l’image soit bien chargée avant de centrer
-  const img = new Image();
-  img.onload = () => {
-    renderMarkers();
-    clampPlayer();
-    centerOnPlayer();
-  };
-  img.src = mapObj.bg;
-}
-
-/* Rendu des marqueurs */
-function renderMarkers(){
-  mapEl.querySelectorAll('.marker').forEach(n => n.remove());
-  LOCATIONS.forEach((loc, idx) => {
-let el;
-if (showLabels) {
-  // Affiche le label (texte)
-  el = document.createElement('div');
-  el.textContent = loc.label;
-  el.style.color = "white";
-  el.style.background = "rgba(0,0,0,0.6)";
-  el.style.padding = "2px 6px";
-  el.style.borderRadius = "4px";
-  el.style.fontSize = "14px";
-  el.style.whiteSpace = "nowrap";
-} else {
-  // Affiche l'image
-  el = document.createElement('img');
-  el.src = loc.img;
-  el.style.width = loc.size ? loc.size + "px" : "50px";
-  el.style.height = "auto";
-  el.style.objectFit = "contain";
-}
-
-el.className = 'marker';
-el.style.left = loc.x + 'px';
-el.style.top = loc.y + 'px';
-el.dataset.idx = idx;
-el.addEventListener('click', (ev) => {
-  ev.stopPropagation();
-  handleLocationClick(loc);
-});
-el.addEventListener('mouseenter', () => locLabelEl.textContent = loc.label);
-el.addEventListener('mouseleave', () => locLabelEl.textContent = "");
-mapEl.appendChild(el);
-  });
-}
-
-/* Action selon le type */
-function handleLocationClick(loc){
-  if(!loc) return;
-  switch(loc.type){
-    case 'info':
-      showModal(loc.contentImg, loc.contentText);
-      break;
-    case 'map':
-      if(MAPS[loc.link]) loadMap(loc.link);
-      else if (loc.link.endsWith('.html')) window.location.href = loc.link;
-      break;
-    default:
-      console.warn("Type non géré:", loc.type);
-  }
-}
-
-/* Affichage du modal */
-function showModal(imgSrc, text){
-  modal.style.display = 'flex';
-  modalImg.src = imgSrc || '';
-  modalText.innerHTML = formatText(text || '');
-}
-
-/* Masquer le modal */
-function hideModal(){
-  modal.style.display = 'none';
-  modalImg.src = '';
-  modalText.textContent = '';
-}
-
-/* Formater le texte : \n = <br>, \n\n = <br><br> */
-function formatText(str){
-  return str
-    .replace(/\n\s*\n/g, '<br><br>')
-    .replace(/\n/g, '<br>');
-}
-
-/* Centrage sur le joueur */
-function centerOnPlayer(){
-  const vpW = viewport.clientWidth;
-  const vpH = viewport.clientHeight;
-  const mapW = mapEl.clientWidth;
-  const mapH = mapEl.clientHeight;
-  let offsetX = vpW/2 - state.player.x;
-  let offsetY = vpH/2 - state.player.y;
-  offsetX = Math.min(0, Math.max(vpW - mapW, offsetX));
-  offsetY = Math.min(0, Math.max(vpH - mapH, offsetY));
-  mapEl.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-  playerEl.style.left = state.player.x + 'px';
-  playerEl.style.top = state.player.y + 'px';
-}
-
-/* Limiter les coordonnées */
-function clampPlayer(){
-  if(!state.mapObj) return;
-  state.player.x = Math.max(0, Math.min(state.mapObj.width, state.player.x));
-  state.player.y = Math.max(0, Math.min(state.mapObj.height, state.player.y));
-}
-
-/* Déplacement clavier */
-window.addEventListener('keydown', (e)=> state.keys[e.key.toLowerCase()] = true);
-window.addEventListener('keyup', (e)=> state.keys[e.key.toLowerCase()] = false);
-
-// Toggle affichage labels / images avec la touche 'a'
-window.addEventListener('keydown', (e) => {
-  const key = e.key.toLowerCase();
-  if (key === 'a') {
-    showLabels = !showLabels; // On bascule l'état
-    renderMarkers();          // On rerend les markers
-  }
-});
-  
-/* Drag */
-let dragOffset = {x:0,y:0};
-playerEl.addEventListener('pointerdown', (ev)=>{
-  ev.preventDefault();
-  playerEl.setPointerCapture(ev.pointerId);
-  state.dragging = true;
-  dragOffset.x = ev.clientX;
-  dragOffset.y = ev.clientY;
-});
-playerEl.addEventListener('pointermove', (ev)=>{
-  if(!state.dragging) return;
-  const dx = ev.clientX - dragOffset.x;
-  const dy = ev.clientY - dragOffset.y;
-  state.player.x += dx;
-  state.player.y += dy;
-  dragOffset.x = ev.clientX;
-  dragOffset.y = ev.clientY;
-  clampPlayer();
-  centerOnPlayer();
-  updateHUD();
-});
-playerEl.addEventListener('pointerup', (ev)=>{
-  state.dragging = false;
-  try{ playerEl.releasePointerCapture(ev.pointerId);}catch(e){}
-});
-
-/* HUD dynamique */
-function updateHUD(){
-  posEl.textContent = `x:${Math.round(state.player.x)} y:${Math.round(state.player.y)}`;
-  let nearest = null, bestDist = Infinity;
-  LOCATIONS.forEach(loc => {
-    const d = Math.hypot(state.player.x - loc.x, state.player.y - loc.y);
-    if (d < bestDist) { bestDist = d; nearest = loc; }
-  });
-  locLabelEl.textContent = (nearest && bestDist < DETECTION_RADIUS) ? nearest.label : "";
-}
-
-/* Boucle principale */
-function loop(ts){
-  if(!state.lastTs) state.lastTs = ts;
-  const dt = (ts - state.lastTs) / 1000;
-  state.lastTs = ts;
-  let dx = 0, dy = 0;
-  if(state.keys['arrowup'] || state.keys['w']) dy -= 1;
-  if(state.keys['arrowdown'] || state.keys['s']) dy += 1;
-  if(state.keys['arrowleft'] || state.keys['a']) dx -= 1;
-  if(state.keys['arrowright'] || state.keys['d']) dx += 1;
-  if(dx || dy){
-    const len = Math.hypot(dx,dy) || 1;
-    state.player.x += (dx/len) * PLAYER_SPEED * dt;
-    state.player.y += (dy/len) * PLAYER_SPEED * dt;
-    clampPlayer();
-    centerOnPlayer();
-    updateHUD();
-  } else updateHUD();
-  requestAnimationFrame(loop);
-}
-
-/* Initialisation */
-function init(){
-  loadMap(CURRENT_MAP_ID);
-  // On centre le joueur au milieu de la carte
-  state.player.x = state.mapObj.width / 2;
-  state.player.y = state.mapObj.height / 2;
-
-  // On attend que la map soit bien rendue avant de centrer
-  requestAnimationFrame(() => {
-    centerOnPlayer();
-    updateHUD();
-    requestAnimationFrame(loop);
-  });
-}
-
-init();
 </script>
+
 </body>
 </html>
