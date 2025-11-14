@@ -3,231 +3,122 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title>Carte interactive mobile</title>
-
+<title>Page interactive mobile</title>
 <style>
   body{
     margin:0;
+    font-family:sans-serif;
     background:#f2f2f2;
     overflow:hidden;
-    font-family:system-ui, sans-serif;
   }
-
-  #map{
+  #container{
     position:relative;
     width:100vw;
     height:100vh;
-    overflow:hidden;
-  }
-
-  .point{
-    position:absolute;
-    width:60px;
-    height:60px;
-    border-radius:8px;
-    overflow:hidden;
-    box-shadow:0 3px 8px rgba(0,0,0,0.25);
-    cursor:pointer;
-    transition:transform .15s;
-  }
-  .point:active{
-    transform:scale(0.95);
-  }
-  .point img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-  }
-
-  /* Fenêtre qui s'ouvre en bas (bottom sheet) */
-  #modal{
-    position:fixed;
-    bottom:-100%;
-    left:0; right:0;
+    overflow:auto;
+    touch-action:manipulation;
     background:#fff;
-    border-radius:22px 22px 0 0;
-    box-shadow:0 -6px 20px rgba(0,0,0,0.25);
-    padding:20px;
-    transition:bottom .35s ease;
-    max-height:70vh;
-    overflow-y:auto;
   }
-  #modal.open{
-    bottom:0;
-  }
-
-  #modal img{
-    width:100%;
-    border-radius:14px;
-    margin-bottom:14px;
-  }
-
-  #closeBtn{
+  .marker{
     position:absolute;
-    top:10px;
-    right:16px;
-    font-size:22px;
+    width:80px;
+    height:80px;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    cursor:pointer;
+  }
+  .marker img{
+    width:100%; height:100%; object-fit:cover;
+  }
+
+  #panel{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:#fff;
+    border-top-left-radius:20px;
+    border-top-right-radius:20px;
+    box-shadow:0 -3px 14px rgba(0,0,0,.25);
+    padding:16px;
+    transform:translateY(100%);
+    transition:transform .25s ease;
+    max-height:70vh;
+    overflow:auto;
+  }
+  #panel.open{transform:translateY(0)}
+
+  #returnBtn{
+    position:fixed;
+    top:12px;
+    left:12px;
+    background:#000;
+    color:#fff;
+    padding:8px 14px;
+    border-radius:10px;
+    font-size:14px;
+    cursor:pointer;
+    z-index:200;
+  }
+  #labelBtn{
+    margin-top:10px;
+    background:#222;
+    color:#fff;
+    padding:8px 12px;
+    border-radius:8px;
+    font-size:14px;
     cursor:pointer;
   }
 </style>
 </head>
-
 <body>
+<div id="returnBtn" onclick="closePanel()">Retour</div>
+<div id="container"></div>
 
-<div id="map"></div>
-
-<!-- Fenêtre de contenu -->
-<div id="modal">
-  <div id="closeBtn">✕</div>
-  <img id="modalImg" src="">
-  <h2 id="modalTitle"></h2>
-  <p id="modalText"></p>
+<div id="panel">
+  <img id="panelImg" style="width:100%; border-radius:12px; margin-bottom:12px;" />
+  <div id="panelText" style="white-space:pre-line; font-size:16px; line-height:1.4;"></div>
+  <div id="labelBtn" onclick="alert(currentLabel)">Voir label</div>
 </div>
 
-
 <script>
-/* ---------------------------------------------------
-   LISTE DES ÉLÉMENTS À AFFICHER
-   Tu peux en ajouter autant que tu veux
---------------------------------------------------- */
-const items = [
-    { x: 200, y: 150, img: "Biblio/Adorno Theodor.jpg", type: "info", 
-    label:"Adorno Theodor",
-    contentImg:"Adorno Theodor",
-    contentText:"Adorno dans la dialectique de la raison introduit le terme d’industrie culturelle pour désigner la production de masse de biens culturels. Ce n’est pas une simple extension de la culture populaire : c’est une rationalisation capitaliste de la culture, soumise aux logiques de la production en série et du profit. La culture devient un système uniforme, planifié, qui impose partout les mêmes modèles et réduit la diversité au nom de l’efficacité économique  \n \n L’industrie culturelle fonctionne selon des schémas fixes : mêmes intrigues au cinéma, mêmes stéréotypes dans la musique, mêmes recettes dans la littérature de masse. Ce qui est présenté comme « nouveau » n’est en réalité qu’une variation d’un produit déjà connu. Cela garantit que rien d’imprévu ou de subversif ne puisse émerger. La nouveauté devient un slogan publicitaire, pas une réalité artistique \n \n La consommation de masse n’éveille plus l’imagination, elle la paralyse. Le spectateur doit suivre la succession rapide d’images et de sons sans pouvoir ajouter de sens personnel. Le loisir devient une extension du travail : on se « détend » pour mieux retourner à l’usine le lendemain. L’amusement n’est pas une libération mais une forme de résignation organisée : on consomme ce qui est proposé et on se contente de l’illusion de liberté \n \n Le produit culturel promet un plaisir qu’il ne délivre jamais réellement : il entretient un désir frustré (par exemple avec le cinéma érotique où tout est suggéré mais rien montré). La publicité devient le moteur de l’industrie culturelle, et le consommateur participe par peur de « manquer quelque chose ». Ce mécanisme prépare les masses à accepter des formes de manipulation politique, comme dans le fascisme",
-    },
-  { x: 300, y: 150, img: "Biblio/Hannah Arendt.jpeg", type: "info", 
-    label:"Hannah Arendt",
-    contentImg:"Hannah Arendt",
-    contentText:"CRISE DE LA CULTURE – Hannah Arendt\n \n La pensée politique occidentale est née avec Platon et Aristote, qui considéraient le monde des affaires humaines comme secondaire par rapport au domaine des vérités éternelles. Cette séparation entre l’éternel et le contingent a façonné toute la tradition philosophique. Mais avec Marx, un renversement s’opère : la vérité ne se situe plus hors du monde, mais dans l’histoire et l’action collective. Ainsi, la fin de la tradition survient lorsque la philosophie veut s’incarner directement dans le social et le politique. Arendt montre que cette bascule entraîne une crise : ni l’autorité de la tradition, ni la continuité de l’histoire ne suffisent plus à orienter les hommes.\n \n Alors que les Anciens concevaient le temps comme cyclique et la politique comme fondée dans la permanence de la cité, la modernité introduit une vision linéaire et évolutive. Hegel et Marx conçoivent l’histoire comme un processus rationnel qui conduit à un but. Cette conception donne aux hommes le sentiment de maîtriser leur devenir, mais elle efface en même temps le caractère imprévisible des actions. Pour Arendt, l’histoire devient un cadre englobant, où les événements sont interprétés comme étapes nécessaires. Cela prépare le terrain aux idéologies, qui prétendent lire le sens caché de l’histoire en imposant des schémas d’explication.\n \n Dans cette perspective, Arendt met en lumière la fragilisation de l’autorité. Chez les Romains, l’autorité reposait sur la fondation et le respect du passé. Elle était stable parce qu’elle liait les générations par la continuité d’une origine. Or, dans le monde moderne, cette référence fondatrice disparaît. Les religions elles-mêmes n’assurent plus ce rôle de transmission, et la politique moderne n’arrive pas à inventer une nouvelle source d’autorité durable. \n \n Ce vide conduit à deux dérives : soit une obéissance imposée par la violence brute, soit des idéologies qui se donnent l’apparence de légitimité, mais dont la fragilité finit par apparaître. La crise de l’autorité se manifeste ainsi autant dans l’éducation que dans les institutions politiques.\n \n Arendt insiste sur le fait que la liberté politique n’est pas simplement l’absence de contraintes, mais la capacité d’agir ensemble dans un espace public. La liberté véritable apparaît lorsque des hommes s’associent pour fonder, créer et délibérer. Dans l’Antiquité, elle s’expérimentait dans la polis. Dans la modernité, elle tend à être confondue avec la libération de nécessités économiques ou sociales. Arendt souligne alors que l’émancipation sociale, bien que nécessaire, ne suffit pas : elle ne garantit pas la liberté politique, qui suppose un espace commun où les hommes peuvent agir et prendre des initiatives.\n \n L’un des terrains où cette crise se manifeste fortement est celui de l’éducation. Arendt montre que l’éducation moderne a perdu son sens d’autorité et de transmission. Éduquer signifie introduire un enfant dans un monde commun déjà existant, mais lorsque ce monde n’a plus de fondement reconnu, la tâche éducative devient confuse. On oscille entre laisser l’enfant livré à lui-même ou l’assujettir à des règles arbitraires. L’école moderne illustre cette difficulté : elle ne sait plus si elle doit former des individus pour s’adapter à la société, ou les préparer à exercer une liberté dans un monde commun. La crise de l’éducation devient ainsi le reflet de la crise plus large de la culture.\n \n Enfin, Arendt analyse comment la culture elle-même est affectée par cette rupture. La culture, qui était autrefois l’espace de la mémoire, des œuvres et des traditions partagées, tend à être absorbée par la logique de la consommation et de la société de masse. Les œuvres cessent d’être des biens durables pour devenir des produits de divertissement éphémères. Ce glissement dévalue l’expérience culturelle et réduit la pensée à des clichés. L’absence de tradition vivante permet cette instrumentalisation de la culture, qui ne sert plus à orienter les hommes mais à les distraire. La crise de la culture est donc à la fois politique et sociale : elle reflète la difficulté à transmettre un monde commun entre les générations.",
-  },
-  { x: 400, y: 150, img: "Biblio/Walter Benjamin.jpeg", type: "info", 
-    label:"Walter Benjamin",
-    contentImg:"Walter Benjamin",
-    contentText:"L’aura n’est pas une propriété matérielle, mais une expérience perceptive et spirituelle : elle naît du sentiment de distance qui entoure une œuvre authentique, du respect silencieux qu’elle inspire, de la lenteur du regard qu’elle exige. Contempler un tableau unique dans un musée ou une église, c’est éprouver cette distance sacrée qui confère à l’objet une autorité quasi religieuse. Or, la modernité technique — avec la photographie, puis le cinéma — bouleverse ce rapport. La reproduction mécanique rend les images infiniment réplicables, transportables et accessibles à tous : elle abolit la distance et la rareté, et transforme ainsi la manière dont nous percevons les œuvres.\n \n Selon Benjamin, la disparition de l’aura marque la fin du culte de l’œuvre d’art au profit d’un usage politique et social de l’image. L’art cesse d’être l’objet d’une contemplation silencieuse pour devenir un instrument de communication de masse. Cette mutation n’est pas seulement esthétique : elle traduit une révolution dans la sensibilité moderne, où la perception se fait rapide, fragmentaire, orientée vers la consommation visuelle plutôt que vers la méditation.\n \n Selon Benjamin, la disparition de l’aura marque la fin du culte de l’œuvre d’art au profit d’un usage politique et social de l’image. L’art cesse d’être l’objet d’une contemplation silencieuse pour devenir un instrument de communication de masse. Cette mutation n’est pas seulement esthétique : elle traduit une révolution dans la sensibilité moderne, où la perception se fait rapide, fragmentaire, orientée vers la consommation visuelle plutôt que vers la méditation.",
-  },
-  { x: 500, y: 150, img: "Biblio/Regis Debray.jpeg", type: "info", 
-    label:"Regis Debray",
-    contentImg:"Regis Debray",
-    contentText:"Régis Debray est un penseur français né en 1940, connu pour avoir développé une approche originale des phénomènes culturels : la médiologie. Son idée centrale est que les idées, les croyances ou les savoirs ne se propagent pas par leur seule force intellectuelle, mais grâce à des moyens matériels et sociaux de transmission. Autrement dit, il ne suffit pas qu’une idée soit vraie ou séduisante pour se répandre : elle doit pouvoir s’appuyer sur des supports techniques (écriture, imprimerie, numérique…) et sur des institutions (Église, école, médias, réseaux). Debray cherche ainsi à comprendre comment une idée devient une force historique.\n \n Une religion, une idéologie, un savoir ou une œuvre d’art n’existent et ne survivent que s’ils trouvent des supports matériels et des structures organisationnelles qui en assurent la diffusion et la continuité. Par exemple, le christianisme s’est transmis grâce à l’écriture des Évangiles, à l’institution ecclésiale et à la diffusion d’images et d’édifices religieux.\n \n Debray distingue trois grandes médiasphères successives. La logosphère, d’abord, correspond à l’Antiquité et au Moyen Âge : c’est l’ère de la parole et de l’écriture manuscrite, dominée par la religion et la tradition orale. Ensuite vient la graphosphère, qui émerge avec l’invention de l’imprimerie à la Renaissance. L’écrit imprimé devient le vecteur principal du savoir : c’est l’époque des livres, des journaux, de l’école, de la raison et des États-nations. Enfin, au XXᵉ siècle, s’impose la vidéosphère, dominée par l’image et les médias audiovisuels (cinéma, télévision, publicité), qui façonnent une culture de masse centrée sur le spectacle et la consommation.",
-  },
-  { x: 600, y: 150, img: "Biblio/JuergenHabermas_retouched.jpg", type: "info", 
-    label:"Habermas",
-    contentImg:"Habermas",
-    contentText:"Habermas développe ce concept pour comprendre comment les sociétés modernes se sont dotées d’un lieu symbolique de délibération entre citoyens, distinct de l’État et du marché.\n \n L’espace public est un espace de discussion rationnelle, accessible à tous, dans lequel les citoyens débattent des affaires communes afin de former une opinion publique. Il ne s’agit pas d’un lieu physique, mais d’un espace de communication.\n \n Habermas situe la naissance de l’espace public au XVIIIe siècle, notamment dans :\n \n Les salons littéraires français\n Les cafés anglais\n La presse bourgeoise\n \n C’est là que la bourgeoisie éclairée débat des affaires politiques, critiquant le pouvoir royal à partir d’un usage public de la raison.\n \n Caractéristiques de l’espace public idéal :\n Accès ouvert à tous (principe d’égalité)\n Délibération rationnelle fondée sur les arguments, non sur la coercition\n Indépendance vis-à-vis de l’État\n Formation de l’opinion et de la volonté collective\n \n Habermas souligne qu’à partir du XXe siècle :\n Les médias de masse (radio, télévision, réseaux sociaux) transforment les citoyens en spectateurs passifs.\n La publicité, les relations publiques et le marketing politique colonisent l’espace public.\n L’opinion publique n’est plus produite par la délibération, mais fabriquée.\n \n C’est ce qu’il appelle : la « refeudalisation de l’espace public », c’est-à-dire son retour à une forme de domination symbolique, où quelques acteurs influents contrôlent l’information.",
-  },
-  { x: 150, y: 300, img: "Biblio/arton2136.jpg", type: "info", 
-    label:"Pierre Levy",
-    contentImg:"Pierre Levy",
-    contentText:"L’intelligence collective désigne la capacité d’un groupe humain à mutualiser ses compétences, ses savoirs et ses expériences pour penser, apprendre et créer ensemble. Autrement dit, chacun détient une partie du savoir, et la valeur émerge de la mise en réseau de ces connaissances.\n \n Distribution du savoir\n Personne ne sait tout, mais tout le monde sait quelque chose.\n \n Coordination en temps réel\n Les technologies numériques permettent de connecter instantanément les individus.\n \n Valorisation des compétences individuelles\n Chaque contribution compte, même si elle est partielle.\n \n Finalité commune\n L’intelligence collective n’a de sens que si elle vise un but partagé.\n \n Pour Lévy, le cyberespace n’est pas seulement un outil technique, mais un espace anthropologique nouveau, où l’humanité développe une nouvelle forme de conscience collective.\n Il parle d’un « cerveau planétaire », où les intelligences individuelles s’interconnectent pour résoudre ensemble des problèmes complexes.",
-  },
-  { x: 300, y: 300, img: "Biblio/Simondon.jpg", type: "info", 
-    label:"Simondon",
-    contentImg:"Simondon",
-    contentText:"Dans Du mode d’existence des objets techniques (1958), Gilbert Simondon cherche à réhabiliter la valeur philosophique de la technique, souvent négligée ou dévalorisée dans la culture occidentale. Il critique la vision traditionnelle qui oppose l’homme et la machine, la culture et la technique, l’esprit et la matière. Pour lui, comprendre les objets techniques, c’est aussi comprendre une part essentielle de l’humanité moderne. Il veut donc montrer que les objets techniques ne sont pas de simples outils utilitaires, mais des réalités ayant leur propre mode d’existence, qu’il faut analyser avec rigueur.\n \n Simondon introduit la notion d’individuation technique, par analogie avec l’individuation des êtres vivants. Un objet technique évolue au fil du temps : il passe de formes abstraites et rudimentaires (comme l’outil artisanal) à des formes concrètes et cohérentes, où les différentes parties de la machine s’intègrent harmonieusement. Par exemple, un moteur primitif nécessite de nombreux dispositifs extérieurs (refroidissement, lubrification…), alors qu’un moteur moderne intègre ces fonctions en lui-même. Cette évolution traduit une auto-organisation progressive de la technique.\n \n Simondon critique l’attitude de l’aliénation technique, où l’homme se contente d’utiliser des machines sans comprendre leur fonctionnement. Il appelle à une culture technique, c’est-à-dire à une connaissance approfondie des principes internes des objets techniques. Comprendre la machine, c’est renouer un rapport plus humain et plus intelligent avec elle. Il ne faut pas opposer technique et humanité, mais les penser ensemble : la technique prolonge l’intelligence humaine dans la matière.\n \n Au fond, Simondon plaide pour une réconciliation entre l’homme et le monde technique. Il pense qu’une société équilibrée doit reconnaître la valeur des ingénieurs, inventeurs et techniciens, non comme de simples exécutants, mais comme des médiateurs de sens. En redonnant à la technique sa dignité philosophique, il ouvre la voie à une vision humaniste et intégrée du progrès.",
-  },
-  { x: 450, y: 300, img: "Biblio/2016_HTNM_Bernard_Stiegler_(30301265471)_(cropped).jpg", type: "info", 
-    label:"Bernard Stiegler",
-    contentImg:"Bernard Stiegler",
-    contentText:"Dans la société contemporaine, les savoirs ne circulent plus seulement par des livres, des écoles ou des enseignants : ils passent désormais par des réseaux d’information (Internet, bases de données, plateformes, intelligence artificielle). C’est ce processus que Stiegler appelle l’informationnalisation des savoirs.\n \n Selon Stiegler, cette évolution marque un changement profond dans la nature du savoir. Autrefois, le savoir impliquait un effort de compréhension, d’assimilation et de réflexion. Aujourd’hui, il tend à être réduit à des flux d’informations, stockées et traitées automatiquement par des machines.\n Autrement dit, le savoir devient une donnée (« data ») manipulable par des systèmes informatiques. Cette transformation modifie notre rapport au temps, à la mémoire et à l’apprentissage : nous consultons plutôt que nous retenons, nous accédons plutôt que nous comprenons.\n \n Pour Stiegler, cette informationnalisation n’est pas neutre : elle entraîne une forme de désindividuation, c’est-à-dire une perte de la capacité des individus à se construire par la pensée critique. Quand les savoirs sont externalisés dans les machines, les individus deviennent dépendants des systèmes techniques qui pensent à leur place.\n Les plateformes numériques captent notre attention, formatent nos comportements et substituent des algorithmes à nos processus de jugement. Stiegler voit là un danger pour la démocratie, la créativité et la transmission culturelle.\n \n Il propose de repenser le rapport entre savoir vivant (celui de l’esprit humain) et savoir informationnel (celui des machines). La clé, selon lui, est de développer une économie de la contribution, où chacun participe activement à la production et à la transmission du savoir, au lieu d’en être un simple consommateur.\n \n",
-  },
-  { x: 600, y: 300, img: "Biblio/paul-virilio-resize-750-645x648.jpeg", type: "info", 
-    label:"Paul Virilio",
-    contentImg:"Paul Virilio",
-    contentText:"Paul Virilio, philosophe, urbaniste et théoricien de la vitesse, a forgé le concept de « tyrannie du temps réel » pour désigner l’emprise croissante de l’instantanéité sur nos sociétés modernes. Selon lui, la révolution technologique — télécommunications, médias, puis Internet — a fait basculer le monde dans un régime temporel nouveau, où l’information circule à la vitesse de la lumière et où tout doit être perçu, compris et réagi immédiatement. Le temps réel efface les distances et abolit la lenteur : l’espace concret, le déplacement, l’attente, la durée — fondements de la vie humaine et sociale — sont remplacés par la simultanéité et la connexion continue. Virilio appelle cela la domination du temps mondial unique, un temps sans épaisseur, qui remplace la diversité des rythmes locaux et des temporalités culturelles. L’expérience du monde devient instantanée et dématérialisée : on « assiste » à tout sans y être, on « agit » sans délai, mais aussi sans recul.\n \n Cette accélération généralisée engendre, selon Virilio, des effets politiques, psychologiques et spirituels préoccupants. La tyrannie du temps réel réduit la capacité à penser, à débattre et à construire une mémoire collective ; elle favorise la réaction émotionnelle plutôt que la réflexion critique. Dans un monde où les médias synchronisent les émotions planétaires, où la vitesse de l’information prime sur sa véracité, la démocratie et la culture du jugement se trouvent fragilisées. Virilio y voit une nouvelle forme de totalitarisme : non plus celui de l’État ou de l’idéologie, mais celui de l’immédiat, du flux, du présent perpétuel. En anticipant les effets d’Internet et des réseaux sociaux, il nous invite à repenser notre rapport au temps : à retrouver la valeur de la lenteur, de la distance et de la durée comme conditions essentielles de la liberté, de la pensée et du vivre-ensemble.",
-  },
-  { x: 150, y: 450, img: "Biblio/Norbert_wiener.jpg", type: "info", 
-    label:"ALAVA SERAPHIN",
-    contentImg:"ALAVA SERAPHIN",
-    contentText:"La médiation documentaire désigne l’ensemble des dispositifs, des pratiques et des acteurs qui facilitent l’accès à l’information et au savoir. Son rôle est de mettre en relation les documents, les institutions éducatives et les apprenants. Après la Seconde Guerre mondiale, face à la massification scolaire, la documentation devient un outil stratégique pour former enseignants et élèves. L’État et les collectivités territoriales développent des services et infrastructures documentaires. \n \n Sur le plan pédagogique, la médiation documentaire a cherché à favoriser l’autonomie des élèves, en développant l’usage des Centres de Documentation et d’Information (CDI) et des bibliothèques scolaires. Dans les années 1970-1980, les documentalistes sont progressivement reconnus comme des acteurs pédagogiques à part entière, capables de former les élèves aux méthodes de recherche, de sélection et d’analyse de l’information\n \n Toutefois la coopération entre enseignants et documentalistes reste variable, et l’intégration réelle de la recherche documentaire dans les apprentissages n’a pas toujours été évaluée de manière systématique. Néanmoins, la médiation documentaire s’est imposée comme un levier pour répondre à l’hétérogénéité scolaire et aux défis de l’échec scolaire, en aidant les élèves à construire des compétences transversales (prise de notes, résumé, synthèse, lecture critique)\n \n Enfin, à partir des années 1990, avec l’essor des technologies de l’information et de la communication (TIC), la médiation documentaire prend une nouvelle dimension : il ne s’agit plus seulement de donner accès aux documents physiques, mais aussi de développer une culture de l’information. Cela implique d’apprendre aux élèves et enseignants à naviguer dans un environnement numérique, à évaluer la pertinence et la fiabilité des sources.",
-  },
-    { x: 150, y: 450, img: "Biblio/Jorge_Luis_Borges.jpg", type: "info", 
-    label:"jean luis borges",
-    contentImg:"jean luis borges",
-    contentText:"La “Bibliothèque de Babel” de Jorge Luis Borges est une nouvelle emblématique parue en 1941 dans le recueil Fictions. Dans ce texte, Borges imagine un univers infini entièrement constitué d’une bibliothèque. Cette bibliothèque contient tous les livres possibles, formés par toutes les combinaisons possibles de lettres, de signes et d’espaces. Autrement dit, elle renferme non seulement tous les ouvrages jamais écrits, mais aussi ceux qui pourraient l’être — les vérités, les mensonges, les absurdités, les textes sacrés, les dictionnaires, les récits incohérents, et même le livre qui explique le sens de la bibliothèque elle-même.\n \n Cette idée vertigineuse amène Borges à réfléchir sur la connaissance, le hasard, et l’infini. Dans un univers où tout texte existe déjà, la quête du savoir devient à la fois possible et désespérée : tout est là, mais noyé dans un océan d’erreurs et de chaos. Les habitants de la bibliothèque — les bibliothécaires — se consacrent à chercher un livre qui donnerait un sens à l’ensemble, ou une clé pour distinguer le vrai du faux. Cependant, cette recherche tourne à l’obsession et à la folie, car dans un univers infini, chaque vérité est perdue parmi une infinité d’autres versions erronées.\n \n Borges utilise la métaphore de la bibliothèque pour représenter l’univers comme un système infini de signes. La bibliothèque devient une image du monde, de la connaissance humaine et même du langage : chaque combinaison de lettres peut exister, mais c’est l’interprétation humaine qui donne sens à ces combinaisons. L’œuvre interroge donc la place de l’homme face à un savoir illimité, la possibilité même de comprendre l’univers, et la nature du sens dans un monde saturé d’informations.\n \n Enfin, “La Bibliothèque de Babel” est souvent lue comme une anticipation des problématiques modernes liées au numérique et à l’infobésité. On y voit une métaphore précoce d’Internet : un espace où tout savoir est potentiellement accessible, mais où l’excès d’information rend la compréhension difficile. Borges, par cette fable métaphysique, met en lumière la tension entre la soif de connaissance et les limites de la compréhension humaine.",
-  },
-    { x: 300, y: 450, img: "Biblio/Suzanne_Briet.png", type: "info", 
-    label:"Suzanne Briet",
-    contentImg:"Suzanne Briet",
-    contentText:"Son œuvre majeure : Qu’est-ce que la documentation ? (1951)\n \n Ce petit ouvrage (publié à Paris en 1951) est fondateur dans l’histoire de la pensée documentaire.\n Briet y propose une théorie du document et une réflexion sur ce que signifie documenter le monde.\n \n 📄 La notion élargie de « document »\n \n Traditionnellement, le mot document désignait un texte écrit (livre, manuscrit, rapport, etc.).\n Briet élargit radicalement cette définition :\n \n Est document tout objet qui sert de preuve ou de démonstration dans un processus de connaissance.\n \n Autrement dit, un document n’est pas défini par sa forme, mais par son usage.\n \n 🦌 L’exemple célèbre de l’antilope\n \n C’est l’un des passages les plus commentés de son ouvrage.\n \n Briet écrit, en substance :\n \n Une antilope sauvage dans la savane n’est pas un document.\n Mais si cette antilope est capturée, placée dans un zoo, identifiée, observée et décrite par des chercheurs, elle devient un document, car elle entre dans un système documentaire.\n \n → Ce qui fait le document, c’est l’intention de documentation : le fait de transformer un objet du monde en élément de preuve, de démonstration ou d’information dans un dispositif de connaissance.",
-  },
-    { x: 450, y: 450, img: "Biblio/Caperon Françoise.jpg", type: "info", 
-    label:"Chaperon Francoise",
-    contentImg:"Chaperon Francoise",
-    contentText:"Chapron Françoise  - Les CDI\n \n Le CDI comme espace éducatif\n \n Il n’est pas qu’un lieu de ressources, mais un lieu d’apprentissage, où les élèves développent leur autonomie et leur maîtrise de l’information.\n \n Le professeur documentaliste comme médiateur\n \n Son rôle dépasse la gestion documentaire : il devient enseignant et formateur à l’information, accompagnant les élèves dans la recherche, la sélection et l’évaluation des sources.\n \n La culture informationnelle\n \n Chapron insiste sur la nécessité de développer une culture de l’information, c’est-à-dire une compétence citoyenne à s’orienter dans un monde saturé de données.\n \n Les enjeux institutionnels\n \n Elle souligne les tensions entre la fonction pédagogique et la fonction gestionnaire du professeur documentaliste.\n \n Elle appelle à une reconnaissance pleine et entière de ce métier dans le système éducatif.\n \n Les perspectives d’avenir\n \n Anticipe les mutations liées au numérique, à Internet et aux nouvelles pratiques de lecture et d’apprentissage.",
-    },
-    { x: 600, y: 450, img: "Biblio/Melvil_Dewey.jpg", type: "info", 
-    label:"Melvil Dewey",
-    contentImg:"Melvil Dewey",
-    contentText:"Melvil Dewey (1851–1931) est une figure majeure de l’histoire des bibliothèques modernes. Bibliothécaire américain, il est avant tout connu pour avoir créé en 1876 la Classification Décimale de Dewey (CDD), un système de classement des connaissances encore largement utilisé dans les bibliothèques du monde entier. Son apport ne s’arrête pas là : Dewey a profondément transformé le métier de bibliothécaire et le fonctionnement des bibliothèques.\n \n ### La Classification Décimale de Dewey (1876)\n \n La CDD repose sur une organisation numérique et hiérarchique du savoir. Elle permet de ranger et retrouver les ouvrages de manière claire et efficace en les regroupant selon dix grandes classes principales, de 000 (généralités) à 900 (histoire, géographie). C’est une avancée cruciale dans la gestion de l’information, à une époque où les bibliothèques se densifiaient.\n \n ### Professionnalisation du métier\n \n En 1887, Dewey fonde la première école de bibliothéconomie, rattachée à la Columbia University. Il s'agit d'un moment décisif : jusque-là, le travail des bibliothécaires était souvent artisanal ou improvisé. Dewey introduit l’idée d’une **formation scientifique et technique** pour gérer les collections, accueillir les publics et diffuser le savoir.\n \n Il soutient que :\n \n > « La bibliothèque est une école, le bibliothécaire, un enseignant. »\n \n Pour Dewey, le bibliothécaire n’est pas seulement un gestionnaire de livres, mais un **médiateur du savoir**, chargé de guider le lecteur, de former les esprits, et de servir la démocratie en rendant la connaissance accessible au plus grand nombre.\n \n ### Innovation sociale : la « bibliothèque wagon »\n \n Pionnier des services itinérants, Dewey invente le concept de la **bibliothèque wagon**, qui deviendra le **bibliobus**. Son idée : porter les livres vers les populations éloignées, rurales ou défavorisées. Grâce à cette innovation, les bibliothèques cessent d’être des lieux statiques, réservés à ceux qui peuvent se déplacer, et deviennent un service public mobile.\n \n ---\n \n **En résumé**, Melvil Dewey est un acteur fondamental de la démocratisation culturelle. Par ses innovations à la fois techniques (CDD), institutionnelles (enseignement de la bibliothéconomie), et sociales (bibliobus), il a contribué à transformer les bibliothèques en véritables lieux d’éducation et de diffusion du savoir, accessibles à tous.",
-    },
-    { x: 150, y: 600, img: "Biblio/pascal-duplessis.jpg", type: "info", 
-    label:"Pascal Duplessis",
-    contentImg:"Pascal Duplessis",
-    contentText:"Dans sa conception des « 3T » de la culture de l’information, Pascal Duplessis met en lumière l’importance d’une formation équilibrée, qui ne se contente pas de transmettre des compétences techniques, mais cherche à former l’élève dans sa globalité. Le savoir-faire correspond aux habiletés pratiques : chercher, trier, évaluer, utiliser l’information avec efficacité. Il ne suffit toutefois pas de manier des outils ou de connaître des procédures. Il est tout aussi essentiel de développer une attitude responsable, faite d’esprit critique, de respect des droits d’auteur, de compréhension des enjeux éthiques et sociaux liés à la circulation des données. Ces savoir-faire et attitudes doivent s’appuyer sur un savoir théorique, qui permet à l’élève de comprendre les notions et les structures qui sous-tendent l’information : comment elle se construit, se classe, se hiérarchise. En articulant ces trois dimensions – efficacité, responsabilité, intelligibilité – Duplessis propose une éducation à l’information complète et émancipatrice.\n Sa démarche pédagogique repose par ailleurs sur une approche « bottom-up », c’est-à-dire ascendante. Plutôt que d’imposer des contenus savants déconnectés des pratiques des élèves, il recommande de partir de ce qu’ils font effectivement : leurs recherches sur Google, leurs publications sur les réseaux sociaux, leurs pratiques de veille ou de partage. À partir de ces usages réels, il devient possible de construire des situations d’apprentissage pertinentes, qui donnent du sens aux notions à enseigner. L’élève est ainsi acteur de son apprentissage, invité à réfléchir sur sa propre pratique avant d’accéder à une formalisation scolaire des savoirs. Cette approche s’oppose à une logique descendante (top-down) où le savoir théorique est transmis sans s’ancrer dans l’expérience, et permet de mieux ancrer les apprentissages info-documentaires dans la réalité quotidienne des élèves.",
-    },
-      { x: 300, y: 600, img: "Biblio/Sylvie Fayet-Scribe.jpeg", type: "info", 
-    label:"Sylvie Fayet-Scribe",
-    contentImg:"Sylvie Fayet-Scribe",
-    contentText:"Au cœur de ses travaux, Sylvie Fayet-Scribe place la notion de médiation documentaire, qu’elle définit comme le processus permettant l’accès du public à des connaissances organisées. Pour elle, la médiation documentaire n’est pas une simple transmission d’informations : c’est un ensemble de moyens et de dispositifs conçus pour rendre les savoirs visibles, accessibles, utilisables. Elle repose sur une double exigence : organiser les connaissances et en penser l'accès en fonction des publics.\n \n Pour soutenir cette médiation, Fayet-Scribe distingue deux types d’outils essentiels :\n \n Les outils d’accès, qui permettent de localiser et de retrouver directement une information. Ils donnent un accès effectif à la ressource. Exemple type : un index, un moteur de recherche interne, un lien hypertexte.\n \n Les outils de repérage, qui signalent l’existence d’une information sans en fournir l’accès direct. Ils sont des pistes, des aides à l’orientation. Exemple : un catalogue de bibliothèque, une bibliographie, une notice.\n \n Cette distinction est fondamentale dans la pratique documentaire : elle permet de concevoir des dispositifs centrés sur les usages, de penser des interfaces équilibrant repérage et accès, et de former les usagers à la navigation dans des environnements complexes.\n \n Elle insiste sur le fait que la médiation ne se réduit ni à la technique, ni à la pédagogie, mais qu’elle est un acte de mise en relation : entre des savoirs organisés, des outils structurants, et des usagers souvent en quête de repères.",  
-    },
-  { x: 450, y: 600, img: "Biblio/c6c57a5de11eb0b434ae03e81f41fa6007618cf7b0a48b259ef2c312d1d7fadc.jpg", type: "info", 
-    label:"Fondin Hubert",
-    contentImg:"Fondin Hubert",
-    contentText:"Fondin rappelle que toute communication n’a pas nécessairement recours au document. Les signaux de fumée, les échanges oraux ou encore les gestes sont autant de formes de communication qui se passent de tout support matériel ou reproductible. En revanche, ce qui caractérise le document, c’est sa capacité à rendre la communication durable, formelle et partageable. Le document s'inscrit sur un support – matériel ou numérique – qui permet non seulement de conserver et de transmettre une information mais aussi de la rendre accessible et traitable par autrui, même en l’absence de son émetteur.\n \n La première approche est centrée autour du document. Il s’agit de la logique patrimoniale, où le CDI est perçu comme un lieu de conservation, de classement et de mise à disposition d’un corpus documentaire stable. L’accent est mis sur la collection, l’archivage et la transmission d’un fonds matériel ou numérique pensé comme un héritage culturel ou éducatif. Cette logique a longtemps dominé les pratiques documentaires, notamment avant l’essor du numérique, lorsque la valeur du CDI reposait principalement sur la richesse de sa collection physique.\n \n La seconde approche, orientée vers la recherche, traduit une logique techno-centrée. Ici, la priorité est donnée aux outils, aux technologies d’accès à l’information, et aux dispositifs de recherche documentaire. Le rôle du documentaliste devient celui d’un médiateur technique, guidant l’usager dans l’usage des moteurs de recherche, des bases de données, ou des portails documentaires. Cette approche a pris de l’importance avec l’informatisation et la dématérialisation, mais elle peut parfois renforcer une dépendance aux outils au détriment de la réflexion critique sur l’information elle-même.\n \n La troisième approche est systémique. Elle privilégie une vision globale des fonctions du CDI comme un système intégrant des dimensions techniques, organisationnelles, humaines et sociales. Le risque inhérent à cette approche est que la logique technique et fonctionnelle, en cherchant à optimiser les flux d’information et la performance des dispositifs, prenne le pas sur la prise en compte des usages concrets, des relations humaines ou des aspects éducatifs. Elle met néanmoins en lumière la nécessité d’une cohérence architecturale, entre les technologies, les pratiques professionnelles et les besoins institutionnels.\n \n Enfin, l’approche orientée-usager incarne une logique marketing, où le CDI s’adapte aux attentes, comportements et profils des usagers. Elle suppose une segmentation du public, une analyse des pratiques d’usage et une offre ajustée en fonction des catégories d’utilisateurs. Si cette approche met en avant la personnalisation du service, elle comporte aussi un risque de déterminisme : enfermer les usagers dans des catégories préconçues (élèves, enseignants, lecteurs occasionnels, etc.) pourrait figer leurs usages et limiter leur capacité à explorer de nouvelles formes d'information ou de savoir.\n \n Fondin distingue deux types de documents : le document par intention et le document par interrogation. Le premier est créé pour être partagé, comme un livre ou un article : il est pensé dès le départ comme un document. Le second, en revanche, ne devient document que lorsqu’il est utilisé ou questionné, par exemple une donnée brute ou une trace personnelle que l’on décide d’examiner. Cette distinction montre que le document n’est pas seulement un objet figé, mais qu’il dépend des usages et du contexte : c’est le regard qu’on porte sur lui qui le transforme en document.",
-  },
-  { x: 600, y: 600, img: "Biblio/ZOAHV0jyfrM_.jpg", type: "info", 
-    label:"Harnad Stevan ",
-    contentImg:"Harnad Stevan ",
-    contentText:"« Skywriting », littéralement « écrire dans le ciel à la vitesse de la pensée ». Cette idée désigne l’utilisation des archives ouvertes d’articles scientifiques afin de permettre un accès libre et rapide au savoir, sans barrière géographique ou temporelle. Grâce à cette forme de communication asynchrone, les chercheurs peuvent échanger leurs idées plus facilement, enrichissant ainsi la réflexion collective et favorisant une véritable intelligence partagée.",
-  },
-      { x: 150, y: 750, img: "Biblio/Suzanne_Briet.png", type: "info", 
-    label:"Suzanne Briet",
-    contentImg:"Suzanne Briet",
-    contentText:"Son œuvre majeure : Qu’est-ce que la documentation ? (1951)\n \n Ce petit ouvrage (publié à Paris en 1951) est fondateur dans l’histoire de la pensée documentaire.\n Briet y propose une théorie du document et une réflexion sur ce que signifie documenter le monde.\n \n 📄 La notion élargie de « document »\n \n Traditionnellement, le mot document désignait un texte écrit (livre, manuscrit, rapport, etc.).\n Briet élargit radicalement cette définition :\n \n Est document tout objet qui sert de preuve ou de démonstration dans un processus de connaissance.\n \n Autrement dit, un document n’est pas défini par sa forme, mais par son usage.\n \n 🦌 L’exemple célèbre de l’antilope\n \n C’est l’un des passages les plus commentés de son ouvrage.\n \n Briet écrit, en substance :\n \n Une antilope sauvage dans la savane n’est pas un document.\n Mais si cette antilope est capturée, placée dans un zoo, identifiée, observée et décrite par des chercheurs, elle devient un document, car elle entre dans un système documentaire.\n \n → Ce qui fait le document, c’est l’intention de documentation : le fait de transformer un objet du monde en élément de preuve, de démonstration ou d’information dans un dispositif de connaissance.",
-  },
-      { x: 300, y: 750, img: "Biblio/Suzanne_Briet.png", type: "info", 
-    label:"Suzanne Briet",
-    contentImg:"Suzanne Briet",
-    contentText:"Son œuvre majeure : Qu’est-ce que la documentation ? (1951)\n \n Ce petit ouvrage (publié à Paris en 1951) est fondateur dans l’histoire de la pensée documentaire.\n Briet y propose une théorie du document et une réflexion sur ce que signifie documenter le monde.\n \n 📄 La notion élargie de « document »\n \n Traditionnellement, le mot document désignait un texte écrit (livre, manuscrit, rapport, etc.).\n Briet élargit radicalement cette définition :\n \n Est document tout objet qui sert de preuve ou de démonstration dans un processus de connaissance.\n \n Autrement dit, un document n’est pas défini par sa forme, mais par son usage.\n \n 🦌 L’exemple célèbre de l’antilope\n \n C’est l’un des passages les plus commentés de son ouvrage.\n \n Briet écrit, en substance :\n \n Une antilope sauvage dans la savane n’est pas un document.\n Mais si cette antilope est capturée, placée dans un zoo, identifiée, observée et décrite par des chercheurs, elle devient un document, car elle entre dans un système documentaire.\n \n → Ce qui fait le document, c’est l’intention de documentation : le fait de transformer un objet du monde en élément de preuve, de démonstration ou d’information dans un dispositif de connaissance.",
+  const data = [
+    {
+      x: 200, y: 150,
+      img: "Biblio/Adorno Theodor.jpg",
+      type: "info",
+      label:"Adorno Theodor",
+      contentImg:"Biblio/Adorno Theodor.jpg",
+      contentText:"Adorno dans la \n "
+    }
+  ];
+
+  const container = document.getElementById("container");
+  const panel = document.getElementById("panel");
+  let currentLabel = "";
+
+  function createMarkers(){
+    data.forEach(item =>{
+      const m = document.createElement("div");
+      m.className = "marker";
+      m.style.left = item.x + "px";
+      m.style.top = item.y + "px";
+      m.innerHTML = `<img src="${item.img}">`;
+      m.onclick = ()=> openPanel(item);
+      container.appendChild(m);
+    });
   }
-];
 
+  function openPanel(item){
+    currentLabel = item.label;
+    document.getElementById("panelImg").src = item.contentImg;
+    document.getElementById("panelText").textContent = item.contentText;
+    panel.classList.add("open");
+  }
+  function closePanel(){ panel.classList.remove("open"); }
 
-/* ---------------------------------------------------
-   GÉNÉRATION DES IMAGES SUR LA CARTE
---------------------------------------------------- */
-const map = document.getElementById("map");
-const modal = document.getElementById("modal");
-const modalImg = document.getElementById("modalImg");
-const modalTitle = document.getElementById("modalTitle");
-const modalText = document.getElementById("modalText");
-
-items.forEach(item => {
-  let el = document.createElement("div");
-  el.className = "point";
-  el.style.left = item.x + "px";
-  el.style.top = item.y + "px";
-  el.innerHTML = `<img src="${item.img}">`;
-
-  el.addEventListener("click", () => {
-    modalImg.src = item.contentImg;
-    modalTitle.textContent = item.label;
-    modalText.textContent = item.contentText;
-    modal.classList.add("open");
-  });
-
-  map.appendChild(el);
-});
-
-
-/* ---------------------------------------------------
-   BOUTON FERMETURE
---------------------------------------------------- */
-document.getElementById("closeBtn").onclick = () => {
-  modal.classList.remove("open");
-};
+  createMarkers();
 </script>
-
 </body>
 </html>
