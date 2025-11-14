@@ -87,7 +87,7 @@
     { x: 200, y: 150, img: "Biblio/Adorno Theodor.jpg", type: "info", 
     label:"Adorno Theodor",
     contentImg:"Adorno Theodor",
-    contentText:"Adorno dans <b> la dialectique de la raison</b> introduit le terme d’industrie culturelle pour désigner la production de masse de biens culturels. Ce n’est pas une simple extension de la culture populaire : c’est une rationalisation capitaliste de la culture, soumise aux logiques de la production en série et du profit. La culture devient un système uniforme, planifié, qui impose partout les mêmes modèles et réduit la diversité au nom de l’efficacité économique  \n \n L’industrie culturelle fonctionne selon des schémas fixes : mêmes intrigues au cinéma, mêmes stéréotypes dans la musique, mêmes recettes dans la littérature de masse. Ce qui est présenté comme « nouveau » n’est en réalité qu’une variation d’un produit déjà connu. Cela garantit que rien d’imprévu ou de subversif ne puisse émerger. La nouveauté devient un slogan publicitaire, pas une réalité artistique \n \n La consommation de masse n’éveille plus l’imagination, elle la paralyse. Le spectateur doit suivre la succession rapide d’images et de sons sans pouvoir ajouter de sens personnel. Le loisir devient une extension du travail : on se « détend » pour mieux retourner à l’usine le lendemain. L’amusement n’est pas une libération mais une forme de résignation organisée : on consomme ce qui est proposé et on se contente de l’illusion de liberté \n \n Le produit culturel promet un plaisir qu’il ne délivre jamais réellement : il entretient un désir frustré (par exemple avec le cinéma érotique où tout est suggéré mais rien montré). La publicité devient le moteur de l’industrie culturelle, et le consommateur participe par peur de « manquer quelque chose ». Ce mécanisme prépare les masses à accepter des formes de manipulation politique, comme dans le fascisme",
+    contentText:"Adorno dans la dialectique de la raison introduit le terme d’industrie culturelle pour désigner la production de masse de biens culturels. Ce n’est pas une simple extension de la culture populaire : c’est une rationalisation capitaliste de la culture, soumise aux logiques de la production en série et du profit. La culture devient un système uniforme, planifié, qui impose partout les mêmes modèles et réduit la diversité au nom de l’efficacité économique  \n \n L’industrie culturelle fonctionne selon des schémas fixes : mêmes intrigues au cinéma, mêmes stéréotypes dans la musique, mêmes recettes dans la littérature de masse. Ce qui est présenté comme « nouveau » n’est en réalité qu’une variation d’un produit déjà connu. Cela garantit que rien d’imprévu ou de subversif ne puisse émerger. La nouveauté devient un slogan publicitaire, pas une réalité artistique \n \n La consommation de masse n’éveille plus l’imagination, elle la paralyse. Le spectateur doit suivre la succession rapide d’images et de sons sans pouvoir ajouter de sens personnel. Le loisir devient une extension du travail : on se « détend » pour mieux retourner à l’usine le lendemain. L’amusement n’est pas une libération mais une forme de résignation organisée : on consomme ce qui est proposé et on se contente de l’illusion de liberté \n \n Le produit culturel promet un plaisir qu’il ne délivre jamais réellement : il entretient un désir frustré (par exemple avec le cinéma érotique où tout est suggéré mais rien montré). La publicité devient le moteur de l’industrie culturelle, et le consommateur participe par peur de « manquer quelque chose ». Ce mécanisme prépare les masses à accepter des formes de manipulation politique, comme dans le fascisme",
     },
   { x: 300, y: 150, img: "Biblio/Hannah Arendt.jpeg", type: "info", 
     label:"Hannah Arendt",
@@ -184,9 +184,9 @@
     contentImg:"Suzanne Briet",
     contentText:"Son œuvre majeure : Qu’est-ce que la documentation ? (1951)\n \n Ce petit ouvrage (publié à Paris en 1951) est fondateur dans l’histoire de la pensée documentaire.\n Briet y propose une théorie du document et une réflexion sur ce que signifie documenter le monde.\n \n 📄 La notion élargie de « document »\n \n Traditionnellement, le mot document désignait un texte écrit (livre, manuscrit, rapport, etc.).\n Briet élargit radicalement cette définition :\n \n Est document tout objet qui sert de preuve ou de démonstration dans un processus de connaissance.\n \n Autrement dit, un document n’est pas défini par sa forme, mais par son usage.\n \n 🦌 L’exemple célèbre de l’antilope\n \n C’est l’un des passages les plus commentés de son ouvrage.\n \n Briet écrit, en substance :\n \n Une antilope sauvage dans la savane n’est pas un document.\n Mais si cette antilope est capturée, placée dans un zoo, identifiée, observée et décrite par des chercheurs, elle devient un document, car elle entre dans un système documentaire.\n \n → Ce qui fait le document, c’est l’intention de documentation : le fait de transformer un objet du monde en élément de preuve, de démonstration ou d’information dans un dispositif de connaissance.",
   }
-];
-  
-document.getElementById("panelText").innerHTML = item.contentText;
+  ];
+
+  const container = document.getElementById("container");
   const panel = document.getElementById("panel");
   let currentLabel = "";
 
@@ -205,7 +205,7 @@ document.getElementById("panelText").innerHTML = item.contentText;
   function openPanel(item){
     currentLabel = item.label;
     document.getElementById("panelImg").src = item.contentImg;
-    document.getElementById("panelText").textContent = item.contentText;
+    document.getElementById("panelText").innerHTML = item.contentText;
     panel.classList.add("open");
   }
   function closePanel(){ panel.classList.remove("open"); }
