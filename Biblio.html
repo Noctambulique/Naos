@@ -10,7 +10,7 @@
     --ui-bg: rgba(0,0,0,0.6);
     --ui-color: #fff;
     --player-size: 100px;
-    --marker-size: 150px;
+    --marker-size: 400px;
   }
   html,body{height:100%;margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;}
   #app{height:100vh;display:flex;flex-direction:column;}
@@ -86,6 +86,26 @@
     #hud {font-size:12px}
     :root{--player-size:28px; --marker-size:28px;}
   }
+#toggleBtn{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,0.7);
+  color:white;
+  border:none;
+  padding:12px 20px;
+  border-radius:8px;
+  font-size:16px;
+  z-index:200;
+  display:none;
+}
+
+@media (max-width:600px){
+  #toggleBtn{
+    display:block;
+  }
+}
 </style>
 </head>
 <body>
@@ -111,6 +131,9 @@
       <button id="closeBtn" onclick="hideModal()">Fermer</button>
     </div>
   </div>
+
+  <button id="toggleBtn" onclick="toggleMarkers()">Labels / Images</button>
+  
 </div>
 
 <script>
@@ -252,6 +275,11 @@ let state = {
 };
 
   let showLabels = false; // false = images, true = labels
+
+  function toggleMarkers(){
+  showLabels = !showLabels;
+  renderMarkers();
+}
 
 /* DOM elements */
 const viewport = document.getElementById('viewport');
