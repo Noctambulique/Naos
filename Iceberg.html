@@ -4,52 +4,109 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Iceberg</title>
+
   <style>
-    html,body{height:100%;margin:0;font-family:system-ui;background:#fff;display:flex;align-items:center;justify-content:center}
-    #viewer img{max-width:90vw;max-height:90vh;display:block}
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:system-ui;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-    /* colonne de contrôle minimaliste */
-    #bar{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:18px}
+    #viewer img{
+      max-width:90vw;
+      max-height:90vh;
+      display:block;
+    }
 
-    /* 3 boutons ronds = Iceberg */
-    .dot{width:18px;height:18px;border-radius:50%;background:#bbb;cursor:pointer;transition:background .2s}
-    .dot.active{background:#000}
+    /* colonne de contrôle */
+    #bar{
+      position:fixed;
+      right:16px;
+      top:50%;
+      transform:translateY(-50%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:18px;
+    }
 
-    #label{font-size:13px;opacity:0.7;margin-top:10px}
+    /* points améliorés */
+    .dot{
+      width:20px;
+      height:20px;
+      border-radius:50%;
+      background:#d0d0d0;
+      border:2px solid #888;
+      cursor:pointer;
+      transition:background .2s, transform .15s;
+    }
+    .dot:hover{
+      transform:scale(1.15);
+    }
+    .dot.active{
+      background:#000;
+      border-color:#000;
+    }
+
+    /* petit label explicatif */
+    #label{
+      margin-top:14px;
+      font-size:13px;
+      opacity:0.75;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+    }
   </style>
 </head>
+
 <body>
 
   <main id="viewer">
-    <img id="display" src="img1.jpg" alt="cran 1">
+    <img id="display" src="" alt="cran">
   </main>
 
   <aside id="bar">
     <div class="dot active" data-cran="1"></div>
     <div class="dot" data-cran="2"></div>
     <div class="dot" data-cran="3"></div>
+    <div id="label">Cran 1</div>
   </aside>
 
   <script>
-    const images = ['D hiver/Iceberg 1.png','D hiver/Iceberg 2.png','D hiver/Iceberg 3.png']
-    const display = document.getElementById('display')
-    const label = document.getElementById('label')
-    const dots = document.querySelectorAll('.dot')
+    const images = [
+      'D hiver/Iceberg 1.png',
+      'D hiver/Iceberg 2.png',
+      'D hiver/Iceberg 3.png'
+    ];
+
+    const display = document.getElementById('display');
+    const label   = document.getElementById('label');
+    const dots    = document.querySelectorAll('.dot');
 
     function setCran(n){
-      display.src = images[n-1] || ''
-      display.alt = 'cran ' + n
-      label.textContent = 'Cran ' + n
-      dots.forEach(d => d.classList.remove('active'))
-      dots[n-1].classList.add('active')
+      // Evite erreurs si l'image n'existe pas
+      if(images[n-1]) display.src = images[n-1];
+      display.alt = "cran " + n;
+
+      label.textContent = "Cran " + n;
+
+      dots.forEach(d => d.classList.remove('active'));
+      dots[n-1].classList.add('active');
     }
 
     dots.forEach(dot => {
       dot.addEventListener('click', () => {
-        const n = Number(dot.dataset.cran)
-        setCran(n)
-      })
-    })
+        const n = Number(dot.dataset.cran);
+        setCran(n);
+      });
+    });
+
+    // affiche automatiquement le premier cran
+    setCran(1);
   </script>
 
 </body>
