@@ -3,65 +3,54 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>3 crans — page ultra-minimaliste</title>
+  <title>3 crans — interface simple</title>
   <style>
-    /* style ultra-minimaliste */
-    :root{--bar-w:64px}
-    html,body{height:100%;margin:0;font-family:system-ui,Arial}
-    body{display:flex;align-items:center;justify-content:center;background:#ffffff}
+    html,body{height:100%;margin:0;font-family:system-ui;background:#fff;display:flex;align-items:center;justify-content:center}
+    #viewer img{max-width:90vw;max-height:90vh;display:block}
 
-    /* zone d'affichage centrale */
-    #viewer{max-width:90vw;max-height:90vh;display:flex;align-items:center;justify-content:center}
-    #viewer img{max-width:100%;max-height:100%;display:block}
+    /* colonne de contrôle minimaliste */
+    #bar{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:18px}
 
-    /* barre à droite */
-    #bar{position:fixed;right:12px;top:50%;transform:translateY(-50%);width:var(--bar-w);display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px;border-radius:10px}
-    /* slider rendu vertical en le faisant pivoter */
-    #slider{appearance:none;width:160px;height:28px;transform:rotate(-90deg);cursor:pointer}
+    /* 3 boutons ronds = 3 crans */
+    .dot{width:18px;height:18px;border-radius:50%;background:#bbb;cursor:pointer;transition:background .2s}
+    .dot.active{background:#000}
 
-    /* minimal thumb pour tous navigateurs modernes */
-    #slider::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:#111}
-    #slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#111}
-
-    /* indicateur numérique discret */
-    #pos{font-size:12px;opacity:0.7}
+    #label{font-size:13px;opacity:0.7;margin-top:10px}
   </style>
 </head>
 <body>
 
   <main id="viewer">
-    <!-- Remplacez les chemins 'img1.jpg' 'img2.jpg' 'img3.jpg' par vos images -->
-    <img id="display" alt="cran 1" src="img1.jpg">
+    <img id="display" src="img1.jpg" alt="cran 1">
   </main>
 
-  <aside id="bar" aria-hidden="false">
-    <input id="slider" type="range" min="1" max="3" step="1" value="1" aria-label="Sélecteur de cran">
-    <div id="pos">Cran 1</div>
-    <div style="width:40px;height:4px;background:#111;margin-top:6px;border-radius:2px;transform:rotate(0deg);"></div>
+  <aside id="bar">
+    <div class="dot active" data-cran="1"></div>
+    <div class="dot" data-cran="2"></div>
+    <div class="dot" data-cran="3"></div>
+    <div id="label">Cran 1</div>
   </aside>
 
   <script>
-    // chemins par défaut — remplacez par vos images locales ou URLs
     const images = ['img1.jpg','img2.jpg','img3.jpg']
-
-    const slider = document.getElementById('slider')
     const display = document.getElementById('display')
-    const pos = document.getElementById('pos')
+    const label = document.getElementById('label')
+    const dots = document.querySelectorAll('.dot')
 
-    function update(v){
-      const i = Number(v) - 1
-      display.src = images[i] || ''
-      display.alt = 'cran ' + v
-      pos.textContent = 'Cran ' + v
+    function setCran(n){
+      display.src = images[n-1] || ''
+      display.alt = 'cran ' + n
+      label.textContent = 'Cran ' + n
+      dots.forEach(d => d.classList.remove('active'))
+      dots[n-1].classList.add('active')
     }
 
-    // initialisation
-    update(slider.value)
-
-    // gestion du changement — input pour mise à jour instantanée
-    slider.addEventListener('input', (e) => update(e.target.value))
-
-    // astuce : navigation clavier (flèches) fonctionne naturellement sur le range
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        const n = Number(dot.dataset.cran)
+        setCran(n)
+      })
+    })
   </script>
 
 </body>
