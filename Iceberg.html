@@ -1,40 +1,67 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Iceberg de Basile</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>3 crans — page ultra-minimaliste</title>
   <style>
-    :root {
-      --page-bg: #000;
-    }
+    /* style ultra-minimaliste */
+    :root{--bar-w:64px}
+    html,body{height:100%;margin:0;font-family:system-ui,Arial}
+    body{display:flex;align-items:center;justify-content:center;background:#ffffff}
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      background: var(--page-bg);
-      overflow-x: auto; /* permet le défilement horizontal */
-      overflow-y: hidden; /* bloque le défilement vertical */
-    }
+    /* zone d'affichage centrale */
+    #viewer{max-width:90vw;max-height:90vh;display:flex;align-items:center;justify-content:center}
+    #viewer img{max-width:100%;max-height:100%;display:block}
 
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    /* barre à droite */
+    #bar{position:fixed;right:12px;top:50%;transform:translateY(-50%);width:var(--bar-w);display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px;border-radius:10px}
+    /* slider rendu vertical en le faisant pivoter */
+    #slider{appearance:none;width:160px;height:28px;transform:rotate(-90deg);cursor:pointer}
 
-    img {
-      display: block;
-      height: 100vh;        /* l’image prend toute la hauteur visible */
-      width: auto;          /* conserve les proportions */
-      object-fit: contain;  /* ne coupe jamais l’image */
-      margin: 0 auto;
-    }
+    /* minimal thumb pour tous navigateurs modernes */
+    #slider::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:#111}
+    #slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#111}
+
+    /* indicateur numérique discret */
+    #pos{font-size:12px;opacity:0.7}
   </style>
 </head>
 <body>
-  <img src="D hiver/Iceberg.png" alt="Image 1" loading="lazy">
+
+  <main id="viewer">
+    <!-- Remplacez les chemins 'img1.jpg' 'img2.jpg' 'img3.jpg' par vos images -->
+    <img id="display" alt="cran 1" src="img1.jpg">
+  </main>
+
+  <aside id="bar" aria-hidden="false">
+    <input id="slider" type="range" min="1" max="3" step="1" value="1" aria-label="Sélecteur de cran">
+    <div id="pos">Cran 1</div>
+  </aside>
+
+  <script>
+    // chemins par défaut — remplacez par vos images locales ou URLs
+    const images = ['img1.jpg','img2.jpg','img3.jpg']
+
+    const slider = document.getElementById('slider')
+    const display = document.getElementById('display')
+    const pos = document.getElementById('pos')
+
+    function update(v){
+      const i = Number(v) - 1
+      display.src = images[i] || ''
+      display.alt = 'cran ' + v
+      pos.textContent = 'Cran ' + v
+    }
+
+    // initialisation
+    update(slider.value)
+
+    // gestion du changement — input pour mise à jour instantanée
+    slider.addEventListener('input', (e) => update(e.target.value))
+
+    // astuce : navigation clavier (flèches) fonctionne naturellement sur le range
+  </script>
+
 </body>
 </html>
