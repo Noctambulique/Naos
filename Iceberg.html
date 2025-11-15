@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>3 crans — interface simple</title>
+  <title>Iceberg</title>
   <style>
     html,body{height:100%;margin:0;font-family:system-ui;background:#fff;display:flex;align-items:center;justify-content:center}
     #viewer img{max-width:90vw;max-height:90vh;display:block}
@@ -11,7 +11,7 @@
     /* colonne de contrôle minimaliste */
     #bar{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:18px}
 
-    /* 3 boutons ronds = 3 crans */
+    /* 3 boutons ronds = Iceberg */
     .dot{width:18px;height:18px;border-radius:50%;background:#bbb;cursor:pointer;transition:background .2s}
     .dot.active{background:#000}
 
@@ -28,7 +28,6 @@
     <div class="dot active" data-cran="1"></div>
     <div class="dot" data-cran="2"></div>
     <div class="dot" data-cran="3"></div>
-    <div id="label">Cran 1</div>
   </aside>
 
   <script>
