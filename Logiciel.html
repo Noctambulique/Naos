@@ -1,49 +1,164 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <title>Mots en duo</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rectangles cliquables — Minimal</title>
   <style>
-    body {
-      font-family: "Georgia", serif;
-      background: #faf8f5;
-      color: #222;
-      margin: 0;
-      padding: 5vh 10vw;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+    :root{
+      --rect-width: 18vw; /* largeur d'un rectangle (modifiable) */
+      --gap: 2vw;         /* espace entre rectangles */
+      --bg: #0f1113;
+      --card-radius: 10px;
+      --label-height: 3.6rem;
+    }
+    /* page entière, minimaliste */
+    html,body{height:100%;margin:0;background:var(--bg);font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;color:#fff}
+
+    /* conteneur qui aligne les rectangles horizontalement et permet le scroll */
+    .rack{
+      display:flex;
+      gap:var(--gap);
+      padding:calc(var(--gap) / 2);
+      height:100vh; /* prend tout l'écran en hauteur */
+      align-items:center; /* centre verticalement le contenu des cartes */
+      overflow-x:auto;
+      overflow-y:hidden;
+      box-sizing:border-box;
+      -webkit-overflow-scrolling:touch;
+      scroll-behavior:smooth;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem 4rem;
-      text-align: center;
+    /* style d'un rectangle (carte) : très haut, peu large */
+    .card{
+      flex:0 0 var(--rect-width); /* largeur fixe, ne rétrécit pas */
+      height:88vh; /* quasi toute la hauteur (laisse un petit espace) */
+      border-radius:var(--card-radius);
+      background:#222;
+      display:block; /* pour l'ancre <a> */
+      position:relative;
+      text-decoration:none;
+      color:inherit;
+      box-shadow:0 6px 20px rgba(0,0,0,0.6), inset 0 -40px 80px rgba(0,0,0,0.25);
+      overflow:hidden;
+      transition:transform 280ms cubic-bezier(.2,.9,.3,1), box-shadow 280ms;
     }
 
-    a {
-      text-decoration: none;
-      color: #3b2e1a;
-      font-size: 1.5rem;
-      letter-spacing: 0.05em;
-      transition: color 0.3s ease, transform 0.3s ease;
+    /* image couvrante dans la carte */
+    .card .cover{
+      position:absolute;inset:0;
+      background-position:center center;background-size:cover;
+      filter:contrast(1.02) saturate(0.95);
+      transform-origin:center center;
+      transition:transform 420ms cubic-bezier(.2,.9,.3,1), filter 420ms;
     }
 
-    a:hover {
-      color: #9c6b3e;
-      transform: scale(1.05);
+    /* petit bandeau bas pour le label */
+    .card .label{
+      position:absolute;left:0;right:0;bottom:0;height:var(--label-height);
+      display:flex;align-items:center;gap:0.6rem;padding:0 0.8rem;
+      backdrop-filter: blur(6px);
+      background:linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.55));
+      font-size:0.95rem;font-weight:600;
     }
+
+    .card:focus, .card:hover{
+      transform:translateY(-6px) scale(1.02);
+      box-shadow:0 14px 40px rgba(0,0,0,0.7);
+      outline:3px solid rgba(255,255,255,0.06);
+    }
+    .card:focus .cover, .card:hover .cover{ transform:scale(1.06); filter:brightness(1.02) }
+
+    /* petit indicateur de lien */
+    .card .chev{margin-left:auto;opacity:0.9;font-size:0.85rem}
+
+    /* focus keyboard visible */
+    .card:focus{outline-offset:6px}
+
+    /* comportement responsive : sur petits écrans on augmente la largeur minimale */
+    @media (max-width:720px){
+      :root{--rect-width: 36vw}
+      .card{height:86vh}
+    }
+    @media (max-width:420px){
+      :root{--rect-width: 48vw}
+      .card{height:84vh}
+    }
+
+    /* petite aide visuelle en bas à gauche (optionnel) */
+    .hint{
+      position:fixed;left:12px;bottom:12px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.03);font-size:0.82rem;color:rgba(255,255,255,0.8)
+    }
+
+    /* accessible : hide scrollbar but keep scroll available */
+    .rack::-webkit-scrollbar{height:10px}
+    .rack::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:10px}
   </style>
 </head>
 <body>
 
-  <div class="grid">
-    <a href="Logiciel/Convertisseur Excel.html">Convertisseur Excel</a>
-    <a href="Logiciel/Convertisseur slash N.html">Convertisseur Slash N</a>
-    <a href="Logiciel/Emploi du Temps.html">Emploi du Temps</a>
-  </div>
+  <main class="rack" id="rack" aria-label="Liste de cartes cliquables">
+    <!-- Les cartes seront injectées ici par JS pour que tu puisses facilement les modifier -->
+  </main>
 
+  <div class="hint">← glisse / tab pour naviguer • clic ouvre le lien</div>
+
+  <script>
+    /*
+      Configuration : modifie ce tableau pour ajouter/retirer/éditer des rectangles.
+      Chaque objet a :
+        - label: texte affiché sur la carte
+        - image: chemin ou URL de l'image de couverture
+        - href: lien vers lequel la carte pointe (peut être externe ou interne)
+        - alt: texte alternatif pour l'image (accessibilité)
+    */
+    const items = [
+      { label: 'Projet A', image: 'https://picsum.photos/id/1015/800/1400', href: 'https://example.com/a', alt: 'Montagne' },
+      { label: 'Galerie', image: 'https://picsum.photos/id/1025/800/1400', href: 'https://example.com/b', alt: 'Portrait' },
+      { label: 'Archive', image: 'https://picsum.photos/id/1039/800/1400', href: 'https://example.com/c', alt: 'Arbre' },
+      { label: 'Notes', image: 'https://picsum.photos/id/1043/800/1400', href: 'https://example.com/d', alt: 'Ville la nuit' }
+    ];
+
+    const rack = document.getElementById('rack');
+
+    // Création simple et sémantique des cartes
+    items.forEach((it, idx) => {
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = it.href || '#';
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.tabIndex = 0;
+      a.setAttribute('aria-label', it.label + (it.href ? ', ouvre un lien' : ''));
+
+      // cover div (image en background pour un rendu propre sur toute la carte)
+      const cover = document.createElement('div');
+      cover.className = 'cover';
+      cover.style.backgroundImage = `url('${it.image}')`;
+      cover.setAttribute('role','img');
+      cover.setAttribute('aria-label', it.alt || it.label);
+      a.appendChild(cover);
+
+      // label en bas
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.innerHTML = `<span>${it.label}</span><span class="chev">→</span>`;
+      a.appendChild(label);
+
+      // fallback si l'image ne charge pas
+      cover.addEventListener('error', ()=>{ cover.style.backgroundColor = '#333' });
+
+      rack.appendChild(a);
+    });
+
+    // Ajoute du contrôle clavier pour faciliter la navigation (gauche/droite)
+    window.addEventListener('keydown', (e)=>{
+      if(document.activeElement === document.body){
+        if(e.key === 'ArrowRight') rack.scrollBy({left: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--rect-width')) + 20, behavior:'smooth'});
+        if(e.key === 'ArrowLeft') rack.scrollBy({left: - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--rect-width')) + 20), behavior:'smooth'});
+      }
+    });
+
+  </script>
 </body>
 </html>
