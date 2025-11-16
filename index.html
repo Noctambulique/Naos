@@ -35,7 +35,7 @@
   z-index:40;
   cursor:grab;
   transition: transform .03s linear;
-  display:none; /* 👈 ajouté : le curseur est caché au départ */
+  display:none;
   }
   #player:active{cursor:grabbing;}
 .marker{
@@ -47,7 +47,7 @@
   z-index:35;
   pointer-events:auto;
   user-select:none;
-  object-fit: contain; /* ✅ Ajout important : garde le format original de l’image */
+  object-fit: contain;
 }
   #modal{
     display:none; position:fixed; inset:0; z-index:100; background: rgba(0,0,0,.7);
@@ -84,9 +84,6 @@
 </div>
 
 <script>
-/* ==========================
-   CONFIGURATION
-   ========================== */
 const MAPS = {
   "ville-centre": {
     id: "ville-centre",
@@ -97,10 +94,25 @@ const MAPS = {
   }
 };
 
-// Map de départ
 let CURRENT_MAP_ID = "ville-centre";
 
 let LOCATIONS = [
+
+];
+
+// --- Curseurs personnalisés affichés avec la touche D ---
+let CUSTOM_CURSORS = [
+  {
+    x: 500, y: 500,
+    icon: "Map/curseur1.png",
+    image: "Images/Photo1.png"
+  },
+  {
+    x: 900, y: 300,
+    icon: "Map/curseur2.png",
+    image: "Images/Photo2.png"
+  }
+];
   { x: 630, y: 430, img: "Map/Maison1.png", type: "map", link: "Anecdotes.html", label:"Anecdotes, Roi de ♦️", size: 80 },
   { x: 366, y: 814, img: "Map/Maison1.png", type: "map", link: "Histoire de la Philo.html", label:"Histoire Philo, Dame de ♦️", size: 85 },
   { x: 649, y: 1164, img: "Map/Maison1.png", type: "map", link: "Psycho.html", label:"Psycho, Valet de ♦️", size: 65 },
@@ -125,9 +137,8 @@ let LOCATIONS = [
 
 const PLAYER_SPEED = 800;
 const CLICK_RADIUS = 40;
-const DETECTION_RADIUS = 60; // distance à laquelle le label apparaît
+const DETECTION_RADIUS = 60;
 
-/* ========================== */
 let state = {
   mapObj: null,
   player: { x: 100, y: 100 },
@@ -136,15 +147,12 @@ let state = {
   dragging: false
 };
 
-let modeDeplacement = false; // 👈 au départ le déplacement est désactivé
-let modeLabel = false;       // Touche B : affiche texte à la place des icônes
+let modeDeplacement = false;
+let modeLabel = false;
 
-// 🔎 Filtrage par symboles (touche C)
-let filterStep = -1; // -1 = aucun filtre actif
+let filterStep = -1;
 const SUITS = ["♦️", "♠️", "♣️", "❤️"];
 
-
-/* DOM elements */
 const viewport = document.getElementById('viewport');
 const mapEl = document.getElementById('map');
 const playerEl = document.getElementById('player');
@@ -155,7 +163,6 @@ const modal = document.getElementById('modal');
 const modalImg = document.getElementById('modalImg');
 playerEl.style.display = 'none';
 
-/* Charger une map */
 function loadMap(mapIdOrObj){
   const mapObj = (typeof mapIdOrObj === 'string') ? MAPS[mapIdOrObj] : mapIdOrObj;
   if(!mapObj){
@@ -174,22 +181,36 @@ function loadMap(mapIdOrObj){
 }
 
 function renderMarkers(){
-  // On supprime les anciens marqueurs
+  const old = mapEl.querySelectorAll('.marker, .label-marker');
+  old.forEach(n => n.remove());
+}
+
+// --- Curseurs personnalisés : affichés lorsque l’on appuie sur D ---
+function showCustomCursors() {
   const old = mapEl.querySelectorAll('.marker, .label-marker');
   old.forEach(n => n.remove());
 
-    // 🎯 Appliquer le filtrage en fonction du symbole sélectionné
-  let filteredLocations = LOCATIONS;
-  if (filterStep >= 0) {
-    const suit = SUITS[filterStep];
-    filteredLocations = LOCATIONS.filter(loc => loc.label.includes(suit));
-  }
+  CUSTOM_CURSORS.forEach((c, idx) => {
+    const el = document.createElement("img");
+    el.src = c.icon;
+    el.className = "marker";
+    el.style.left = c.x + "px";
+    el.style.top = c.y + "px";
+    el.dataset.idx = idx;
+
+    el.addEventListener("click", ev => {
+      ev.stopPropagation();
+      showModal(c.image);
+    });
+
+    mapEl.appendChild(el);
+  });
+}
 
   filteredLocations.forEach((loc, idx) => {
     let element;
 
     if(modeLabel) {
-      // 🏷️ Mode Label : afficher le texte
       element = document.createElement('div');
       element.className = 'label-marker';
       element.textContent = loc.label;
@@ -202,7 +223,6 @@ function renderMarkers(){
       element.style.fontSize = '14px';
       element.style.whiteSpace = 'nowrap';
     } else {
-      // 🏠 Mode normal : afficher l'image
       element = document.createElement('img');
       element.src = loc.img;
       element.className = 'marker';
@@ -214,12 +234,10 @@ function renderMarkers(){
       element.style.objectFit = 'contain';
     }
 
-    // Positionnement
     element.style.left = loc.x + 'px';
     element.style.top = loc.y + 'px';
     element.dataset.idx = idx;
 
-    // Interaction
     element.addEventListener('click', ev => {
       ev.stopPropagation();
       handleLocationClick(loc);
@@ -231,7 +249,6 @@ function renderMarkers(){
   });
 }
 
-/* Click sur la map */
 function handleMapClick(clientX, clientY){
   const mapRect = mapEl.getBoundingClientRect();
   const mx = (clientX - mapRect.left);
@@ -246,7 +263,6 @@ function handleMapClick(clientX, clientY){
   }
 }
 
-/* Action selon le type */
 function handleLocationClick(loc){
   if(!loc) return;
   switch(loc.type){
@@ -271,11 +287,9 @@ function handleLocationClick(loc){
   }
 }
 
-/* Modal */
 function showModal(url){ modalImg.src = url; modal.style.display = 'flex'; }
 function hideModal(){ modal.style.display = 'none'; modalImg.src = ''; }
 
-/* Centrage */
 function centerOnPlayer(){
   const vpW = viewport.clientWidth;
   const vpH = viewport.clientHeight;
@@ -290,49 +304,43 @@ function centerOnPlayer(){
   playerEl.style.top = state.player.y + 'px';
 }
 
-/* Limiter le joueur */
 function clampPlayer(){
   if(!state.mapObj) return;
   state.player.x = Math.max(0, Math.min(state.mapObj.width, state.player.x));
   state.player.y = Math.max(0, Math.min(state.mapObj.height, state.player.y));
 }
 
-/* Déplacement clavier */
 window.addEventListener('keydown', (e) => {
   const key = e.key.toLowerCase();
 
-  // 🔄 Toggle mode déplacement
 if (key === 'a') {
   modeDeplacement = !modeDeplacement;
-  console.log("Mode déplacement :", modeDeplacement);
-
-  // 👇 Ajout : afficher / cacher le curseur
   playerEl.style.display = modeDeplacement ? 'block' : 'none';
-
-  return; // On stoppe ici pour ne pas activer une touche de déplacement
+  return;
 }
 
-  // 🔄 Toggle mode affichage des labels
   if (key === 'b') {
     modeLabel = !modeLabel;
     renderMarkers();
-    console.log("Mode labels :", modeLabel);
     return;
   }
 if (key === 'c') {
-  filterStep = (filterStep + 1) % (SUITS.length + 1); // cycle à travers les filtres
+  filterStep = (filterStep + 1) % (SUITS.length + 1);
   if (filterStep === SUITS.length) {
-    filterStep = -1; // revenir à affichage complet
-    console.log("Filtre désactivé, affichage de tous les bâtiments");
-  } else {
-    console.log("Filtre actif :", SUITS[filterStep]);
+    filterStep = -1;
   }
   renderMarkers();
   return;
 }
 
+// --- Touche D : afficher les curseurs personnalisés ---
+if (key === 'd') {
+  showCustomCursors();
+  console.log("Mode curseurs activé.");
+  return;
+}
+}
 
-  // ✅ Activer les touches de déplacement uniquement si le mode est actif
   if (modeDeplacement) {
     state.keys[key] = true;
   }
@@ -343,7 +351,6 @@ window.addEventListener('keyup', (e) => {
   state.keys[key] = false;
 });
 
-/* Drag */
 let dragOffset = {x:0,y:0};
 playerEl.addEventListener('pointerdown', (ev)=>{
   ev.preventDefault();
@@ -371,7 +378,6 @@ playerEl.addEventListener('pointerup', (ev)=>{
 
 mapEl.addEventListener('click', (ev)=> handleMapClick(ev.clientX, ev.clientY));
 
-/* Boucle principale */
 function loop(ts){
   if(!state.lastTs) state.lastTs = ts;
   const dt = (ts - state.lastTs) / 1000;
@@ -383,8 +389,6 @@ function loop(ts){
   if(state.keys['arrowright'] || state.keys['d']) dx += 1;
 
   if(modeDeplacement) {
-    // 👉 Curseur visible en mode déplacement
-
     if(dx || dy){
       const len = Math.hypot(dx,dy) || 1;
       state.player.x += (dx/len) * PLAYER_SPEED * dt;
@@ -392,19 +396,14 @@ function loop(ts){
       clampPlayer();
       centerOnPlayer();
     }
-  } else {
-    // 👇 Curseur caché en mode exploration libre
   }
 
   updateHUD();
   requestAnimationFrame(loop);
 }
 
-/* HUD dynamique */
 function updateHUD(){
   posEl.textContent = `x:${Math.round(state.player.x)} y:${Math.round(state.player.y)}`;
-  
-  // Trouver le lieu le plus proche
   let nearest = null;
   let bestDist = Infinity;
   LOCATIONS.forEach(loc => {
@@ -414,17 +413,13 @@ function updateHUD(){
       nearest = loc;
     }
   });
-
-  // Affichage du label si assez proche
   if (nearest && bestDist < DETECTION_RADIUS) {
     locLabelEl.textContent = nearest.label;
   } else if (!state.dragging) {
-    // On efface seulement si le joueur ne traîne pas un marker
     locLabelEl.textContent = "";
   }
 }
 
-/* Initialisation */
 function init(){
   loadMap(CURRENT_MAP_ID);
   state.player.x = state.mapObj.width/2;
