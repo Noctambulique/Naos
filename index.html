@@ -295,6 +295,58 @@ function handleMapClick(clientX, clientY){
   }
 }
 
+  /* ==========================
+   DEPLACEMENT MAP : souris, trackpad, tactile
+   ========================== */
+
+let isPanning = false;
+let panStart = { x: 0, y: 0 };
+let mapStart = { x: 0, y: 0 };
+
+/* Récupère la translation actuelle de la map */
+function getCurrentMapOffset() {
+  const style = window.getComputedStyle(mapEl);
+  const matrix = new DOMMatrixReadOnly(style.transform);
+  return { x: matrix.m41, y: matrix.m42 };
+}
+
+/* Début du pan */
+viewport.addEventListener("pointerdown", (e) => {
+  // si on clique sur le joueur : ne pas bouger la map
+  if (e.target === playerEl) return;
+
+  isPanning = true;
+  viewport.setPointerCapture(e.pointerId);
+
+  const offset = getCurrentMapOffset();
+  mapStart.x = offset.x;
+  mapStart.y = offset.y;
+
+  panStart.x = e.clientX;
+  panStart.y = e.clientY;
+});
+
+/* Pan en cours */
+viewport.addEventListener("pointermove", (e) => {
+  if (!isPanning) return;
+
+  const dx = e.clientX - panStart.x;
+  const dy = e.clientY - panStart.y;
+
+  const newX = mapStart.x + dx;
+  const newY = mapStart.y + dy;
+
+  // on applique la translation
+  mapEl.style.transform = `translate(${newX}px, ${newY}px)`;
+
+});
+
+/* Fin du pan */
+viewport.addEventListener("pointerup", (e) => {
+  isPanning = false;
+  try { viewport.releasePointerCapture(e.pointerId); } catch(e){}
+});
+
 /* Action selon le type */
 function handleLocationClick(loc){
   if(!loc) return;
