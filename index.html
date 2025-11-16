@@ -419,6 +419,56 @@ playerEl.addEventListener('pointerup', (ev)=>{
   try{ playerEl.releasePointerCapture(ev.pointerId);}catch(e){}
 });
 
+/* ============================================
+   DRAG DEPLACEMENT DE LA MAP (SOURIS / TOUCH)
+   Fonctionnel même si A n'est pas activé
+   ============================================ */
+let isPanning = false;
+let panStart = { x: 0, y: 0 };
+let mapStart = { x: 0, y: 0 };
+
+viewport.addEventListener('pointerdown', ev => {
+  // Commencer à glisser la map
+  isPanning = true;
+  panStart.x = ev.clientX;
+  panStart.y = ev.clientY;
+
+  // Récupérer la position actuelle du translate()
+  const style = window.getComputedStyle(mapEl);
+  const matrix = new DOMMatrixReadOnly(style.transform);
+  mapStart.x = matrix.m41;
+  mapStart.y = matrix.m42;
+
+  viewport.setPointerCapture(ev.pointerId);
+});
+
+viewport.addEventListener('pointermove', ev => {
+  if (!isPanning) return;
+
+  const dx = ev.clientX - panStart.x;
+  const dy = ev.clientY - panStart.y;
+
+  let newX = mapStart.x + dx;
+  let newY = mapStart.y + dy;
+
+  // Limiter mouvement à l’intérieur de la map
+  const vpW = viewport.clientWidth;
+  const vpH = viewport.clientHeight;
+  const mapW = mapEl.clientWidth;
+  const mapH = mapEl.clientHeight;
+
+  newX = Math.min(0, Math.max(vpW - mapW, newX));
+  newY = Math.min(0, Math.max(vpH - mapH, newY));
+
+  mapEl.style.transform = `translate(${newX}px, ${newY}px)`;
+});
+
+viewport.addEventListener('pointerup', ev => {
+  isPanning = false;
+  try { viewport.releasePointerCapture(ev.pointerId); } catch(e){}
+});
+
+  
 mapEl.addEventListener('click', (ev)=> handleMapClick(ev.clientX, ev.clientY));
 
 /* Boucle principale */
