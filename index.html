@@ -431,6 +431,11 @@ let panStart = { x: 0, y: 0 };
 let mapStart = { x: 0, y: 0 };
 
 viewport.addEventListener('pointerdown', ev => {
+  // ⛔ Empêcher de drag si on clique sur un marker ou un label
+  if (ev.target.classList.contains('marker') || ev.target.classList.contains('label-marker')) {
+    return;
+  }
+
   // Commencer à glisser la map
   isPanning = true;
   panStart.x = ev.clientX;
