@@ -34,7 +34,7 @@
       gap:18px;
     }
 
-    /* points améliorés */
+    /* points simples */
     .dot{
       width:20px;
       height:20px;
@@ -47,35 +47,21 @@
     .dot:hover{
       transform:scale(1.15);
     }
-    .dot.active{
-      background:#000;
-      border-color:#000;
-    }
-
-    /* petit label explicatif */
-    #label{
-      margin-top:14px;
-      font-size:13px;
-      opacity:0.75;
-      text-transform:uppercase;
-      letter-spacing:0.5px;
-    }
   </style>
 </head>
 
 <body>
 
   <main id="viewer">
-    <img id="display" src="" alt="cran">
+    <img id="display" src="" alt="">
   </main>
 
   <aside id="bar">
-    <div class="dot active" data-cran="1"></div>
-    <div class="dot" data-cran="2"></div>
-    <div class="dot" data-cran="3"></div>
-    <div class="dot" data-cran="4"></div>
-    <div class="dot" data-cran="5"></div>
-    <div id="label">Cran 1</div>
+    <div class="dot" data-img="1"></div>
+    <div class="dot" data-img="2"></div>
+    <div class="dot" data-img="3"></div>
+    <div class="dot" data-img="4"></div>
+    <div class="dot" data-img="5"></div>
   </aside>
 
   <script>
@@ -88,29 +74,21 @@
     ];
 
     const display = document.getElementById('display');
-    const label   = document.getElementById('label');
     const dots    = document.querySelectorAll('.dot');
 
-    function setCran(n){
-      // Evite erreurs si l'image n'existe pas
+    function showImage(n){
       if(images[n-1]) display.src = images[n-1];
-      display.alt = "cran " + n;
-
-      label.textContent = "Cran " + n;
-
-      dots.forEach(d => d.classList.remove('active'));
-      dots[n-1].classList.add('active');
     }
 
     dots.forEach(dot => {
       dot.addEventListener('click', () => {
-        const n = Number(dot.dataset.cran);
-        setCran(n);
+        const n = Number(dot.dataset.img);
+        showImage(n);
       });
     });
 
-    // affiche automatiquement le premier cran
-    setCran(1);
+    // image initiale
+    showImage(1);
   </script>
 
 </body>
