@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Emploi du temps — simple & interactif</title>
+  <style>
+    :root{ --bg:#0f1724; --card:#0b1220; --accent:#06b6d4; --muted:#94a3b8; --ok:#10b981; --danger:#ef4444; }
+    *{box-sizing:border-box}
+    body{font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#e6eef6;background:linear-gradient(180deg,#071029 0%,var(--bg) 100%);margin:0;padding:24px;}
+    .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:360px 1fr;gap:20px}
+    header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+    h1{font-size:20px;margin:0}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+
+    /* Form */
+    form{display:flex;flex-direction:column;gap:10px}
+    label{font-size:13px;color:var(--muted)}
+    input,select,textarea{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .row{display:flex;gap:8px}
+    button{padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:#042024;cursor:pointer}
+    button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+
+    /* Planner */
+    .planner{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .day{min-height:120px;padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.02)}
+    .day h3{margin:0 0 8px 0;font-size:14px}
+    .tasks{display:flex;flex-direction:column;gap:6px}
+    .task{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.01)}
+    .meta{display:flex;gap:8px;align-items:center}
+    .time{font-size:12px;color:var(--muted)}
+    .title{font-size:13px}
+    .controls{display:flex;gap:6px}
+    .btn-sm{padding:6px 8px;border-radius:6px;border:0;cursor:pointer}
+    .done{opacity:0.6;text-decoration:line-through;color:var(--muted)}
+
+    /* Responsive */
+    @media (max-width:900px){.container{grid-template-columns:1fr;}.planner{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:520px){.planner{grid-template-columns:1fr}.row{flex-direction:column}}
+
+    footer{grid-column:1/-1;margin-top:12px;color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Emploi du temps interactif</h1>
+      <div style="font-size:13px;color:var(--muted)">Sauvegarde locale • double-clique pour éditer</div>
+    </header>
+
+    <aside class="card">
+      <form id="taskForm">
+        <label for="title">Tâche</label>
+        <input id="title" required placeholder="Ex : Préparer la réunion" />
+
+        <div class="row">
+          <div style="flex:1">
+            <label for="day">Jour</label>
+            <select id="day">
+              <option value="0">Lundi</option>
+              <option value="1">Mardi</option>
+              <option value="2">Mercredi</option>
+              <option value="3">Jeudi</option>
+              <option value="4">Vendredi</option>
+              <option value="5">Samedi</option>
+              <option value="6">Dimanche</option>
+            </select>
+          </div>
+          <div style="width:120px">
+            <label for="time">Heure</label>
+            <input id="time" type="time" />
+          </div>
+        </div>
+
+        <label for="notes">Notes (optionnel)</label>
+        <textarea id="notes" rows="3" placeholder="Détails..."></textarea>
+
+        <div class="row" style="margin-top:6px">
+          <button id="addBtn">Ajouter</button>
+          <button type="button" id="clearBtn" class="secondary">Tout supprimer</button>
+        </div>
+      </form>
+
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0">
+      <div style="font-size:13px;color:var(--muted)">Raccourcis : appuie Enter dans le champ tâche pour ajouter.</div>
+    </aside>
+
+    <main>
+      <section class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <strong>Vue semaine</strong>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button id="todayBtn" class="secondary btn-sm">Aujourd'hui</button>
+            <label style="font-size:13px;color:var(--muted)">Afficher :</label>
+            <select id="filterSelect">
+              <option value="all">Tous</option>
+              <option value="active">Actifs</option>
+              <option value="done">Terminés</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="planner" id="planner"></div>
+      </section>
+
+      <footer>Les tâches sont stockées dans votre navigateur (localStorage). Elles restent sur cet appareil.</footer>
+    </main>
+  </div>
+
+  <script>
+    // ----- Helpers -----
+    const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+    const STORAGE_KEY = 'edt_tasks_v1';
+
+    // ----- State -----
+    let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+    // ----- Elements -----
+    const planner = document.getElementById('planner');
+    const form = document.getElementById('taskForm');
+    const titleInput = document.getElementById('title');
+    const daySelect = document.getElementById('day');
+    const timeInput = document.getElementById('time');
+    const notesInput = document.getElementById('notes');
+    const addBtn = document.getElementById('addBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const todayBtn = document.getElementById('todayBtn');
+    const filterSelect = document.getElementById('filterSelect');
+
+    // ----- Core functions -----
+    function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
+
+    function addTask({title,day,time,notes,done=
