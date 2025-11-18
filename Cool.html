@@ -80,11 +80,11 @@ function showText(txt){
   wrap.style.opacity = 0;
 
   setTimeout(()=>{
-    // Remplace \n par <br>
-    solo.innerHTML = txt.replace(/\n/g, "<br>");
+    solo.textContent = txt;   // <-- ici
     solo.classList.add('show');
   }, 400);
 }
+
 
 // Retour au contenu
 solo.addEventListener('click', ()=>{
