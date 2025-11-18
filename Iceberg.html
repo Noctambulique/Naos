@@ -1,3 +1,8 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+
 <style>
   html,body{
     height:100%;
@@ -46,27 +51,20 @@
     border-color:#000;
   }
 
-  #label{
-    margin-top:14px;
-    font-size:13px;
-    opacity:0.75;
-    text-transform:uppercase;
-    letter-spacing:0.5px;
-  }
+  /* supprimé : #label */
 </style>
 </head>
 
 <body>
 
   <main id="viewer">
-    <img id="display" src="" alt="cran">
+    <img id="display" src="">
   </main>
 
   <aside id="bar">
-    <div class="dot active" data-cran="1"></div>
-    <div class="dot" data-cran="2"></div>
-    <div class="dot" data-cran="3"></div>
-    <div id="label">Cran 1</div>
+    <div class="dot active" data-id="1"></div>
+    <div class="dot" data-id="2"></div>
+    <div class="dot" data-id="3"></div>
   </aside>
 
   <script>
@@ -77,29 +75,22 @@
     ];
 
     const display = document.getElementById('display');
-    const label   = document.getElementById('label');
     const dots    = document.querySelectorAll('.dot');
 
-    function setCran(n){
-      // Evite erreurs si l'image n'existe pas
+    function show(n){
       if(images[n-1]) display.src = images[n-1];
-      display.alt = "cran " + n;
-
-      label.textContent = "Cran " + n;
-
+      display.alt = ""; // plus de texte
       dots.forEach(d => d.classList.remove('active'));
       dots[n-1].classList.add('active');
     }
 
     dots.forEach(dot => {
       dot.addEventListener('click', () => {
-        const n = Number(dot.dataset.cran);
-        setCran(n);
+        show(Number(dot.dataset.id));
       });
     });
 
-    // affiche automatiquement le premier cran
-    setCran(1);
+    show(1);
   </script>
 
 </body>
