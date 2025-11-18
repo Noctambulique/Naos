@@ -1,19 +1,60 @@
 <!doctype html>
 <meta charset="utf-8">
 <style>
-body{display:flex;gap:12px;padding:20px;font-family:sans-serif}
+body{
+  display:flex;gap:12px;padding:20px;font-family:sans-serif;
+  transition:opacity .5s ease;
+}
 #wrap{display:flex;gap:12px}
-.r{width:320px;height:220px;background-size:cover;background-position:center;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6);font-weight:700}
-.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#00000088}
-.overlay .card{width:80vmin;height:50vmin;background-size:cover;background-position:center;border-radius:10px;display:flex;align-items:center;justify-content:center}
-.overlay .card .txt{background:rgba(255,255,255,0.85);padding:18px;border-radius:8px;color:#000;font-size:1.6rem;text-align:center;max-width:85%}
+.r{
+  width:320px;height:220px;background-size:cover;background-position:center;
+  border-radius:8px;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;color:#fff;
+  text-shadow:0 1px 2px rgba(0,0,0,.6);font-weight:700
+}
+
+/* Écran texte seul */
+#solo{
+  position:fixed;inset:0;background:white;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .6s;
+  font-size:2rem;text-align:center;padding:20px;
+}
+#solo.show{
+  opacity:1;pointer-events:auto;
+}
 </style>
-<div id=wrap>
-  <div class=r data-img="https://picsum.photos/800/600?1" data-text="Voici le texte 1"></div>
-  <div class=r data-img="https://picsum.photos/800/600?2" data-text="Voici le texte 2"></div>
-  <div class=r data-img="https://picsum.photos/800/600?3" data-text="Voici le texte 3"></div>
+
+<div id="wrap">
+  <div class="r" data-img="https://picsum.photos/800/600?1" data-text="Voici le texte 1"></div>
+  <div class="r" data-img="https://picsum.photos/800/600?2" data-text="Voici le texte 2"></div>
+  <div class="r" data-img="https://picsum.photos/800/600?3" data-text="Voici le texte 3"></div>
 </div>
+
+<div id="solo"></div>
+
 <script>
+const wrap=document.getElementById('wrap');
+const solo=document.getElementById('solo');
+
+wrap.querySelectorAll('.r').forEach(r=>{
+  r.style.backgroundImage=`url(${r.dataset.img})`;
+  r.addEventListener('click',()=>showText(r.dataset.text));
+});
+
+function showText(txt){
+  document.body.style.opacity = 0;        // fade-out du contenu
+  setTimeout(()=>{
+    solo.textContent = txt;
+    solo.classList.add('show');           // affiche le texte seul
+  }, 500);
+}
+
+solo.addEventListener('click',()=>{        // retour à l'état initial
+  solo.classList.remove('show');
+  document.body.style.opacity = 1;
+});
+</script>
 const wrap=document.getElementById('wrap');
 wrap.querySelectorAll('.r').forEach(r=>{ r.style.backgroundImage=`url(${r.dataset.img})`; r.addEventListener('click',()=>openFull(r.dataset.img,r.dataset.text)) })
 function openFull(img,txt){
