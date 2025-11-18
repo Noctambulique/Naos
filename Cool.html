@@ -4,7 +4,7 @@
 body{
   padding:20px;
   font-family:sans-serif;
-  transition:opacity .5s ease;
+  transition:opacity .4s ease;
 }
 
 #wrap{
@@ -19,15 +19,9 @@ body{
   background-position:center;
   border-radius:8px;
   cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  text-shadow:0 1px 2px rgba(0,0,0,.6);
-  font-weight:700;
 }
 
-/* Écran texte seul */
+/* Écran blanc + texte */
 #solo{
   position:fixed;
   inset:0;
@@ -37,7 +31,7 @@ body{
   justify-content:center;
   opacity:0;
   pointer-events:none;
-  transition:opacity .5s ease;
+  transition:opacity .4s ease;
   font-size:2rem;
   text-align:center;
   padding:20px;
@@ -61,21 +55,23 @@ body{
 const wrap = document.getElementById('wrap');
 const solo = document.getElementById('solo');
 
-// applique les images et click
+// mise en place des images et clics
 wrap.querySelectorAll('.r').forEach(r=>{
   r.style.backgroundImage = `url(${r.dataset.img})`;
   r.addEventListener('click', ()=> showText(r.dataset.text));
 });
 
 function showText(txt){
+  // fade-out de la page
   document.body.style.opacity = 0;
 
   setTimeout(()=>{
     solo.textContent = txt;
     solo.classList.add('show');
-  }, 500);
+  }, 400);
 }
 
+// retour
 solo.addEventListener('click', ()=>{
   solo.classList.remove('show');
   document.body.style.opacity = 1;
