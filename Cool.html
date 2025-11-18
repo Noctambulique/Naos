@@ -38,7 +38,6 @@ body{
   text-align:center;
   padding:20px;
   line-height:1.5;
-  white-space:pre-line; /* permet aussi de gérer les \n */
 }
 
 #solo.show{
@@ -76,11 +75,19 @@ function showText(txt){
   wrap.style.opacity = 0;
 
   setTimeout(()=>{
-    solo.innerHTML = txt.replace(/\n/g, "<br>");
+
+    // 1) On sépare en paragraphes sur \n\n
+    const paragraphs = txt.split(/\n\s*\n/);
+
+    // 2) On convertit chaque paragraphe en <p> avec les \n internes → <br>
+    const html = paragraphs
+      .map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`)
+      .join("");
+
+    solo.innerHTML = html;
     solo.classList.add('show');
   }, 400);
 }
-
 
 // Retour au contenu
 solo.addEventListener('click', ()=>{
