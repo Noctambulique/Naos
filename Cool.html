@@ -64,7 +64,6 @@
     // sauvegarde l'HTML initial pour pouvoir réinitialiser
     const initialHTML = container.innerHTML;
 
-    // fonction qui transforme les séquences littérales "\\n \\n" ou "\\n\\n" en <br><br>, et les "\\n" simples en <br>
     function formatTextLiteral(str){
       if(!str) return '';
       // remplace les doubles backslash-n (avec éventuellement des espaces entre) en <br><br>
