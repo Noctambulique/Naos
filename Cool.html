@@ -2,26 +2,50 @@
 <meta charset="utf-8">
 <style>
 body{
-  display:flex;gap:12px;padding:20px;font-family:sans-serif;
+  padding:20px;
+  font-family:sans-serif;
   transition:opacity .5s ease;
 }
-#wrap{display:flex;gap:12px}
+
+#wrap{
+  display:flex;
+  gap:12px;
+}
+
 .r{
-  width:320px;height:220px;background-size:cover;background-position:center;
-  border-radius:8px;cursor:pointer;display:flex;
-  align-items:center;justify-content:center;color:#fff;
-  text-shadow:0 1px 2px rgba(0,0,0,.6);font-weight:700
+  width:320px;
+  height:220px;
+  background-size:cover;
+  background-position:center;
+  border-radius:8px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  text-shadow:0 1px 2px rgba(0,0,0,.6);
+  font-weight:700;
 }
 
 /* Écran texte seul */
 #solo{
-  position:fixed;inset:0;background:white;
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .6s;
-  font-size:2rem;text-align:center;padding:20px;
+  position:fixed;
+  inset:0;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .5s ease;
+  font-size:2rem;
+  text-align:center;
+  padding:20px;
 }
+
 #solo.show{
-  opacity:1;pointer-events:auto;
+  opacity:1;
+  pointer-events:auto;
 }
 </style>
 
@@ -34,6 +58,29 @@ body{
 <div id="solo"></div>
 
 <script>
+const wrap = document.getElementById('wrap');
+const solo = document.getElementById('solo');
+
+// Applique les images dès le départ
+wrap.querySelectorAll('.r').forEach(r=>{
+  r.style.backgroundImage = `url(${r.dataset.img})`;
+  r.addEventListener('click', ()=> showText(r.dataset.text));
+});
+
+function showText(txt){
+  document.body.style.opacity = 0;  // fade-out
+
+  setTimeout(()=>{
+    solo.textContent = txt;
+    solo.classList.add('show');
+  }, 500);
+}
+
+solo.addEventListener('click', ()=>{
+  solo.classList.remove('show');
+  document.body.style.opacity = 1;
+});
+</script>
 const wrap=document.getElementById('wrap');
 const solo=document.getElementById('solo');
 
