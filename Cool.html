@@ -1,99 +1,97 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rectangles interactifs</title>
 <style>
-body{
-  padding:20px;
-  font-family:sans-serif;
-}
-
-#wrap{
-  display:flex;
-  gap:12px;
-  transition:opacity .4s ease;
-}
-
-.r{
-  width:320px;
-  height:220px;
-  background-size:cover;
-  background-position:center;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-/* Écran blanc + texte */
-#solo{
-  position:fixed;
-  inset:0;
-  background:white;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .4s ease;
-  font-size:2rem;
-  text-align:center;
-  padding:20px;
-  line-height:1.5;
-}
-
-#solo.show{
-  opacity:1;
-  pointer-events:auto;
-}
+  body {
+    margin: 0;
+    font-family: sans-serif;
+  }
+  #wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+  }
+  .r {
+    width: 200px;
+    height: 150px;
+    background-color: #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: transform 0.2s;
+  }
+  .r:hover {
+    transform: scale(1.05);
+  }
+  #viewer {
+    display: none;
+    padding: 40px;
+    background: white;
+    min-height: 100vh;
+  }
+  #viewer img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 20px;
+  }
+  #back {
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background: #eee;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 5px;
+    display: inline-block;
+  }
 </style>
 </head>
-
 <body>
 
 <div id="wrap">
   <div class="r"
        data-img="D hiver/AERO_IN_20240322161510.png"
-       data-text="Sanctuary on the Moon\n\nC’est une capsule temporelle lunaire : l’idée est de déposer un objet sur la Lune pour “témoigner” de l’humanité, aujourd’hui, pour les générations futures (ou même des civilisations intelligentes).\n\nLe plan : envoyer 24 disques en saphir (diamètre ~10 cm) optiquement gravés, avec des milliards de “pixels” d’informations par disque. Ces disques contiendront du contenu varié : des connaissances en sciences (mathématiques, physique, biologie), des représentations du génome humain, des œuvres culturelles, des images, des textes, de l’art, des diagrammes.\n\nLe saphir est choisi parce que c’est un matériau très durable : les gravures sont faites de façon à être lisibles avec une loupe ou simplement à l’œil, et résisteront aux conditions lunaires pendant des millions d’années. La capsule (1,4 kg) sera déposée sur la Lune via une mission de la NASA (programme Artemis).\n\nL’objectif philosophique : “mettre l’information dans la peau d’un archéologue du futur”. https://sanctuaryonthemoon.com/fr/"></div>
+       data-text="Sanctuary on the Moon\n\nC’est une capsule temporelle lunaire : l’idée est de déposer un objet sur la Lune pour “témoigner” de l’humanité, aujourd’hui, pour les générations futures (ou même des civilisations intelligentes).\n\nLe plan : envoyer 24 disques en saphir (diamètre ~10 cm) optiquement gravés, avec des milliards de “pixels” d’informations par disque. Ces disques contiendront du contenu varié : des connaissances en sciences (mathématiques, physique, biologie), des représentations du génome humain, des œuvres culturelles, des images, des textes, de l’art, des diagrammes.\n\nLe saphir est choisi parce que c’est un matériau très durable : les gravures sont faites de façon à être lisibles avec une loupe ou simplement à l’œil, et résisteront aux conditions lunaires pendant des millions d’années. La capsule (1,4 kg) sera déposée sur la Lune via une mission de la NASA (programme Artemis).\n\nL’objectif philosophique : “mettre l’information dans la peau d’un archéologue du futur”. https://sanctuaryonthemoon.com/fr/">Rect 1</div>
 
   <div class="r"
        data-img="D hiver/cover.jpg"
-       data-text="We Feel Fine est un projet artistique et numérique lancé en 2005 par Jonathan Harris et Sep Kamvar. Il explore les émotions humaines en collectant automatiquement des phrases contenant “I feel” ou “I am feeling” sur des blogs.\n\nLe système transforme ces fragments de vie en un vaste paysage émotionnel, permettant de parcourir des milliers de sentiments exprimés en ligne.\n\nLe projet se veut une réflexion sur l’intimité à l’ère du numérique et sur la manière dont les émotions individuelles composent un portrait collectif. http://www.wefeelfine.org/"></div>
+       data-text="We Feel Fine est un projet artistique et numérique lancé en 2005 par Jonathan Harris et Sep Kamvar. Il explore les émotions humaines en collectant automatiquement des phrases contenant “I feel” ou “I am feeling” sur des blogs.\n\nLe système transforme ces fragments de vie en un vaste paysage émotionnel, permettant de parcourir des milliers de sentiments exprimés en ligne.\n\nLe projet se veut une réflexion sur l’intimité à l’ère du numérique et sur la manière dont les émotions individuelles composent un portrait collectif. http://www.wefeelfine.org/">Rect 2</div>
 </div>
 
-<div id="solo"></div>
+<div id="viewer">
+  <div id="back">← Retour</div>
+  <img id="viewerImg" src="" alt="" />
+  <pre id="viewerText"></pre>
+</div>
 
 <script>
-const wrap = document.getElementById('wrap');
-const solo = document.getElementById('solo');
+  const wrap = document.getElementById('wrap');
+  const viewer = document.getElementById('viewer');
+  const viewerImg = document.getElementById('viewerImg');
+  const viewerText = document.getElementById('viewerText');
+  const back = document.getElementById('back');
 
-// Applique les images et crée les événements
-wrap.querySelectorAll('.r').forEach(r => {
-  r.style.backgroundImage = `url("${r.dataset.img}")`;
-  r.addEventListener('click', () => showText(r.dataset.text));
-});
+  document.querySelectorAll('.r').forEach(el => {
+    el.addEventListener('click', () => {
+      const img = el.getAttribute('data-img');
+      const text = el.getAttribute('data-text');
+      viewerImg.src = img;
+      viewerText.textContent = text;
+      wrap.style.display = 'none';
+      viewer.style.display = 'block';
+    });
+  });
 
-function showText(txt){
-  wrap.style.opacity = 0;
-
-  setTimeout(()=>{
-
-    // 1) On sépare en paragraphes sur \n\n
-    const paragraphs = txt.split(/\n\s*\n/);
-
-    // 2) On convertit chaque paragraphe en <p> avec les \n internes → <br>
-    const html = paragraphs
-      .map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`)
-      .join("");
-
-    solo.innerHTML = html;
-    solo.classList.add('show');
-  }, 400);
-}
-
-// Retour au contenu
-solo.addEventListener('click', ()=>{
-  solo.classList.remove('show');
-  wrap.style.opacity = 1;
-});
+  back.addEventListener('click', () => {
+    viewer.style.display = 'none';
+    wrap.style.display = 'flex';
+  });
 </script>
 
 </body>
