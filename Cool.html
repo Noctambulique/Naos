@@ -4,12 +4,12 @@
 body{
   padding:20px;
   font-family:sans-serif;
-  transition:opacity .4s ease;
 }
 
 #wrap{
   display:flex;
   gap:12px;
+  transition:opacity .4s ease;
 }
 
 .r{
@@ -55,15 +55,14 @@ body{
 const wrap = document.getElementById('wrap');
 const solo = document.getElementById('solo');
 
-// mise en place des images et clics
+// applique les images
 wrap.querySelectorAll('.r').forEach(r=>{
   r.style.backgroundImage = `url(${r.dataset.img})`;
   r.addEventListener('click', ()=> showText(r.dataset.text));
 });
 
 function showText(txt){
-  // fade-out de la page
-  document.body.style.opacity = 0;
+  wrap.style.opacity = 0; // fade-out du contenu SEULEMENT
 
   setTimeout(()=>{
     solo.textContent = txt;
@@ -71,9 +70,9 @@ function showText(txt){
   }, 400);
 }
 
-// retour
+// retour au contenu
 solo.addEventListener('click', ()=>{
   solo.classList.remove('show');
-  document.body.style.opacity = 1;
+  wrap.style.opacity = 1;
 });
 </script>
