@@ -1,101 +1,111 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Rectangles interactifs</title>
-<style>
-  body {
-    margin: 0;
-    font-family: sans-serif;
-  }
-  #wrap {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-  }
-  .r {
-    width: 200px;
-    height: 150px;
-    background-color: #ddd;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: transform 0.2s;
-  }
-  .r:hover {
-    transform: scale(1.05);
-  }
-  #viewer {
-    display: none;
-    padding: 40px;
-    background: white;
-    min-height: 100vh;
-  }
-  #viewer img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin-bottom: 20px;
-  }
-  pre#viewerText {
-    white-space: pre-wrap;
-  }
-  #back {
-    margin-bottom: 20px;
-    padding: 10px 15px;
-    background: #eee;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    border-radius: 5px;
-    display: inline-block;
-  }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rectangles cliquables — affiche texte</title>
+  <style>
+    :root{--gap:18px;--radius:14px}
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{background:#f3f4f6;padding:30px;box-sizing:border-box}
+    .wrap{max-width:1100px;margin:0 auto}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--gap)}
+    .card{background:white;border-radius:var(--radius);overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:150px;box-shadow:0 6px 18px rgba(2,6,23,0.08);transition:transform .18s,box-shadow .18s}
+    .card:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(2,6,23,0.12)}
+    .card img{width:100%;height:100%;object-fit:cover;display:block}
+    .title{font-weight:700;margin:0 0 12px 0}
+
+    /* zone qui remplacera les images pour afficher le texte sur fond blanc */
+    .reader{background:#fff;padding:28px;border-radius:12px;min-height:320px;box-shadow:0 10px 30px rgba(2,6,23,0.08)}
+    .reader .content{white-space:pre-wrap;line-height:1.5;color:#111}
+
+    .controls{margin:18px 0 10px 0;display:flex;gap:12px}
+    .btn{background:#0b5cff;color:white;padding:8px 14px;border-radius:10px;border:0;cursor:pointer}
+    .btn--ghost{background:transparent;color:#0b5cff;border:1px solid rgba(11,92,255,0.12)}
+
+    /* responsive smaller spacing */
+    @media (max-width:520px){:root{--gap:12px}}
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <h1 class="title">Rectangles cliquables — clique pour afficher un texte</h1>
+    <p>Les rectangles contiennent des images. En cliquant sur un rectangle, les images sont supprimées et le texte apparaît sur fond blanc. Utilisez <code>\n \n</code> dans le texte (deux backslash + n) pour sauter une ligne.</p>
 
-<div id="wrap">
-  <div class="r"
-       data-img="D hiver/AERO_IN_20240322161510.png"
-       data-text="Sanctuary on the Moon\n\nC’est une capsule temporelle lunaire : l’idée est de déposer un objet sur la Lune pour “témoigner” de l’humanité, aujourd’hui, pour les générations futures (ou même des civilisations intelligentes).\n\nLe plan : envoyer 24 disques en saphir (diamètre ~10 cm) optiquement gravés, avec des milliards de “pixels” d’informations par disque. Ces disques contiendront du contenu varié : des connaissances en sciences (mathématiques, physique, biologie), des représentations du génome humain, des œuvres culturelles, des images, des textes, de l’art, des diagrammes.\n\nLe saphir est choisi parce que c’est un matériau très durable : les gravures sont faites de façon à être lisibles avec une loupe ou simplement à l’œil, et résisteront aux conditions lunaires pendant des millions d’années. La capsule (1,4 kg) sera déposée sur la Lune via une mission de la NASA (programme Artemis).\n\nL’objectif philosophique : “mettre l’information dans la peau d’un archéologue du futur”. https://sanctuaryonthemoon.com/fr/">Rect 1</div>
+    <div class="controls">
+      <button id="resetBtn" class="btn btn--ghost">Réinitialiser les vignettes</button>
+    </div>
 
-  <div class="r"
-       data-img="D hiver/cover.jpg"
-       data-text="We Feel Fine est un projet artistique et numérique lancé en 2005 par Jonathan Harris et Sep Kamvar. Il explore les émotions humaines en collectant automatiquement des phrases contenant “I feel” ou “I am feeling” sur des blogs.\n\nLe système transforme ces fragments de vie en un vaste paysage émotionnel, permettant de parcourir des milliers de sentiments exprimés en ligne.\n\nLe projet se veut une réflexion sur l’intimité à l’ère du numérique et sur la manière dont les émotions individuelles composent un portrait collectif. http://www.wefeelfine.org/">Rect 2</div>
-</div>
+    <div id="container" class="grid">
+      <!-- chaque carte contient une image et un attribut data-text qui contient le texte à afficher -->
+      <div class="card" data-text="Voici le texte du premier rectangle.\n \nIl contient deux paragraphes séparés par \"\\n \\n\".\n\nVous pouvez aussi écrire plusieurs lignes avec des \"\\n\" simples.">
+        <img src="https://picsum.photos/seed/1/600/400" alt="image 1">
+      </div>
 
-<div id="viewer">
-  <div id="back">← Retour</div>
-  <img id="viewerImg" src="" alt="" />
-  <pre id="viewerText"></pre>
-</div>
+      <div class="card" data-text="Deuxième carte :\n \nExemple avec sauts de ligne.\n- Puce 1\n- Puce 2\n \nFin du texte.">
+        <img src="https://picsum.photos/seed/2/600/400" alt="image 2">
+      </div>
 
-<script>
-  const wrap = document.getElementById('wrap');
-  const viewer = document.getElementById('viewer');
-  const viewerImg = document.getElementById('viewerImg');
-  const viewerText = document.getElementById('viewerText');
-  const back = document.getElementById('back');
+      <div class="card" data-text="Troisième :\n \nUn long texte qui sera automatiquement mis en page et convertira les séquences \\n en sauts de ligne visuels.\n\nAmusez-vous !">
+        <img src="https://picsum.photos/seed/3/600/400" alt="image 3">
+      </div>
 
-  document.querySelectorAll('.r').forEach(el => {
-    el.addEventListener('click', () => {
-      const img = el.getAttribute('data-img');
-      const text = el.getAttribute('data-text');
-      viewerImg.src = img;
-      viewerText.textContent = text;
-      wrap.style.display = 'none';
-      viewer.style.display = 'block';
+      <div class="card" data-text="Carte 4\n \nTexte court.">
+        <img src="https://picsum.photos/seed/4/600/400" alt="image 4">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById('container');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // sauvegarde l'HTML initial pour pouvoir réinitialiser
+    const initialHTML = container.innerHTML;
+
+    // fonction qui transforme les séquences littérales "\\n \\n" ou "\\n\\n" en <br><br>, et les "\\n" simples en <br>
+    function formatTextLiteral(str){
+      if(!str) return '';
+      // remplace les doubles backslash-n (avec éventuellement des espaces entre) en <br><br>
+      let s = str.replace(/\\n\s*\\n/g, '<br><br>');
+      // puis remplace les simples backslash-n restants en <br>
+      s = s.replace(/\\n/g, '<br>');
+      return s;
+    }
+
+    // événement sur les rectangles
+    container.addEventListener('click', e => {
+      const card = e.target.closest('.card');
+      if(!card) return;
+
+      // récupère le texte depuis l'attribut data-text (le texte peut contenir des séquences \n)
+      const raw = card.getAttribute('data-text') || '';
+      const html = formatTextLiteral(raw);
+
+      // remplace toute la grille par une zone blanche affichant le texte
+      // ceci "chasse" les images (elles ne sont plus dans le DOM)
+      container.innerHTML = `
+        <div class="reader">
+          <div class="content">${html}</div>
+        </div>
+      `;
+
+      // met aussi le fond de la page en blanc (optionnel) pour que ce soit bien lisible
+      document.body.style.background = '#ffffff';
+
+      // scroll en haut pour mettre le texte en vue
+      window.scrollTo({top:0,behavior:'smooth'});
     });
-  });
 
-  back.addEventListener('click', () => {
-    viewer.style.display = 'none';
-    wrap.style.display = 'flex';
-  });
-</script>
+    // bouton réinitialiser : remet les images en place et restaure le fond d'origine
+    resetBtn.addEventListener('click', () => {
+      container.innerHTML = initialHTML;
+      document.body.style.background = '#f3f4f6';
+    });
 
+    // --- Astuce pour éditer : si vous voulez mettre des "retours à la ligne" dans l'attribut data-text,
+    // écrivez littéralement "\\n" (backslash + n). Pour obtenir un saut de paragraphe, écrivez "\\n \\n".
+  </script>
 </body>
 </html>
