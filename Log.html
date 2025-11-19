@@ -2,195 +2,53 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Liste — Petits carrés verts</title>
+  <title>Liste simple — Carrés verts</title>
   <style>
-    :root{
-      --bg:#ffffff;
-      --square-color:#2ecc71; /* default green */
-      --square-size:14px;
-      --gap:12px;
-      --font-size:16px;
+    body {
+      background: #ffffff;
+      margin: 40px;
+      font-family: Arial, sans-serif;
+      color: #111;
+      line-height: 1.6;
     }
-    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg); color:#111}
-    .app{max-width:900px;margin:28px auto;padding:20px}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-    h1{font-size:20px;margin:0}
-    .controls{display:flex;gap:8px;align-items:center}
-    .controls label{font-size:13px;color:#444}
-    .controls input[type=range]{width:120px}
-
-    .list{display:flex;flex-direction:column;gap:8px}
-    .line{display:flex;align-items:center;gap:var(--gap);padding:6px 8px;border-radius:8px}
-    .line:hover .actions{opacity:1}
-
-    .square{width:var(--square-size);height:var(--square-size);min-width:var(--square-size);border-radius:3px;background:var(--square-color);flex-shrink:0}
-    .text{outline:none;min-height:20px;font-size:var(--font-size)}
-
-    .heading{font-weight:700;font-size:1rem;padding:8px 6px;border-radius:6px;background:#f6f6f6}
-
-    .actions{margin-left:auto;display:flex;gap:6px;opacity:0;transition:opacity .14s}
-    button{background:#fff;border:1px solid #e6e6e6;padding:6px 8px;border-radius:6px;cursor:pointer}
-    button.secondary{background:transparent;border:0;color:#666}
-
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-    .hint{font-size:13px;color:#666;margin-top:10px}
-
-    footer{margin-top:18px;color:#666;font-size:13px}
+    .ligne {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .carre {
+      width: 14px;
+      height: 14px;
+      background: #2ecc71; /* vert */
+      margin-right: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .titre {
+      font-weight: bold;
+      margin: 20px 0 10px;
+      font-size: 18px;
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1>Liste à petits carrés</h1>
-      <div class="controls toolbar">
-        <label>Couleur <input id="color" type="color" value="#2ecc71"></label>
-        <label>Taille <input id="size" type="range" min="8" max="30" value="14"></label>
-        <label>Taille police <input id="fontsize" type="range" min="12" max="28" value="16"></label>
-        <button id="addLine">+ Ajouter ligne</button>
-        <button id="addHeading">+ Ajouter titre</button>
-        <button id="export">Exporter</button>
-      </div>
-    </header>
 
-    <main>
-      <div id="list" class="list" aria-live="polite"></div>
-      <div class="hint">Astuce : survolez une ligne pour voir les actions (ajouter au-dessus/en-dessous, supprimer). Texte et titres sont éditables en place. Tout est enregistré localement.</div>
-    </main>
+  <div class="titre">Mon titre</div>
 
-    <footer>Personnalisez la couleur, la taille du carré et la police. Utilise les boutons pour insérer des éléments entre deux lignes.</footer>
+  <div class="ligne">
+    <div class="carre"></div>
+    <div>Texte de ligne 1</div>
   </div>
 
-  <template id="tpl-line">
-    <div class="line" data-type="item">
-      <div class="square" role="img" aria-label="Carré"></div>
-      <div class="text" contenteditable="true" data-placeholder="Écris quelque chose..."></div>
-      <div class="actions">
-        <button class="add-above" title="Ajouter au-dessus">↑</button>
-        <button class="add-below" title="Ajouter en-dessous">↓</button>
-        <button class="toggle-square" title="Basculer carré">◻/◼</button>
-        <button class="delete" title="Supprimer">✕</button>
-      </div>
-    </div>
-  </template>
+  <div class="ligne">
+    <div class="carre"></div>
+    <div>Texte de ligne 2</div>
+  </div>
 
-  <template id="tpl-heading">
-    <div class="heading" data-type="heading" contenteditable="true">Titre</div>
-  </template>
+  <div class="ligne">
+    <div class="carre"></div>
+    <div>Texte de ligne 3</div>
+  </div>
 
-  <script>
-    // Utilities
-    const $ = sel => document.querySelector(sel);
-    const list = $('#list');
-    const tplLine = document.getElementById('tpl-line');
-    const tplHeading = document.getElementById('tpl-heading');
-
-    // Persistence
-    function save(){
-      const items = [];
-      for(const child of list.children){
-        const type = child.dataset.type;
-        if(type==='item'){
-          items.push({type:'item', text: child.querySelector('.text').innerHTML, squareOn: child.querySelector('.square').style.display !== 'none'});
-        }else{
-          items.push({type:'heading', text: child.innerHTML});
-        }
-      }
-      localStorage.setItem('carres-data', JSON.stringify(items));
-    }
-    function load(){
-      const raw = localStorage.getItem('carres-data');
-      if(!raw) return;
-      try{const items = JSON.parse(raw);items.forEach(obj=>{
-        if(obj.type==='item') addLine(null, obj.text, obj.squareOn);
-        else addHeading(null, obj.text);
-      })}catch(e){console.warn(e)}
-    }
-
-    // Create elements
-    function addLine(after=null, html='', squareOn=true){
-      const node = tplLine.content.firstElementChild.cloneNode(true);
-      node.querySelector('.text').innerHTML = html || '';
-      if(!squareOn) node.querySelector('.square').style.display='none';
-      attachLineEvents(node);
-      if(after && after.parentElement===list) list.insertBefore(node, after.nextSibling);
-      else list.appendChild(node);
-      node.querySelector('.text').focus();
-      save();
-    }
-    function addHeading(after=null, html='Titre'){
-      const node = tplHeading.content.firstElementChild.cloneNode(true);
-      node.innerHTML = html || 'Titre';
-      attachHeadingEvents(node);
-      if(after && after.parentElement===list) list.insertBefore(node, after.nextSibling);
-      else list.appendChild(node);
-      node.focus();
-      save();
-    }
-
-    // Attach events
-    function attachLineEvents(node){
-      const text = node.querySelector('.text');
-      const square = node.querySelector('.square');
-      node.querySelector('.add-above').addEventListener('click',()=> addLine(node.previousSibling));
-      node.querySelector('.add-below').addEventListener('click',()=> addLine(node));
-      node.querySelector('.toggle-square').addEventListener('click',()=>{
-        if(square.style.display==='none') square.style.display='block'; else square.style.display='none'; save();
-      });
-      node.querySelector('.delete').addEventListener('click',()=>{ node.remove(); save();});
-      text.addEventListener('input', debounce(save,300));
-    }
-    function attachHeadingEvents(node){
-      node.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); addLine(node); } });
-      node.addEventListener('input', debounce(save,300));
-      // allow adding above/below via context menu? simple approach: double-click adds line after
-      node.addEventListener('dblclick', ()=> addLine(node));
-    }
-
-    // Controls
-    $('#addLine').addEventListener('click', ()=> addLine());
-    $('#addHeading').addEventListener('click', ()=> addHeading());
-    $('#color').addEventListener('input', e=>{ document.documentElement.style.setProperty('--square-color', e.target.value); save(); });
-    $('#size').addEventListener('input', e=>{ document.documentElement.style.setProperty('--square-size', e.target.value+'px'); save(); });
-    $('#fontsize').addEventListener('input', e=>{ document.documentElement.style.setProperty('--font-size', e.target.value+'px'); save(); });
-
-    // Export HTML (simple)
-    $('#export').addEventListener('click', ()=>{
-      const copy = document.documentElement.cloneNode(true);
-      // remove scripts to keep exported safe
-      copy.querySelectorAll('script').forEach(s=>s.remove());
-      const blob = new Blob([ '<!doctype html>\n' + copy.outerHTML ], {type:'text/html'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href=url; a.download='liste-carres.html'; a.click(); URL.revokeObjectURL(url);
-    });
-
-    // Small helpers
-    function debounce(fn,wait){let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),wait); }}
-
-    // init defaults from controls
-    document.documentElement.style.setProperty('--square-color', $('#color').value);
-    document.documentElement.style.setProperty('--square-size', $('#size').value+'px');
-    document.documentElement.style.setProperty('--font-size', $('#fontsize').value+'px');
-
-    // keyboard: Enter in text creates new line below
-    document.addEventListener('keydown', e=>{
-      const sel = document.getSelection(); if(!sel.rangeCount) return;
-      const parent = sel.anchorNode && sel.anchorNode.parentElement;
-      if(e.key==='Enter' && parent && parent.classList && parent.classList.contains('text')){
-        e.preventDefault(); addLine(parent.closest('.line'));
-      }
-    });
-
-    // load example if empty
-    if(!localStorage.getItem('carres-data')){
-      addHeading(null,'Mon titre');
-      addLine(null,'Élément 1');
-      addLine(null,'Élément 2');
-      addLine(null,'Élément 3');
-    } else load();
-
-    // observe list changes (for drag/drop future) - save on mutation
-    const obs = new MutationObserver(debounce(save,200)); obs.observe(list,{childList:true,subtree:true});
-  </script>
 </body>
 </html>
