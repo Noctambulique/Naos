@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Colonnes interactives — personnalisable</title>
+  <style>
+    :root{--gap:18px;--accent:#0ea5a4;--bg:#f7fafc}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; margin:0; background:var(--bg); color:#042;}
+    header{display:flex;gap:12px;align-items:center;padding:16px;background:linear-gradient(90deg,#fff, #fbfcfd);box-shadow:0 1px 0 rgba(2,6,23,.06)}
+    header h1{font-size:18px;margin:0}
+    .controls{margin-left:auto;display:flex;gap:8px;align-items:center}
+    button{background:var(--accent);color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
+    button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(14,165,164,.18)}
+
+    main{padding:24px}
+    .columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--gap)}
+    .col{background:#fff;padding:14px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,.06);min-height:140px;display:flex;flex-direction:column}
+    .col .title{font-weight:700;font-size:16px;margin-bottom:10px;outline:none}
+    .content{flex:1;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}
+    .word{padding:6px 10px;border-radius:999px;background:rgba(14,165,164,.08);cursor:pointer;user-select:none}
+    .word[contenteditable="true"]{background:rgba(14,165,164,.06);border:1px dashed rgba(14,165,164,.12)}
+
+    /* overlay full-text view */
+    .reader{position:fixed;inset:0;background:#fff;display:none;align-items:center;justify-content:center;padding:40px;z-index:9999}
+    .reader.open{display:flex}
+    .reader .card{max-width:900px;max-height:90vh;overflow:auto;background:#fff;padding:28px;border-radius:12px;box-shadow:0 20px 50px rgba(2,6,23,.12)}
+    .reader .close{position:absolute;top:18px;right:18px;background:transparent;border:0;font-weight:700;color:#042;cursor:pointer}
+
+    /* small editor */
+    .editbar{display:flex;gap:8px;align-items:center}
+    .note{font-size:13px;color:#375;opacity:.7}
+
+    footer{padding:12px 24px;color:#375;font-size:13px}
+
+    @media (max-width:520px){.columns{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Colonnes interactives — personnalisable</h1>
+    <div class="controls">
+      <label style="display:flex;align-items:center;gap:8px;color:#044"><input id="toggleEdit" type="checkbox"> Mode édition</label>
+      <button id="addCol">+ Ajouter colonne</button>
+      <button id="exportBtn" class="ghost">Exporter JSON</button>
+    </div>
+  </header>
+
+  <main>
+    <p class="note">Double-cliquez sur un titre ou un mot pour modifier le texte directement. En mode édition, vous pouvez définir le texte complet affiché lors du clic.</p>
+
+    <div class="columns" id="columns">
+      <!-- Exemple de colonne — personnalisez le contenu et les data-full-text -->
+      <section class="col" data-col-id="col-1">
+        <div class="title" contenteditable="true">Titre 1</div>
+        <div class="content">
+          <span class="word" tabindex="0" data-full="Ceci est le texte complet pour le mot A. Vous pouvez le remplacer en mode édition.">Mot A</span>
+          <span class="word" tabindex="0" data-full="Texte personnalisé pour Mot B — exemple.">Mot B</span>
+          <span class="word" tabindex="0" data-full="Un troisième texte détaillé pour Mot C.">Mot C</span>
+        </div>
+      </section>
+
+      <section class="col" data-col-id="col-2">
+        <div class="title" contenteditable="true">Titre 2</div>
+        <div class="content">
+          <span class="word" tabindex="0" data-full="Explication complète pour X.">X</span>
+          <span class="word" tabindex="0" data-full="Détails pour Y.">Y</span>
+        </div>
+      </section>
+
+      <section class="col" data-col-id="col-3">
+        <div class="title" contenteditable="true">Titre 3</div>
+        <div class="content">
+          <span class="word" tabindex="0" data-full="Paragraphe long pour Z. Vous pouvez inclure HTML si nécessaire, par ex. &lt;strong&gt;bold&lt;/strong&gt;.">Z</span>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="reader" id="reader">
+    <button class="close" id="closeReader">✕</button>
+    <div class="card" id="readerCard"></div>
+  </div>
+
+  <!-- modal simple pour éditer le texte complet d'un mot -->
+  <div id="editorModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,.4);align-items:center;justify-content:center;z-index:9998">
+    <div style="background:#fff;padding:18px;border-radius:10px;max-width:720px;width:94%;box-shadow:0 20px 60px rgba(2,6,23,.12)">
+      <h3 style="margin-top:0">Éditer le mot / le texte complet</h3>
+      <label style="display:block;margin-bottom:8px">Mot (texte affiché dans la colonne)</label>
+      <input id="editWordText" type="text" style="width:100%;padding:8px;margin-bottom:12px" />
+      <label style="display:block;margin-bottom:8px">Texte complet (HTML autorisé)</label>
+      <textarea id="editFullText" rows="8" style="width:100%;padding:8px"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="saveEdit">Enregistrer</button>
+        <button id="cancelEdit" class="ghost">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Facile à personnaliser — éditez directement les titres et mots, ou utilisez le <strong>Mode édition</strong> pour modifier le texte complet lié à chaque mot.</footer>
+
+  <script>
+    // Utilitaires
+    const columns = document.getElementById('columns');
+    const reader = document.getElementById('reader');
+    const readerCard = document.getElementById('readerCard');
+    const closeReader = document.getElementById('closeReader');
+    const toggleEdit = document.getElementById('toggleEdit');
+    const editorModal = document.getElementById('editorModal');
+    const editWordText = document.getElementById('editWordText');
+    const editFullText = document.getElementById('editFullText');
+    let editingEl = null;
+
+    // Ouvrir vue texte complet (remplace tout le contenu de la page par le texte)
+    function openReader(html){
+      // cache tout et n'affiche que reader
+      readerCard.innerHTML = html;
+      document.body.style.overflow = 'hidden';
+      reader.classList.add('open');
+    }
+    function closeReaderFn(){
+      reader.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    closeReader.addEventListener('click', closeReaderFn);
+
+    // Gérer le clic sur un mot
+    function onWordClick(e){
+      const w = e.currentTarget;
+      if(toggleEdit.checked){
+        // ouvrir modal d'édition
+        editingEl = w;
+        editWordText.value = w.textContent.trim();
+        editFullText.value = w.dataset.full || '';
+        editorModal.style.display = 'flex';
+        return;
+      }
+      // afficher le texte complet. Si data-full absent, utilise le texte du mot
+      const full = w.dataset.full || w.textContent;
+      openReader(full);
+    }
+
+    function attachWordEvents(word){
+      word.addEventListener('click', onWordClick);
+      // accessible via Enter
+      word.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ ev.preventDefault(); onWordClick({currentTarget:word}); } });
+    }
+
+    // initial attach
+    document.querySelectorAll('.word').forEach(attachWordEvents);
+
+    // modal actions
+    document.getElementById('saveEdit').addEventListener('click', ()=>{
+      if(!editingEl) return;
+      // update
+      editingEl.textContent = editWordText.value || '—';
+      editingEl.dataset.full = editFullText.value || '';
+      editorModal.style.display = 'none';
+      editingEl = null;
+    });
+    document.getElementById('cancelEdit').addEventListener('click', ()=>{ editorModal.style.display = 'none'; editingEl = null; });
+
+    // ajouter colonne
+    document.getElementById('addCol').addEventListener('click', ()=>{
+      const id = 'col-'+Date.now();
+      const sec = document.createElement('section');
+      sec.className='col'; sec.dataset.colId=id;
+      sec.innerHTML = `<div class="title" contenteditable="true">Nouveau titre</div><div class="content"><span class="word" tabindex="0" data-full="Texte complet...">Nouveau</span></div>`;
+      columns.appendChild(sec);
+      // attacher événements
+      sec.querySelectorAll('.word').forEach(attachWordEvents);
+    });
+
+    // exporter JSON (structure simple)
+    document.getElementById('exportBtn').addEventListener('click', ()=>{
+      const data = [];
+      document.querySelectorAll('.col').forEach(col=>{
+        const colObj = {title: col.querySelector('.title').textContent.trim(), words: []};
+        col.querySelectorAll('.word').forEach(w=> colObj.words.push({text: w.textContent, full: w.dataset.full || ''}));
+        data.push(colObj);
+      });
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'colonnes.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // accessibility: fermer reader avec Esc
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='Escape'){
+        if(reader.classList.contains('open')) closeReaderFn();
+        if(editorModal.style.display==='flex') { editorModal.style.display='none'; editingEl=null; }
+      }
+    });
+
+    // exemple: double-clic sur un mot rend le mot éditable inline (utile hors mode édition)
+    document.addEventListener('dblclick', (e)=>{
+      if(e.target.classList.contains('word')){
+        const w = e.target;
+        w.setAttribute('contenteditable','true');
+        w.focus();
+        // quitter le contenteditable au blur
+        w.addEventListener('blur', function onblur(){ w.removeAttribute('contenteditable'); w.removeEventListener('blur', onblur); });
+      }
+      if(e.target.classList.contains('title')){
+        e.target.setAttribute('contenteditable','true'); e.target.focus();
+        e.target.addEventListener('blur', function onblur(){ e.target.removeAttribute('contenteditable'); e.target.removeEventListener('blur', onblur); });
+      }
+    });
+
+    // conseils pour personnaliser (console)
+    console.log('Astuce : modifiez les data-full directement dans le HTML pour personnaliser le texte complet.');
+  </script>
+</body>
+</html>
