@@ -3,42 +3,50 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Colonnes interactives</title>
+  <title>Colonnes minimalistes</title>
   <style>
-    :root{--gap:18px;--accent:#0ea5a4;--bg:#ffffff}
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:#042;padding:24px}
-    .columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--gap)}
-    .col{background:#fff;padding:14px;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.06)}
-    .title{font-weight:700;font-size:16px;margin-bottom:10px}
-    .content{display:flex;flex-wrap:wrap;gap:8px}
-    .word{padding:6px 10px;border-radius:999px;background:rgba(14,165,164,.08);cursor:pointer;user-select:none}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    body{padding:24px;color:#111;background:#fff}
 
+    .columns{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+    .col{padding:8px}
+    .title{font-weight:600;font-size:18px;margin-bottom:12px}
+    .line{margin-bottom:8px;cursor:pointer;display:block}
+
+    /* Vue du texte complet */
     .reader{position:fixed;inset:0;background:#fff;display:none;align-items:center;justify-content:center;padding:40px;z-index:9999}
     .reader.open{display:flex}
-    .reader .card{max-width:900px;max-height:90vh;overflow:auto;padding:28px;font-size:18px;line-height:1.5}
-    .close{position:absolute;top:16px;right:16px;font-size:24px;border:0;background:transparent;cursor:pointer;color:#000}
+    .reader .card{max-width:900px;max-height:90vh;overflow:auto;font-size:20px;line-height:1.5}
+    .close{position:absolute;top:16px;right:16px;font-size:28px;border:0;background:transparent;cursor:pointer}
 
-    @media(max-width:520px){.columns{grid-template-columns:1fr}}
+    @media(max-width:700px){.columns{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
 
-  <div class="columns" id="columns">
+  <div class="columns">
+
     <section class="col">
-      <div class="title">Titre 1</div>
-      <div class="content">
-        <span class="word" data-full="Texte complet A">Mot A</span>
-        <span class="word" data-full="Texte complet B">Mot B</span>
-      </div>
+      <div class="title">Colonne 1</div>
+      <span class="line" data-full="Texte complet pour la première phrase.">Première phrase</span>
+      <span class="line" data-full="Second texte plus détaillé.">Deuxième phrase</span>
+      <span class="line" data-full="Troisième texte personnalisé.">Troisième phrase</span>
     </section>
 
     <section class="col">
-      <div class="title">Titre 2</div>
-      <div class="content">
-        <span class="word" data-full="Texte complet C">Mot C</span>
-      </div>
+      <div class="title">Colonne 2</div>
+      <span class="line" data-full="Texte explicatif 1.">Phrase A</span>
+      <span class="line" data-full="Texte explicatif 2.">Phrase B</span>
+      <span class="line" data-full="Texte explicatif 3.">Phrase C</span>
     </section>
+
+    <section class="col">
+      <div class="title">Colonne 3</div>
+      <span class="line" data-full="Information liée à l’élément X.">Élément X</span>
+      <span class="line" data-full="Information liée à l’élément Y.">Élément Y</span>
+      <span class="line" data-full="Information liée à l’élément Z.">Élément Z</span>
+    </section>
+
   </div>
 
   <div class="reader" id="reader">
@@ -51,23 +59,18 @@
   const readerCard = document.getElementById('readerCard');
   const closeReader = document.getElementById('closeReader');
 
-  function openReader(html){
-    readerCard.innerHTML = html;
-    reader.classList.add('open');
-  }
+  function openReader(html){ readerCard.innerHTML = html; reader.classList.add('open'); }
   function closeReaderFn(){ reader.classList.remove('open'); }
   closeReader.onclick = closeReaderFn;
 
-  document.querySelectorAll('.word').forEach(w=>{
-    w.onclick = ()=>{
-      const full = w.dataset.full || w.textContent;
+  document.querySelectorAll('.line').forEach(el=>{
+    el.onclick = ()=>{
+      const full = el.dataset.full || el.textContent;
       openReader(full);
     };
   });
 
-  document.addEventListener('keydown',e=>{
-    if(e.key==='Escape') closeReaderFn();
-  });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeReaderFn(); });
 </script>
 
 </body>
