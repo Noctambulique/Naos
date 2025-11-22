@@ -54,14 +54,22 @@
     backdrop-filter: blur(4px);
   }
 
-  /* L’image remplit la zone */
-  .card img{
-    width:100%;
-    height:100%;
-    object-fit: cover;
-    pointer-events: none;
-    user-select:none;
-  }
+ /* L’image ne déborde jamais : elle garde des marges internes */
+.card img{
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select:none;
+  transition: width var(--transition), height var(--transition);
+}
+
+/* Quand la carte est zoomée, l’image garde un cadre intérieur */
+.card.active img{
+  width: 95%;
+  height: 95%;
+  object-fit: contain;
+}
 
   .grid.zoomed .card:not(.active){
     opacity: 0;
