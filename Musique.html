@@ -13,41 +13,63 @@
 </head>
 <body>
   <div class="wrap">
-    <h1 id="title">Titre du morceau</h1>
-    <p id="artist">Fichier GitHub</p>
+    <h1 id="title">—</h1>
+    <p id="artist">—</p>
   </div>
 
   <audio id="audio"></audio>
 
   <script>
-    // --- PERSONNALISEZ ICI ---
-    // Liste des pistes GitHub RAW
+    /* --------------------------------------------------
+       AJOUTE SIMPLEMENT TES MORCEAUX ICI
+       
+       Tu peux ajouter :
+       { title:"Nom", artist:"Artiste", url:"lien" }
+       OU juste :
+       "lien.mp3"
+    -------------------------------------------------- */
     const tracks = [
-      // 'https://raw.githubusercontent.com/username/repo/branch/audio1.mp3',
-      // 'https://raw.githubusercontent.com/username/repo/branch/audio2.mp3'
+    { title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
     ];
+    /* -------------------------------------------------- */
+
     let index = 0;
 
     const audio = document.getElementById('audio');
     const title = document.getElementById('title');
     const artist = document.getElementById('artist');
 
-    function load(i){
-      index = (i+tracks.length)%tracks.length;
-      const url = tracks[index];
-      audio.src = url;
-      const name = url.split('/').pop().replace(/\.(mp3|ogg|wav|m4a)$/i,'');
-      title.textContent = name;
-      artist.textContent = 'GitHub RAW';
+    function normalize(track){
+      if(typeof track === "string"){
+        const filename = track.split('/').pop().split('?')[0];
+        return {
+          url: track.replace("?dl=0","?dl=1"),
+          title: filename.replace(/\.(mp3|ogg|wav|m4a)$/i,""),
+          artist: "Audio"
+        };
+      }
+      return {
+        url: track.url.replace("?dl=0","?dl=1"),
+        title: track.title || "Sans titre",
+        artist: track.artist || "—"
+      };
     }
 
-    // lecture automatique + piste suivante automatiquement
+    function load(i){
+      if(!tracks.length) return;
+      index = (i + tracks.length) % tracks.length;
+
+      const t = normalize(tracks[index]);
+      audio.src = t.url;
+      title.textContent = t.title;
+      artist.textContent = t.artist;
+    }
+
     audio.addEventListener('ended', ()=>{
       load(index+1);
       audio.play();
     });
 
-    // Initialisation
     if(tracks.length){
       load(0);
       audio.volume = 0.9;
