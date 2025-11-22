@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lecteur minimaliste</title>
+  <style>
+    body{margin:0;padding:0;background:#f5eee6;font-family:Georgia,serif;display:flex;justify-content:center;align-items:center;height:100vh;color:#3b2f2f}
+    .wrap{background:#fff7f0;padding:30px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.15);width:90%;max-width:420px;text-align:center}
+    h1{font-size:22px;margin:0 0 10px 0}
+    p{font-size:13px;margin:0 0 20px 0;color:#8a7b74}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 id="title">Titre du morceau</h1>
+    <p id="artist">Fichier GitHub</p>
+  </div>
+
+  <audio id="audio"></audio>
+
+  <script>
+    // --- PERSONNALISEZ ICI ---
+    // Liste des pistes GitHub RAW
+    const tracks = [
+      // 'https://raw.githubusercontent.com/username/repo/branch/audio1.mp3',
+      // 'https://raw.githubusercontent.com/username/repo/branch/audio2.mp3'
+    ];
+    let index = 0;
+
+    const audio = document.getElementById('audio');
+    const title = document.getElementById('title');
+    const artist = document.getElementById('artist');
+
+    function load(i){
+      index = (i+tracks.length)%tracks.length;
+      const url = tracks[index];
+      audio.src = url;
+      const name = url.split('/').pop().replace(/\.(mp3|ogg|wav|m4a)$/i,'');
+      title.textContent = name;
+      artist.textContent = 'GitHub RAW';
+    }
+
+    // lecture automatique + piste suivante automatiquement
+    audio.addEventListener('ended', ()=>{
+      load(index+1);
+      audio.play();
+    });
+
+    // Initialisation
+    if(tracks.length){
+      load(0);
+      audio.volume = 0.9;
+      audio.play();
+    }
+  </script>
+</body>
+</html>
