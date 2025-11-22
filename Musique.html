@@ -11,6 +11,7 @@
       padding:0;
       height:100vh;
       display:flex;
+      flex-direction:column;
       justify-content:center;
       align-items:center;
       background:#e7dfd3;
@@ -18,6 +19,7 @@
       color:#3a2f2a;
     }
 
+    /* Cadre vintage */
     .wrap{
       background:#f8f1e7;
       border:2px solid #c7b7a3;
@@ -36,18 +38,23 @@
     }
 
     p{
-      margin:6px 0 20px 0;
+      margin:6px 0 0 0;
       font-size:13px;
       color:#7c6c63;
     }
 
+    /* Bouton isolé sous le cadre */
+    .controls{
+      margin-top:18px;
+    }
+
     .btn{
-      padding:10px 20px;
+      padding:10px 22px;
       background:#d8c4b5;
       border:1px solid #b8a293;
       border-radius:8px;
       cursor:pointer;
-      font-size:14px;
+      font-size:15px;
       font-family:inherit;
       transition:0.2s;
       box-shadow: inset 0 0 6px rgba(0,0,0,0.15);
@@ -63,20 +70,69 @@
   <div class="wrap">
     <h1 id="title">—</h1>
     <p id="artist">—</p>
+  </div>
+
+  <!-- Bouton hors du cadre -->
+  <div class="controls">
     <button class="btn" id="toggle">⏵ Lire</button>
   </div>
 
   <audio id="audio"></audio>
 
   <script>
-    /* ----------------------------------------------
-       AJOUTE TES MORCEAUX ICI
-    ---------------------------------------------- */
+    /* --------------------------------------------------
+       AJOUTE TES MORCEAUX ICI (autant que tu veux)
+    -------------------------------------------------- */
     const tracks = [
-      // "https://www.dropbox.com/scl/.../musique.mp3?dl=1",
-  { title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" } 
+      // "https://www.dropbox.com/.../musique1.mp3?dl=1",
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+{ title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
     ];
-    /* ---------------------------------------------- */
+    /* -------------------------------------------------- */
 
     const audio = document.getElementById("audio");
     const title = document.getElementById("title");
@@ -110,14 +166,12 @@
       artist.textContent = t.artist;
     }
 
-    // Auto piste suivante
     audio.addEventListener("ended", ()=>{
       load(index+1);
       audio.play();
       toggleBtn.textContent = "⏸ Pause";
     });
 
-    // Bouton Play/Pause
     toggleBtn.addEventListener("click", ()=>{
       if(audio.paused){
         audio.play();
@@ -128,7 +182,6 @@
       }
     });
 
-    // Initialisation
     if(tracks.length){
       load(0);
       audio.volume = 0.9;
