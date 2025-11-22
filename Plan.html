@@ -3,38 +3,32 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Zoom 2×2 — Garder le fond</title>
+<title>Zoom 2×2 — Images zoomables</title>
 <style>
   :root{
     --gap: 8px;
     --transition: 450ms cubic-bezier(.2,.9,.2,1);
-    --overlay-bg: rgba(255,255,255,0.06); /* couleur légère des cartes */
     --card-radius: 12px;
     --card-shadow: 0 8px 30px rgba(0,0,0,0.35);
   }
 
-  /* FOND GLOBAL — modifiez ici (image, couleur, dégradé...) */
   html,body{
     height:100%;
     margin:0;
   }
+
   body{
-    /* exemple : image de fond qui reste fixe */
     background:
       linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
       url('D hiver/Fond.png');
     background-size: cover;
     background-position: center;
-    background-attachment: fixed; /* IMPORTANT : le fond ne bouge pas */
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background-attachment: fixed;
+    font-family: system-ui;
     color: #fff;
-    -webkit-font-smoothing:antialiased;
     display:flex;
-    align-items:stretch;
-    justify-content:stretch;
   }
 
-  /* grille 2x2 pleine fenêtre */
   .grid{
     display:grid;
     grid-template-columns: 1fr 1fr;
@@ -42,78 +36,56 @@
     gap: var(--gap);
     width:100vw;
     height:100vh;
-    padding: calc(var(--gap));
+    padding: var(--gap);
     box-sizing:border-box;
-    align-content:stretch;
   }
 
   .card{
     position:relative;
     overflow:hidden;
-    min-width:0;
     border-radius: var(--card-radius);
     box-shadow: var(--card-shadow);
     cursor:pointer;
+    transition: transform var(--transition), opacity var(--transition), box-shadow var(--transition);
     display:flex;
     align-items:center;
     justify-content:center;
-    padding: 18px;
-    transition: transform var(--transition), opacity var(--transition), box-shadow var(--transition), border-radius var(--transition);
-    will-change: transform, opacity;
+    background: rgba(0,0,0,0.15);
+    backdrop-filter: blur(4px);
+  }
+
+  /* L’image remplit la zone */
+  .card img{
+    width:100%;
+    height:100%;
+    object-fit: cover;
+    pointer-events: none;
     user-select:none;
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.12)); /* légère toile */
-    backdrop-filter: blur(6px);
   }
 
-  /* contenu interne — pour personnaliser */
-  .card .inner{
-    text-align:center;
-    max-width:90%;
-  }
-  .card h2{
-    margin:0 0 8px 0;
-    font-size: clamp(1rem, 2.2vw, 1.6rem);
-    letter-spacing: -0.01em;
-  }
-  .card p{
-    margin:0;
-    opacity:0.9;
-    font-size: clamp(.8rem, 1.6vw, 1rem);
-  }
-
-  /* état "éclipsé" pour les cartes non actives */
   .grid.zoomed .card:not(.active){
     opacity: 0;
     pointer-events: none;
     transform: scale(0.98);
   }
 
-  /* état actif : la carte devient fixée et s'agrandit */
   .card.active{
     position: fixed;
-    z-index: 60;
     top: 50%;
     left: 50%;
     width: calc(100vw - (var(--gap) * 2));
     height: calc(100vh - (var(--gap) * 2));
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%);
     border-radius: 8px;
     box-shadow: 0 30px 70px rgba(0,0,0,0.6);
-    transition: transform var(--transition), width var(--transition), height var(--transition), left var(--transition), top var(--transition), opacity var(--transition);
-    opacity: 1;
     cursor: default;
-    display:flex;
-    align-items:flex-start;
-    justify-content:flex-start;
-    padding: 40px;
+    z-index:60;
   }
 
-  /* animation d'entrée — s'assurer d'un zoom fluide depuis sa position */
   .card.animating{
-    transition: none;
+    transition:none;
   }
 
-  /* petit bouton fermer */
   .close-btn{
     position:absolute;
     right: 14px;
@@ -128,59 +100,33 @@
     z-index:70;
     backdrop-filter: blur(4px);
   }
-  .close-btn:focus{ outline: 2px solid rgba(255,255,255,0.14); }
 
-  /* responsive : sur mobile garder padding réduit */
-  @media (max-width:700px){
-    .card.active{ padding: 20px; }
-    .grid{ padding: 6px; gap:6px; }
-  }
 </style>
 </head>
 <body>
-  <main class="grid" id="grid" aria-live="polite">
-    <!-- Quatre zones — personnalisez le contenu et les styles par carte -->
-    <section class="card" tabindex="0" data-id="1" aria-label="Partie 1">
-      <div class="inner">
-        <h2>Partie 1</h2>
-        <p>Contenu de la première partie — cliquez pour zoomer.</p>
-      </div>
+  <main class="grid" id="grid">
+
+    <section class="card" data-id="1" tabindex="0">
+      <img src="D hiver/Carreau.png" alt="">
     </section>
 
-    <section class="card" tabindex="0" data-id="2" aria-label="Partie 2">
-      <div class="inner">
-        <h2>Partie 2</h2>
-        <p>Ici vous pouvez mettre ce que vous voulez : image, lecteur audio, texte.</p>
-      </div>
+    <section class="card" data-id="2" tabindex="0">
+      <img src="images/img2.jpg" alt="">
     </section>
 
-    <section class="card" tabindex="0" data-id="3" aria-label="Partie 3">
-      <div class="inner">
-        <h2>Partie 3</h2>
-        <p>Les cartes sont semi-transparentes — le fond global reste visible.</p>
-      </div>
+    <section class="card" data-id="3" tabindex="0">
+      <img src="images/img3.jpg" alt="">
     </section>
 
-    <section class="card" tabindex="0" data-id="4" aria-label="Partie 4">
-      <div class="inner">
-        <h2>Partie 4</h2>
-        <p>Cliquer une deuxième fois ou appuyer sur Échap pour revenir.</p>
-      </div>
+    <section class="card" data-id="4" tabindex="0">
+      <img src="images/img4.jpg" alt="">
     </section>
+
   </main>
 
-  <!-- Bouton de fermeture, ajouté dynamiquement lorsque nécessaire -->
-  <button id="closeBtn" class="close-btn" style="display:none" aria-hidden="true">Fermer ✕</button>
+  <button id="closeBtn" class="close-btn" style="display:none">Fermer ✕</button>
 
 <script>
-/*
- Comportement JS :
- - click sur .card : active/deactive
- - la carte active devient position:fixed et occupe l'écran (sans toucher au background body)
- - ESC ou bouton ferme
- - gestion d'accessibilité : focus and keyboard
-*/
-
 (function(){
   const grid = document.getElementById('grid');
   const cards = Array.from(document.querySelectorAll('.card'));
@@ -190,42 +136,30 @@
   let isAnimating = false;
 
   function openCard(card){
-    if(isAnimating) return;
-    if(activeCard === card) return;
+    if(isAnimating || activeCard === card) return;
     isAnimating = true;
 
-    // calculer la position actuelle de la carte pour faire un rendu fluide
     const rect = card.getBoundingClientRect();
 
-    // préparer : rendre la carte "fixed" tout en gardant son apparence (transform)
-    // on clone la transformation initiale via inline styles pour transition propre
     card.style.width = rect.width + 'px';
     card.style.height = rect.height + 'px';
     card.style.left = rect.left + 'px';
     card.style.top = rect.top + 'px';
-    card.style.transform = 'none';
     card.classList.add('animating');
 
-    // forcer reflow
     card.getBoundingClientRect();
 
-    // marquer active
     card.classList.add('active');
     grid.classList.add('zoomed');
 
-    // attendre très légèrement avant d'autoriser la transition normale
     requestAnimationFrame(() => {
       card.classList.remove('animating');
-      // retirer les styles "posées" pour laisser le CSS gérer la taille fixe à fullscreen
       card.style.width = '';
       card.style.height = '';
       card.style.left = '';
       card.style.top = '';
-      card.style.transform = '';
-      // focus sur close button
+
       closeBtn.style.display = 'block';
-      closeBtn.setAttribute('aria-hidden', 'false');
-      closeBtn.focus({preventScroll:true});
       activeCard = card;
       isAnimating = false;
     });
@@ -235,33 +169,28 @@
     if(!activeCard || isAnimating) return;
     isAnimating = true;
 
-    // pour une fermeture fluide, replacer la carte au-dessus puis animer vers sa position d'origine
     const card = activeCard;
     const original = document.querySelector(`.card[data-id="${card.dataset.id}"]`);
     const targetRect = original.getBoundingClientRect();
 
-    // fixer la carte à sa position fullscreen pour préparer l'animation
     const rect = card.getBoundingClientRect();
     card.style.left = rect.left + 'px';
     card.style.top = rect.top + 'px';
     card.style.width = rect.width + 'px';
     card.style.height = rect.height + 'px';
 
-    // forcer reflow
     card.getBoundingClientRect();
 
-    // ajouter classe animating pour temporairement désactiver certaines transitions si voulu
     card.classList.add('animating');
 
-    // déclencher la transition vers la position d'origine
     requestAnimationFrame(() => {
       card.style.left = targetRect.left + 'px';
       card.style.top = targetRect.top + 'px';
       card.style.width = targetRect.width + 'px';
       card.style.height = targetRect.height + 'px';
-      // après la transition, on retire l'état actif
+
       setTimeout(() => {
-        card.classList.remove('active', 'animating');
+        card.classList.remove('active','animating');
         card.style.left = '';
         card.style.top = '';
         card.style.width = '';
@@ -269,44 +198,23 @@
         grid.classList.remove('zoomed');
         activeCard = null;
         closeBtn.style.display = 'none';
-        closeBtn.setAttribute('aria-hidden', 'true');
         isAnimating = false;
-      }, 420); // doit rester cohérent avec --transition
+      }, 420);
     });
   }
 
-  // clic / entrée (keyboard) sur chaque carte
   cards.forEach(card => {
-    card.addEventListener('click', (e) => {
-      // si on clique sur la carte active -> fermer
-      if(activeCard === card){ closeActive(); return; }
-      openCard(card);
-    });
-
-    // support clavier : Enter ou Space ouvre
-    card.addEventListener('keydown', (e) => {
-      if(e.key === 'Enter' || e.key === ' '){
-        e.preventDefault();
-        if(activeCard === card) closeActive(); else openCard(card);
-      }
+    card.addEventListener('click', () => {
+      if(activeCard === card) closeActive();
+      else openCard(card);
     });
   });
 
   closeBtn.addEventListener('click', closeActive);
 
-  // fermer avec ESC
-  window.addEventListener('keydown', (e) => {
+  window.addEventListener('keydown', e => {
     if(e.key === 'Escape') closeActive();
   });
-
-  // gestion des redimenssionnements : s'il y a une carte active, on la replace proprement
-  window.addEventListener('resize', () => {
-    if(!activeCard) return;
-    // forcer la carte active à respecter le style CSS : on réapplique la classe active
-    activeCard.classList.add('animating');
-    setTimeout(()=> activeCard.classList.remove('animating'), 200);
-  });
-
 })();
 </script>
 </body>
