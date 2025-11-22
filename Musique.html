@@ -3,78 +3,137 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lecteur minimaliste</title>
+  <title>Lecteur Vintage</title>
+
   <style>
-    body{margin:0;padding:0;background:#f5eee6;font-family:Georgia,serif;display:flex;justify-content:center;align-items:center;height:100vh;color:#3b2f2f}
-    .wrap{background:#fff7f0;padding:30px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.15);width:90%;max-width:420px;text-align:center}
-    h1{font-size:22px;margin:0 0 10px 0}
-    p{font-size:13px;margin:0 0 20px 0;color:#8a7b74}
+    body{
+      margin:0;
+      padding:0;
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background:#e7dfd3;
+      font-family:"Georgia",serif;
+      color:#3a2f2a;
+    }
+
+    .wrap{
+      background:#f8f1e7;
+      border:2px solid #c7b7a3;
+      border-radius:14px;
+      padding:30px;
+      width:90%;
+      max-width:420px;
+      text-align:center;
+      box-shadow:0 4px 14px rgba(0,0,0,0.18);
+    }
+
+    h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:0.5px;
+    }
+
+    p{
+      margin:6px 0 20px 0;
+      font-size:13px;
+      color:#7c6c63;
+    }
+
+    .btn{
+      padding:10px 20px;
+      background:#d8c4b5;
+      border:1px solid #b8a293;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:14px;
+      font-family:inherit;
+      transition:0.2s;
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.15);
+    }
+
+    .btn:hover{
+      background:#ccb5a5;
+    }
   </style>
 </head>
 <body>
+
   <div class="wrap">
     <h1 id="title">—</h1>
     <p id="artist">—</p>
+    <button class="btn" id="toggle">⏵ Lire</button>
   </div>
 
   <audio id="audio"></audio>
 
   <script>
-    /* --------------------------------------------------
-       AJOUTE SIMPLEMENT TES MORCEAUX ICI
-       
-       Tu peux ajouter :
-       { title:"Nom", artist:"Artiste", url:"lien" }
-       OU juste :
-       "lien.mp3"
-    -------------------------------------------------- */
+    /* ----------------------------------------------
+       AJOUTE TES MORCEAUX ICI
+    ---------------------------------------------- */
     const tracks = [
-    { title:"C'est ainsi", artist:"Euphonik", url:"https://www.dropbox.com/scl/fi/kf50hho9yzed1revmvbic/C-est-ainsi-Euphonik.mp3?dl=1" },
+      // "https://www.dropbox.com/scl/.../musique.mp3?dl=1",
+  title:"C'est ainsi", artist:"Euphonik", url:"https://...mp3?dl=1" }
     ];
-    /* -------------------------------------------------- */
+    /* ---------------------------------------------- */
+
+    const audio = document.getElementById("audio");
+    const title = document.getElementById("title");
+    const artist = document.getElementById("artist");
+    const toggleBtn = document.getElementById("toggle");
 
     let index = 0;
 
-    const audio = document.getElementById('audio');
-    const title = document.getElementById('title');
-    const artist = document.getElementById('artist');
-
-    function normalize(track){
-      if(typeof track === "string"){
-        const filename = track.split('/').pop().split('?')[0];
+    function norm(t){
+      if(typeof t === "string"){
+        const file = t.split("/").pop().split("?")[0];
         return {
-          url: track.replace("?dl=0","?dl=1"),
-          title: filename.replace(/\.(mp3|ogg|wav|m4a)$/i,""),
+          url: t.replace("?dl=0","?dl=1"),
+          title: file.replace(/\.(mp3|wav|ogg|m4a)$/i,""),
           artist: "Audio"
         };
       }
       return {
-        url: track.url.replace("?dl=0","?dl=1"),
-        title: track.title || "Sans titre",
-        artist: track.artist || "—"
+        url: t.url.replace("?dl=0","?dl=1"),
+        title: t.title || "Sans titre",
+        artist: t.artist || "—"
       };
     }
 
     function load(i){
       if(!tracks.length) return;
       index = (i + tracks.length) % tracks.length;
-
-      const t = normalize(tracks[index]);
+      const t = norm(tracks[index]);
       audio.src = t.url;
       title.textContent = t.title;
       artist.textContent = t.artist;
     }
 
-    audio.addEventListener('ended', ()=>{
+    // Auto piste suivante
+    audio.addEventListener("ended", ()=>{
       load(index+1);
       audio.play();
+      toggleBtn.textContent = "⏸ Pause";
     });
 
+    // Bouton Play/Pause
+    toggleBtn.addEventListener("click", ()=>{
+      if(audio.paused){
+        audio.play();
+        toggleBtn.textContent = "⏸ Pause";
+      } else {
+        audio.pause();
+        toggleBtn.textContent = "⏵ Lire";
+      }
+    });
+
+    // Initialisation
     if(tracks.length){
       load(0);
       audio.volume = 0.9;
-      audio.play();
     }
   </script>
+
 </body>
 </html>
