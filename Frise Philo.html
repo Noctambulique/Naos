@@ -4,11 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Plan simple</title>
+
 <style>
   :root{
-    --cols: 7;        /* 🔧 nombre de rectangles par ligne */
-    --gap: 4px;        /* espace entre rectangles */
-    --radius: 6px;     /* arrondi des cartes */
+    --cols: 10;
+    --gap: 4px;
+    --radius: 6px;
     --zoom-speed: 350ms;
   }
 
@@ -19,7 +20,6 @@
     color:#fff;
   }
 
-  /* --- GRID ULTRA SIMPLE, ILLIMITÉ VERS LE BAS --- */
   .grid{
     display:grid;
     grid-template-columns: repeat(var(--cols), 1fr);
@@ -27,7 +27,6 @@
     padding:var(--gap);
   }
 
-  /* --- CARTE --- */
   .card{
     background:rgba(255,255,255,0.06);
     border-radius:var(--radius);
@@ -47,7 +46,6 @@
     user-select:none;
   }
 
-  /* --- FULLSCREEN --- */
   .card.active{
     position:fixed;
     inset:0;
@@ -57,6 +55,15 @@
     border-radius:0;
     z-index:20;
     transform:none !important;
+    background:#000;
+  }
+
+  /* ⭐ Empêche que l’image déborde en plein écran */
+  .card.active img{
+    width:100vw;
+    height:100vh;
+    object-fit:contain;
+    background:#000;
   }
 
   .grid.zoomed .card:not(.active){
@@ -82,31 +89,29 @@
 </head>
 <body>
 
-  <!-- 🧱 Le grid : ajoute autant de .card que tu veux ! -->
-  <main class="grid" id="grid">
+<main class="grid" id="grid">
+    <!-- tes images -->
+    <section class="card"><img src="Philo/Diapositive1.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive2.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive3.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive4.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive5.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive6.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive7.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive8.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive9.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive10.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive11.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive12.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive13.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive14.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive15.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive16.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive17.PNG"></section>
+    <section class="card"><img src="Philo/Diapositive18.PNG"></section>
+</main>
 
- <section class="card"><img src="Histoire Philo/Diapositive1.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive2.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive3.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive4.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive5.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive6.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive7.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive8.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive9.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive10.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive11.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive12.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive13.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive14.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive15.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive16.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive17.PNG" alt=""></section>
-    <section class="card"><img src="Histoire Philo/Diapositive18.PNG" alt=""></section>
-
-  </main>
-
-  <button id="closeBtn" class="close-btn">Fermer ✕</button>
+<button id="closeBtn" class="close-btn">Fermer ✕</button>
 
 <script>
 (function(){
@@ -132,9 +137,33 @@
     closeBtn.style.display = 'none';
   }
 
-  cards.forEach(c => c.onclick = () => open(c));
+  /* ⭐ Navigation clavier */
+  function goTo(offset){
+    if(!active) return;
+
+    let index = cards.indexOf(active);
+    let newIndex = (index + offset + cards.length) % cards.length;
+
+    active.classList.remove('active');
+    active = cards[newIndex];
+    active.classList.add('active');
+  }
+
+  cards.forEach(c => {
+    c.onclick = () => {
+      if(active === c) close();
+      else open(c);
+    };
+  });
+
   closeBtn.onclick = close;
-  window.onkeydown = e => { if(e.key === 'Escape') close(); };
+
+  window.addEventListener('keydown', e => {
+    if(e.key === 'Escape') close();
+    if(e.key === 'ArrowRight') goTo(1);
+    if(e.key === 'ArrowLeft') goTo(-1);
+  });
+
 })();
 </script>
 
