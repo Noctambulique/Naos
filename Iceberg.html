@@ -1,112 +1,110 @@
 <!doctype html>
-<meta charset="utf-8">
-<style>
-body{
-  padding:20px;
-  font-family:sans-serif;
-  transition:opacity .5s ease;
-}
+ <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Iceberg</title>
 
-#wrap{
-  display:flex;
-  gap:12px;
-}
+  <style>
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:system-ui;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-.r{
-  width:320px;
-  height:220px;
-  background-size:cover;
-  background-position:center;
-  border-radius:8px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  text-shadow:0 1px 2px rgba(0,0,0,.6);
-  font-weight:700;
-}
+    #viewer img{
+      max-width:90vw;
+      max-height:90vh;
+      display:block;
+    }
 
-/* Écran texte seul */
-#solo{
-  position:fixed;
-  inset:0;
-  background:white;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .5s ease;
-  font-size:2rem;
-  text-align:center;
-  padding:20px;
-}
+    /* colonne de contrôle */
+    #bar{
+      position:fixed;
+      right:16px;
+      top:50%;
+      transform:translateY(-50%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:18px;
+    }
 
-#solo.show{
-  opacity:1;
-  pointer-events:auto;
-}
-</style>
+    /* points améliorés */
+    .dot{
+      width:20px;
+      height:20px;
+      border-radius:50%;
+      background:#d0d0d0;
+      border:2px solid #888;
+      cursor:pointer;
+      transition:background .2s, transform .15s;
+    }
+    .dot:hover{
+      transform:scale(1.15);
+    }
+    .dot.active{
+      background:#000;
+      border-color:#000;
+    }
 
-<div id="wrap">
-  <div class="r" data-img="https://picsum.photos/800/600?1" data-text="Voici le texte 1"></div>
-  <div class="r" data-img="https://picsum.photos/800/600?2" data-text="Voici le texte 2"></div>
-  <div class="r" data-img="https://picsum.photos/800/600?3" data-text="Voici le texte 3"></div>
-</div>
+    /* petit label explicatif */
+    #label{
+      margin-top:14px;
+      font-size:13px;
+      opacity:0.75;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+    }
+  </style>
+</head>
 
-<div id="solo"></div>
+<body>
 
-<script>
-const wrap = document.getElementById('wrap');
-const solo = document.getElementById('solo');
+  <main id="viewer">
+    <img id="display" src="" alt="cran">
+  </main>
 
-// Applique les images dès le départ
-wrap.querySelectorAll('.r').forEach(r=>{
-  r.style.backgroundImage = `url(${r.dataset.img})`;
-  r.addEventListener('click', ()=> showText(r.dataset.text));
-});
+  <aside id="bar">
+    <div class="dot active" data-cran="1"></div>
+    <div class="dot" data-cran="2"></div>
+    <div class="dot" data-cran="3"></div>
+    <div id="label">Cran 1</div>
+  </aside>
 
-function showText(txt){
-  document.body.style.opacity = 0;  // fade-out
+  <script>
+    const images = [
+      'D hiver/Iceberg 1.png',
+      'D hiver/Iceberg 2.png',
+      'D hiver/Iceberg 3.png'
+    ];
 
-  setTimeout(()=>{
-    solo.textContent = txt;
-    solo.classList.add('show');
-  }, 500);
-}
+    const display = document.getElementById('display');
+    const label   = document.getElementById('label');
+    const dots    = document.querySelectorAll('.dot');
 
-solo.addEventListener('click', ()=>{
-  solo.classList.remove('show');
-  document.body.style.opacity = 1;
-});
-</script>
-const wrap=document.getElementById('wrap');
-const solo=document.getElementById('solo');
+    function setCran(n){
+      // Evite erreurs si l'image n'existe pas
+      if(images[n-1]) display.src = images[n-1];
+      display.alt = "cran " + n;
 
-wrap.querySelectorAll('.r').forEach(r=>{
-  r.style.backgroundImage=`url(${r.dataset.img})`;
-  r.addEventListener('click',()=>showText(r.dataset.text));
-});
+      label.textContent = "Cran " + n;
 
-function showText(txt){
-  document.body.style.opacity = 0;        // fade-out du contenu
-  setTimeout(()=>{
-    solo.textContent = txt;
-    solo.classList.add('show');           // affiche le texte seul
-  }, 500);
-}
+      dots.forEach(d => d.classList.remove('active'));
+      dots[n-1].classList.add('active');
+    }
 
-solo.addEventListener('click',()=>{        // retour à l'état initial
-  solo.classList.remove('show');
-  document.body.style.opacity = 1;
-});
-</script>
-const wrap=document.getElementById('wrap');
-wrap.querySelectorAll('.r').forEach(r=>{ r.style.backgroundImage=`url(${r.dataset.img})`; r.addEventListener('click',()=>openFull(r.dataset.img,r.dataset.text)) })
-function openFull(img,txt){
-  const ov=document.createElement('div'); ov.className='overlay';
-  ov.innerHTML=`<div class="card" style="background-image:url(${img})"><div class="txt">${txt}</div></div>`;
-  ov.addEventListener('click',()=>ov.remove()); document.body.appendChild(ov);
-}
-</script>
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        const n = Number(dot.dataset.cran);
+        setCran(n);
+      });
+    });
+
+    // affiche automatiquement le premier cran
+    setCran(1);
+  </script>
+
+</body>
