@@ -6,9 +6,9 @@
 <title>Plan simple</title>
 <style>
   :root{
-    --cols: 10;
-    --gap: 4px;
-    --radius: 6px;
+    --cols: 7;        /* 🔧 nombre de rectangles par ligne */
+    --gap: 4px;        /* espace entre rectangles */
+    --radius: 6px;     /* arrondi des cartes */
     --zoom-speed: 350ms;
   }
 
@@ -19,6 +19,7 @@
     color:#fff;
   }
 
+  /* --- GRID ULTRA SIMPLE, ILLIMITÉ VERS LE BAS --- */
   .grid{
     display:grid;
     grid-template-columns: repeat(var(--cols), 1fr);
@@ -26,6 +27,7 @@
     padding:var(--gap);
   }
 
+  /* --- CARTE --- */
   .card{
     background:rgba(255,255,255,0.06);
     border-radius:var(--radius);
@@ -45,6 +47,7 @@
     user-select:none;
   }
 
+  /* --- FULLSCREEN --- */
   .card.active{
     position:fixed;
     inset:0;
@@ -79,7 +82,9 @@
 </head>
 <body>
 
-<main class="grid" id="grid">
+  <!-- 🧱 Le grid : ajoute autant de .card que tu veux ! -->
+  <main class="grid" id="grid">
+
  <section class="card"><img src="Histoire Philo/Diapositive1.PNG" alt=""></section>
     <section class="card"><img src="Histoire Philo/Diapositive2.PNG" alt=""></section>
     <section class="card"><img src="Histoire Philo/Diapositive3.PNG" alt=""></section>
@@ -98,9 +103,10 @@
     <section class="card"><img src="Histoire Philo/Diapositive16.PNG" alt=""></section>
     <section class="card"><img src="Histoire Philo/Diapositive17.PNG" alt=""></section>
     <section class="card"><img src="Histoire Philo/Diapositive18.PNG" alt=""></section>
-</main>
 
-<button id="closeBtn" class="close-btn">Fermer ✕</button>
+  </main>
+
+  <button id="closeBtn" class="close-btn">Fermer ✕</button>
 
 <script>
 (function(){
@@ -126,51 +132,9 @@
     closeBtn.style.display = 'none';
   }
 
-  /* ---- Navigation SLIDES ---- */
-  function goTo(offset){
-    if(!active) return;
-
-    let index = cards.indexOf(active);
-    index = (index + offset + cards.length) % cards.length;
-
-    active.classList.remove('active');
-    active = cards[index];
-    active.classList.add('active');
-  }
-
-  /* ---- Clic sur image fullscreen → fermer ---- */
-  cards.forEach(c => {
-    c.onclick = () => {
-      if(active === c) close();
-      else open(c);
-    };
-  });
-
-  /* ---- Bouton fermer ---- */
+  cards.forEach(c => c.onclick = () => open(c));
   closeBtn.onclick = close;
-
-  /* ---- Clavier ---- */
-  window.addEventListener('keydown', e => {
-    if(e.key === 'Escape') close();
-    if(e.key === 'ArrowRight') goTo(+1);
-    if(e.key === 'ArrowLeft') goTo(-1);
-  });
-
-  /* ---- Swipe mobile ---- */
-  let startX = 0;
-  window.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX;
-  });
-
-  window.addEventListener('touchend', e => {
-    if(!active) return;
-    let dx = e.changedTouches[0].clientX - startX;
-    if(Math.abs(dx) > 50){
-      if(dx < 0) goTo(+1);
-      else goTo(-1);
-    }
-  });
-
+  window.onkeydown = e => { if(e.key === 'Escape') close(); };
 })();
 </script>
 
