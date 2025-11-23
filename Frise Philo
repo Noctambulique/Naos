@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Plan simple</title>
+<style>
+  :root{
+    --cols: 10;        /* 🔧 nombre de rectangles par ligne */
+    --gap: 4px;        /* espace entre rectangles */
+    --radius: 6px;     /* arrondi des cartes */
+    --zoom-speed: 350ms;
+  }
+
+  body{
+    margin:0;
+    background:#111;
+    font-family: system-ui;
+    color:#fff;
+  }
+
+  /* --- GRID ULTRA SIMPLE, ILLIMITÉ VERS LE BAS --- */
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    gap:var(--gap);
+    padding:var(--gap);
+  }
+
+  /* --- CARTE --- */
+  .card{
+    background:rgba(255,255,255,0.06);
+    border-radius:var(--radius);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    overflow:hidden;
+    transition:transform var(--zoom-speed), opacity var(--zoom-speed);
+  }
+
+  .card img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    pointer-events:none;
+    user-select:none;
+  }
+
+  /* --- FULLSCREEN --- */
+  .card.active{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    margin:0;
+    border-radius:0;
+    z-index:20;
+    transform:none !important;
+  }
+
+  .grid.zoomed .card:not(.active){
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .close-btn{
+    position:fixed;
+    top:12px;
+    right:12px;
+    z-index:30;
+    background:rgba(0,0,0,0.5);
+    padding:8px 12px;
+    border:none;
+    border-radius:6px;
+    color:#fff;
+    cursor:pointer;
+    font-size:14px;
+    display:none;
+  }
+</style>
+</head>
+<body>
+
+  <!-- 🧱 Le grid : ajoute autant de .card que tu veux ! -->
+  <main class="grid" id="grid">
+
+    <section class="card"><img src="D hiver/Plan3.png" alt=""></section>
+    <section class="card"><img src="D hiver/Plan4.png" alt=""></section>
+    <section class="card"><img src="D hiver/Plan2.png" alt=""></section>
+    <section class="card"><img src="D hiver/Carreau.png" alt=""></section>
+
+    <!-- ➕ Tu peux en ajouter 200 si tu veux, ça descend sans limite. -->
+
+  </main>
+
+  <button id="closeBtn" class="close-btn">Fermer ✕</button>
+
+<script>
+(function(){
+  const grid = document.getElementById('grid');
+  const cards = [...document.querySelectorAll('.card')];
+  const closeBtn = document.getElementById('closeBtn');
+
+  let active = null;
+
+  function open(card){
+    if(active) return;
+    active = card;
+    card.classList.add('active');
+    grid.classList.add('zoomed');
+    closeBtn.style.display = 'block';
+  }
+
+  function close(){
+    if(!active) return;
+    active.classList.remove('active');
+    grid.classList.remove('zoomed');
+    active = null;
+    closeBtn.style.display = 'none';
+  }
+
+  cards.forEach(c => c.onclick = () => open(c));
+  closeBtn.onclick = close;
+  window.onkeydown = e => { if(e.key === 'Escape') close(); };
+})();
+</script>
+
+</body>
+</html>
