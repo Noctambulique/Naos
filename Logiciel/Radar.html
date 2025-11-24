@@ -44,9 +44,9 @@
 </div>
 
 <script>
-// --- INITIALISATION SÛRE APRÈS LE CHARGEMENT DU DOM ---
 window.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("radarCanvas");
+  if (!canvas) return;
   const ctx = canvas.getContext("2d");
   let radarChart = null;
 
@@ -58,7 +58,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function regenerateLabels() {
     labelsContainer.innerHTML = "";
-    const n = parseInt(sidesInput.value);
+    const n = parseInt(sidesInput.value) || 3;
     for (let i = 0; i < n; i++) {
       const inp = document.createElement("input");
       inp.type = "text";
@@ -75,8 +75,8 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function getData() {
-    const n = parseInt(sidesInput.value);
-    return Array(n).fill(0).map(() => Math.floor(Math.random() * 100) + 20);
+    const n = parseInt(sidesInput.value) || 3;
+    return Array.from({ length: n }, () => Math.floor(Math.random() * 100) + 20);
   }
 
   function updateChart() {
@@ -85,20 +85,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (radarChart) radarChart.destroy();
 
-    const tension = styleInput.value === "soft" ? 0.45 : styleInput.value === "pointy" ? 0.05 : 0.25;
+    let tension = 0.25;
+    if (styleInput.value === "soft") tension = 0.45;
+    if (styleInput.value === "pointy") tension = 0.05;
 
     radarChart = new Chart(ctx, {
       type: "radar",
       data: {
         labels,
-        datasets: [{
-          label: "",
-          data,
-          pointRadius: 3,
-          borderWidth: 2,
-          fill: true,
-          tension
-        }]
+        datasets: [{ data, pointRadius: 3, borderWidth: 2, fill: true, tension }]
       },
       options: {
         responsive: true,
@@ -109,23 +104,21 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // EXPORT PNG FOND BLANC
   downloadWhite.addEventListener("click", () => {
-    const tmpCanvas = document.createElement("canvas");
-    tmpCanvas.width = canvas.width;
-    tmpCanvas.height = canvas.height;
-    const tmpCtx = tmpCanvas.getContext("2d");
-    tmpCtx.fillStyle = "#ffffff";
-    tmpCtx.fillRect(0, 0, tmpCanvas.width, tmpCanvas.height);
-    tmpCtx.drawImage(canvas, 0, 0);
+    const tmp = document.createElement("canvas");
+    tmp.width = canvas.width;
+    tmp.height = canvas.height;
+    const tctx = tmp.getContext("2d");
+    tctx.fillStyle = "#fff";
+    tctx.fillRect(0, 0, tmp.width, tmp.height);
+    tctx.drawImage(canvas, 0, 0);
 
     const link = document.createElement("a");
     link.download = "radar_blanc.png";
-    link.href = tmpCanvas.toDataURL();
+    link.href = tmp.toDataURL();
     link.click();
   });
 
-  // EXPORT PNG TRANSPARENT
   downloadTransparent.addEventListener("click", () => {
     const link = document.createElement("a");
     link.download = "radar_transparent.png";
@@ -133,7 +126,6 @@ window.addEventListener("DOMContentLoaded", () => {
     link.click();
   });
 
-  // Initialisation
   regenerateLabels();
   updateChart();
 
@@ -141,6 +133,7 @@ window.addEventListener("DOMContentLoaded", () => {
     regenerateLabels();
     updateChart();
   });
+
   styleInput.addEventListener("input", updateChart);
 });
 </script>
