@@ -50,9 +50,7 @@
       {id:3, text:"Quand une émotion me dépasse, je me détourne."},
       {id:4, text:"Certains comportements reviennent automatiquement."},
       {id:5, text:"J'hésite à changer malgré l'envie."},
-      {id:6, text:"Je privilégie la logique à l'expérience directe."},
       {id:7, text:"Je garde des habitudes juste par familiarité."},
-      {id:8, text:"Changer en profondeur m'attire et m'effraie."},
       {id:9, text:"Je me défends quand un aspect inconfortable de moi est pointé."}
     ];
 
@@ -72,7 +70,7 @@
               </label>`).join('')}
           </div>
         </div>
-        <div class="hintline">1 = faible · 3 = fort</div>
+        <div class="hintline">1 = non · 3 = oui</div>
       `;
       return div;
     }
@@ -95,21 +93,4 @@
 
       if(score === null){
         box.hidden = false;
-        box.textContent = "Veuillez répondre à tout.";
-        return;
-      }
-
-      // Seuil recalculé pour notation sur 3 crans
-      const result = score >= (questions.length * 2) ? "Non-N" : "N";
-
-      box.hidden = false;
-      box.textContent = result;
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', ()=>{
-      document.getElementById('testForm').reset();
-      document.getElementById('resultBox').hidden = true;
-    });
-  </script>
-</body>
-</html>
+        box.textC
