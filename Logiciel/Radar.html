@@ -161,22 +161,78 @@
       const ctx = canvas.getContext('2d');
       if(chart) chart.destroy();
 
-      chart = new Chart(ctx, {
-        type: 'radar',
-        data: {
-          labels,
-          datasets: [{
-            label: dsLabel.value,
-            data: values,
-            fill: true,
-            backgroundColor: hexToRgba(dsColor.value, Number(dsAlpha.value)),
-            borderColor: dsColor.value,
-            borderWidth: 8,
-            pointRadius: 8,
-            pointBackgroundColor: dsColor.value,
-            pointBorderWidth: 3
-          }]
-        },
+function renderChart(labels, values){
+  const ctx = canvas.getContext('2d');
+  if(chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [{
+        label: dsLabel.value,
+        data: values,
+        fill: true,
+        backgroundColor: hexToRgba(dsColor.value, Number(dsAlpha.value)),
+        borderColor: dsColor.value,
+        borderWidth: 5,         // lignes dataset plus nettes
+        pointRadius: 6,         // points plus lisibles
+        pointHoverRadius: 8,
+        pointBackgroundColor: dsColor.value
+      }]
+    },
+    options: {
+      responsive:false,
+      maintainAspectRatio:false,
+      layout:{ padding: 25 },
+
+      plugins:{
+        legend:{ display:false }
+      },
+
+      scales:{
+        r:{
+          min: 0,
+          max: 10,
+          ticks:{
+            display: showTicks.checked,
+            stepSize: 2,        // 5 crans = 0,2,4,6,8,10
+            backdropColor: 'transparent',
+            color: '#64748b',
+            font:{ size: 13, weight:"600" }
+          },
+
+          pointLabels:{
+            display:true,
+            color:'#0f172a',
+            font:{ size:15, weight:"600" },
+            padding: 8
+          },
+
+          grid:{
+            display: showGrid.checked,
+            lineWidth: 3.5,     // anneaux bien nets
+            color: 'rgba(100,116,139,0.22)'  // gris doux + lisible
+          },
+
+          angleLines:{
+            display: true,
+            lineWidth: 3.5,     // axes épais & propres
+            color: 'rgba(100,116,139,0.32)'
+          },
+
+          borderWidth: 3.5,     // cercle extérieur
+          borderColor: 'rgba(100,116,139,0.40)'
+        }
+      }
+    }
+  });
+
+  // Fond du canvas
+  if(bgMode.value==="transparent") canvas.style.background="transparent";
+  else if(bgMode.value==="white") canvas.style.background="#fff";
+  else canvas.style.background=bgColor.value;
+}
         options: {
           responsive:false,
           maintainAspectRatio:false,
