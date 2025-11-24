@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Radar Chart Maker — Simple</title>
+  <style>
+    :root{ --gap:12px; --muted:#666; --bg:#fbfbfb; }
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;background:var(--bg);color:#111}
+    .wrap{max-width:1100px;margin:28px auto;padding:18px;background:white;border-radius:12px;box-shadow:0 6px 22px rgba(15,20,30,.06);display:grid;grid-template-columns:360px 1fr;gap:18px}
+    h1{font-size:18px;margin:0 0 8px}
+    label{display:block;font-size:13px;color:var(--muted);margin:8px 0 6px}
+    textarea,input,select,button{width:100%;box-sizing:border-box;padding:8px;border-radius:8px;border:1px solid #e5e7eb;font-size:14px}
+    textarea{min-height:72px;resize:vertical}
+    .controls{display:flex;gap:8px;margin-top:8px}
+    .small{padding:6px;font-size:13px}
+    .datasets{margin-top:12px}
+    .dataset{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .dataset input[type="color"]{width:40px;height:34px;padding:0;border:none}
+    .chart-area{padding:8px}
+    canvas{background:linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0));}
+    footer{font-size:13px;color:var(--muted);text-align:center;margin:14px}
+    .row{display:flex;gap:8px}
+    .file{display:flex;align-items:center}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <h1>Radar Chart Maker — Entrées</h1>
+      <p style="margin:0 0 12px;color:var(--muted)">Entrez les étiquettes (séparées par des virgules), puis ajoutez un ou plusieurs jeux de données. Export PNG disponible.</p>
+
+      <label for="labels">Étiquettes (labels) — ex : Force, Vitesse, Agilité</label>
+      <textarea id="labels">Force,Vitesse,Agilité,Endurance,Technique</textarea>
+
+      <label for="datasetName">Nom du dataset</label>
+      <input id="datasetName" placeholder="Ex : Joueur A" />
+
+      <label for="values">Valeurs (séparées par des virgules) — même nombre que d'étiquettes</label>
+      <input id="values" placeholder="ex : 8,6,7,9,5" />
+
+      <div class="controls">
+        <input type="color" id="color" value="#3b82f6" />
+        <button id="add" class="small">Ajouter dataset</button>
+        <button id="randomize" class="small">Remplir aléatoire</button>
+      </div>
+
+      <div class="datasets" id="datasetsList"></div>
+
+      <label style="margin-top:8px">Importer CSV (étiquettes en première ligne ou deux colonnes)</label>
+      <input type="file" id="csvImport" accept=".csv,text/csv" />
+
+      <div style="margin-top:12px" class="row">
+        <button id="updateChart">Mettre à jour le graphique</button>
+        <button id="exportPNG" class="small">Exporter PNG</button>
+      </div>
+
+      <p style="margin-top:10px;color:var(--muted)">Astuce : modifiez les étiquettes puis cliquez sur "Remplir aléatoire" pour tester rapidement.</p>
+    </div>
+
+    <div class="chart-area">
+      <h1 style="font-size:16px">Aperçu</h1>
+      <canvas id="radarCanvas" width="800" height="600"></canvas>
+      <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+        <label style="font-size:13px;color:var(--muted);">Type d'interpolation</label>
+        <select id="lineTension" style="width:140px">
+          <option value="0">Droite (0)</option>
+          <option value="0.3" selected>Courbe douce</option>
+          <option value="1">Très courbe</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <footer>Radar Chart Maker — simple et modifiable • Copiez-collez ce fichier pour l'utiliser localement</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Helper : parse CSV (very simple)
+    function parseCSV(text){
+      const lines = text.trim().split(/\r?\n/).map(l=>l.trim()).filter(Boolean)
+      return lines.map(l=>l.split(/\s*,\s*/));
+    }
+
+    const labelsEl = document.getElementById('labels');
+    const datasetNameEl = document.getElementById('datasetName');
+    const valuesEl = document.getElementById('values');
+    const colorEl = document.getElementById('color');
+    const addBtn = document.getElementById('add');
+    const randomizeBtn = document.getElementById('randomize');
+    const datasetsList = document.getElementById('datasetsList');
+    const updateChartBtn = document.getElementById('updateChart');
+    const exportPNGBtn = document.getElementById('exportPNG');
+    const csvImport = document.getElementById('csvImport');
+    const lineTension = document.getElementById('lineTension');
+
+    let datasets = [];
+
+    // Create base chart
+    const ctx = document.getElementById('radarCanvas');
+    const chart = new Chart(ctx, {
+      type: 'radar',
+      data: { labels: [], datasets: [] },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: { line: { tension: 0.3 } },
+        scales: {
+          r: {
+            beginAtZero: true,
+            suggestedMax: 10
+          }
+        }
+      }
+    });
+
+    function refreshDatasetsList(){
+      datasetsList.innerHTML = '';
+      datasets.forEach((d,i)=>{
+        const el = document.createElement('div'); el.className='dataset';
+        el.innerHTML = `
+          <input type="color" data-i="${i}" value="${d.borderColor}" />
+          <input data-i="${i}" value="${d.label}" />
+          <button data-i="${i}" class="small">Éditer</button>
+          <button data-i="${i}" class="small">Suppr</button>
+        `;
+        datasetsList.appendChild(el);
+      });
+    }
+
+    function updateChartFromState(){
+      const labels = labelsEl.value.split(/\s*,\s*/).filter(Boolean);
+      chart.data.labels = labels;
+      chart.data.datasets = datasets.map(d=>({
+        label: d.label,
+        data: d.data.slice(0, labels.length),
+        borderColor: d.borderColor,
+        backgroundColor: hexToRgba(d.borderColor,0.18),
+        fill: true,
+        pointBackgroundColor: d.borderColor
+      }));
+      chart.options.elements.line.tension = parseFloat(lineTension.value);
+      chart.update();
+    }
+
+    function hexToRgba(hex, alpha){
+      const h = hex.replace('#','');
+      const bigint = parseInt(h,16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+
+    addBtn.addEventListener('click', ()=>{
+      const name = (datasetNameEl.value || `Dataset ${datasets.length+1}`).trim();
+      const vals = valuesEl.value.split(/\s*,\s*/).map(v=>Number(v)||0);
+      const color = colorEl.value;
+      datasets.push({label:name,data:vals,borderColor:color});
+      refreshDatasetsList();
+      updateChartFromState();
+    });
+
+    randomizeBtn.addEventListener('click', ()=>{
+      const labels = labelsEl.value.split(/\s*,\s*/).filter(Boolean);
+      const vals = labels.map(()=>Math.round(Math.random()*10));
+      valuesEl.value = vals.join(',');
+    });
+
+    datasetsList.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button');
+      if(!btn) return;
+      const i = Number(btn.getAttribute('data-i'));
+      const action = btn.textContent.trim();
+      if(action === 'Suppr'){
+        datasets.splice(i,1);
+        refreshDatasetsList(); updateChartFromState();
+        return;
+      }
+      if(action === 'Éditer'){
+        const parent = btn.parentElement;
+        const colorInput = parent.querySelector('input[type=color]');
+        const textInput = parent.querySelectorAll('input')[1];
+        datasets[i].borderColor = colorInput.value;
+        datasets[i].label = textInput.value;
+        refreshDatasetsList(); updateChartFromState();
+      }
+    });
+
+    datasetsList.addEventListener('input', (e)=>{
+      const inp = e.target.closest('input');
+      if(!inp) return;
+      const i = Number(inp.getAttribute('data-i'));
+      if(inp.type === 'color') datasets[i].borderColor = inp.value;
+      else datasets[i].label = inp.value;
+      updateChartFromState();
+    });
+
+    updateChartBtn.addEventListener('click', ()=>{
+      updateChartFromState();
+    });
+
+    exportPNGBtn.addEventListener('click', ()=>{
+      const link = document.createElement('a');
+      link.download = 'radar-chart.png';
+      link.href = document.getElementById('radarCanvas').toDataURL('image/png');
+      link.click();
+    });
+
+    csvImport.addEventListener('change', async (e)=>{
+      const f = e.target.files[0]; if(!f) return;
+      const text = await f.text();
+      const parsed = parseCSV(text);
+      // If first line is labels and following lines are values -> load labels + first dataset
+      if(parsed.length >= 2 && parsed[0].length > 1){
+        labelsEl.value = parsed[0].join(',');
+        const firstRow = parsed[1].slice(0, parsed[0].length).map(v=>Number(v)||0);
+        datasetNameEl.value = 'Imported'; valuesEl.value = firstRow.join(',');
+      } else if(parsed.length > 0 && parsed[0].length === 2){
+        // two columns: treat as label,value pairs
+        const L = parsed.map(r=>r[0]);
+        const V = parsed.map(r=>Number(r[1])||0);
+        labelsEl.value = L.join(','); valuesEl.value = V.join(',');
+      }
+      updateChartFromState();
+    });
+
+    lineTension.addEventListener('change', ()=>{ updateChartFromState(); });
+
+    // initialize with one dataset
+    datasets.push({label:'Exemple',data:[8,6,7,9,5],borderColor:'#3b82f6'});
+    refreshDatasetsList();
+    updateChartFromState();
+  </script>
+</body>
+</html>
