@@ -11,23 +11,36 @@
       margin: 0;
       padding: 6vh 10vw;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: flex-start;
       align-items: center;
       min-height: 100vh;
+      gap: 4rem;
+    }
+
+    .input-box {
+      width: 12ch; /* environ 10-12 caractères */
+      background: #d3d3d3;
+      padding: 1rem 1.5rem;
+      border-radius: 0.5rem;
+      font-size: 2rem;
+      text-align: center;
+      outline: none;
+      border: none;
     }
 
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 3rem 6rem; /* ↑ écart augmenté entre lignes et colonnes */
+      gap: 3rem 6rem;
       text-align: center;
     }
 
     a {
       text-decoration: none;
       color: #3b2e1a;
-      font-size: 1.8rem;        /* ↑ taille légèrement augmentée */
-      letter-spacing: 0.08em;   /* ↑ écart entre lettres légèrement accru */
+      font-size: 1.8rem;
+      letter-spacing: 0.08em;
       transition: color 0.3s ease, transform 0.3s ease;
     }
 
@@ -38,6 +51,8 @@
   </style>
 </head>
 <body>
+
+  <input class="input-box" type="text" maxlength="12" placeholder="Texte ici..." />
 
   <div class="grid">
     <a href="Psy/Triade">Triade</a>
