@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Radar Chart Builder — Export PNG</title>
+  <title>Radar Chart Builder — Épaisseur + 5 crans</title>
 
   <style>
     :root{ --gap:12px; --card-radius:10px; --accent:#4f46e5; }
@@ -16,7 +16,6 @@
     input[type=text], input[type=number], select{
       width:100%;padding:8px;border-radius:8px;border:1px solid #e6e9f2
     }
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
     .controls-row{display:flex;gap:8px}
     button{
       background:var(--accent);color:#fff;padding:10px 12px;border-radius:8px;border:0;cursor:pointer
@@ -29,7 +28,6 @@
     .row input[type=range]{flex:1}
     .meta{font-size:13px;color:#475569}
     .footer{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
-    .muted{color:#94a3b8;font-size:13px}
   </style>
 </head>
 
@@ -38,9 +36,9 @@
 
     <div class="panel">
       <h1>Radar Chart Builder</h1>
-      <p class="meta">Personnalisez axes, étiquettes, valeurs, couleurs et exportez en PNG.</p>
+      <p class="meta">Radar épais + 5 crans fixes : 0, 2, 4, 6, 8, 10</p>
 
-      <label>Nombre de côtés (axes)</label>
+      <label>Nombre de côtés</label>
       <div class="controls-row">
         <input id="axesCount" type="number" min="3" max="24" value="5">
         <button id="applyAxes" class="small">Appliquer</button>
@@ -49,8 +47,8 @@
 
       <label>Options d'affichage</label>
       <div class="controls-row">
-        <label style="display:flex;align-items:center;gap:8px"><input id="showTicks" type="checkbox" checked> Afficher chiffres</label>
-        <label style="display:flex;align-items:center;gap:8px"><input id="showGrid" type="checkbox" checked> Afficher grille</label>
+        <label style="display:flex;align-items:center;gap:8px"><input id="showTicks" type="checkbox" checked> Chiffres</label>
+        <label style="display:flex;align-items:center;gap:8px"><input id="showGrid" type="checkbox" checked> Grille</label>
       </div>
 
       <label>Fond du canvas</label>
@@ -173,9 +171,10 @@
             fill: true,
             backgroundColor: hexToRgba(dsColor.value, Number(dsAlpha.value)),
             borderColor: dsColor.value,
-            borderWidth: 4,
-            pointRadius: 5,
-            pointBackgroundColor: dsColor.value
+            borderWidth: 8,
+            pointRadius: 8,
+            pointBackgroundColor: dsColor.value,
+            pointBorderWidth: 3
           }]
         },
         options: {
@@ -185,10 +184,32 @@
             r:{
               min:0,
               max:10,
-              ticks:{display:showTicks.checked, stepSize:1},
-              grid:{display:showGrid.checked, lineWidth:3},
-              angleLines:{lineWidth:3},
-              pointLabels:{display:true}
+
+              // ✔ 5 crans : 0, 2, 4, 6, 8, 10
+              ticks:{
+                display:showTicks.checked,
+                stepSize:2,
+                backdropColor:'transparent',
+                color:'#0f172a',
+                font:{ size:14, weight:'bold' }
+              },
+
+              grid:{
+                display:showGrid.checked,
+                lineWidth:6,
+                color:'rgba(0,0,0,0.25)'
+              },
+
+              angleLines:{
+                lineWidth:8,
+                color:'rgba(0,0,0,0.28)'
+              },
+
+              pointLabels:{
+                display:true,
+                font:{ size:16, weight:'600' },
+                color:'#0f172a'
+              }
             }
           }
         }
@@ -213,12 +234,14 @@
 
     function downloadPNG(filled){
       const img = canvas.toDataURL("image/png");
+
       if(!filled){
         const a=document.createElement("a");
         a.download="radar-transparent.png";
         a.href=img; a.click();
         return;
       }
+
       const tmp=document.createElement("canvas");
       tmp.width=canvas.width; tmp.height=canvas.height;
       const t=tmp.getContext("2d");
