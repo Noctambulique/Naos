@@ -3,94 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <title>Test de personnalité</title>
+
   <style>
+    /* Typographie élégante et douce */
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap');
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: #333;
+      font-family: 'Manrope', sans-serif;
+      background: linear-gradient(145deg, #e9eef3, #d8dee6);
+      color: #2e2e2e;
       text-align: center;
       padding: 40px;
     }
+
     .container {
       max-width: 650px;
       margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
-      animation: fadeIn 0.8s ease-in-out;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(6px);
+      padding: 40px 35px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      animation: fadeIn 1s ease-out;
     }
+
     h1 {
-      font-size: 28px;
-      margin-bottom: 25px;
-      color: #444;
-    }
-    .question {
-      font-size: 20px;
-      margin: 25px 0;
+      font-size: 30px;
+      margin-bottom: 28px;
+      color: #3a3a3a;
       font-weight: 500;
+      letter-spacing: 0.5px;
     }
+
+    .question {
+      font-size: 22px;
+      margin: 35px 0;
+      font-weight: 400;
+      color: #4b4b4b;
+    }
+
+    /* Boutons minimalistes, pastels, poétiques */
     button {
-      margin: 10px;
-      padding: 12px 25px;
-      font-size: 16px;
+      margin: 12px;
+      padding: 12px 34px;
+      font-size: 17px;
       border: none;
-      border-radius: 10px;
-      background: #667eea;
-      color: white;
+      border-radius: 12px;
+      background: #d6dce4;
+      color: #2f2f2f;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.35s ease;
+      letter-spacing: 0.3px;
     }
+
     button:hover {
-      background: #5a67d8;
-      transform: scale(1.05);
+      background: #c2c9d4;
+      transform: translateY(-2px);
     }
+
     .hidden {
       display: none;
     }
+
+    /* Résultat */
     #result h2 {
       font-size: 26px;
-      margin-bottom: 15px;
-      color: #222;
+      margin-bottom: 18px;
+      color: #333;
+      font-weight: 500;
     }
-    #result p {
-      font-size: 18px;
-      margin: 8px 0;
-    }
+
     .grade {
-      font-size: 40px;
-      font-weight: bold;
-      margin-top: 15px;
-      padding: 10px 20px;
-      border-radius: 12px;
+      font-size: 42px;
+      font-weight: 600;
+      margin-top: 20px;
+      padding: 12px 26px;
+      border-radius: 14px;
       display: inline-block;
       animation: pop 0.6s ease-in-out;
+      background: #e3e7ed;
+      color: #2f2f2f;
+      border: 1px solid rgba(0,0,0,0.08);
     }
-    .A { background: #f56565; color: white; }
-    .B { background: #ed8936; color: white; }
-    .C { background: #ecc94b; color: #333; }
-    .D { background: #48bb78; color: white; }
-    .E { background: #4299e1; color: white; }
-    .F { background: #9f7aea; color: white; }
 
+    /* Animations */
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
+
     @keyframes pop {
       0% { transform: scale(0.7); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>Test de personnalité</h1>
+
     <div id="question-container">
       <p id="question" class="question"></p>
       <button onclick="answer(true)">Oui</button>
       <button onclick="answer(false)">Non</button>
     </div>
+
     <div id="result" class="hidden"></div>
   </div>
 
@@ -126,8 +144,9 @@
     }
 
     function answer(isYes) {
-      if(isYes) score++; // chaque "Oui" vaut 1 point
+      if(isYes) score++;
       currentQuestion++;
+
       if (currentQuestion < questions.length) {
         showQuestion();
       } else {
@@ -153,12 +172,13 @@
       const grade = getGrade(percentage);
 
       resultDiv.innerHTML = `
-        <h2>Résultats</h2>
-        <div class="grade ${grade}">${grade}</div>
+        <h2>Résultat</h2>
+        <div class="grade">${grade}</div>
       `;
     }
 
     showQuestion();
   </script>
+
 </body>
 </html>
