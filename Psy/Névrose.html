@@ -50,8 +50,8 @@
       {id:3, text:"Quand une émotion me dépasse, je me détourne."},
       {id:4, text:"Certains comportements reviennent automatiquement."},
       {id:5, text:"J'hésite à changer malgré l'envie."},
-      {id:7, text:"Je garde des habitudes juste par familiarité."},
-      {id:9, text:"Je me défends quand un aspect inconfortable de moi est pointé."}
+      {id:6, text:"Je garde des habitudes juste par familiarité."},
+      {id:7, text:"Je me défends quand un aspect inconfortable de moi est pointé."}
     ];
 
     const qContainer = document.getElementById('questions');
@@ -93,4 +93,21 @@
 
       if(score === null){
         box.hidden = false;
-        box.textC
+        box.textContent = "Veuillez répondre à tout.";
+        return;
+      }
+
+      const threshold = questions.length * 2;
+      const result = score >= threshold ? "N" : "Non-N";
+
+      box.hidden = false;
+      box.textContent = result;
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', ()=>{
+      document.getElementById('testForm').reset();
+      document.getElementById('resultBox').hidden = true;
+    });
+  </script>
+</body>
+</html>
