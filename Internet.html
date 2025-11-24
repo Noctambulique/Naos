@@ -133,11 +133,22 @@ Personnalisation (modifier ces sections dans le code):
     const BOXES = [
       { id: 'b1', title: 'Calendrier', url: 'https://calendar.google.com', placeholder:'Double-clic pour éditer' },
       { id: 'b2', title: 'Mail', url: 'https://mail.google.com', placeholder:'Double-clic pour éditer' },
-      { id: 'b3', title: 'Docs', url: 'https://docs.google.com', placeholder:'Double-clic pour éditer' },
-      { id: 'b4', title: 'Tâches', url: 'https://todo.google.com', placeholder:'Double-clic pour éditer' },
-      { id: 'b5', title: 'Notes', url: 'https://www.evernote.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b3', title: 'Reddit', url: 'https://www.reddit.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b4', title: 'Youtube', url: 'https://https://www.youtube.com/', placeholder:'Double-clic pour éditer' },
+      { id: 'b5', title: 'Framapad', url: 'https://framapad.org/abc/fr/', placeholder:'Double-clic pour éditer' },
       { id: 'b6', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
-      // Ajoutez autant de cases que vous voulez ; si vous voulez une grille complète sans définir
+      { id: 'b7', title: 'Tool24', url: 'https://tools.pdf24.org/fr/ocr-pdf', placeholder:'Double-clic pour éditer' },
+      { id: 'b8', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b9', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b10', title: 'Chatgpt', url: 'https://chatgpt.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b11', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b12', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b13', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b14', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b15', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b16', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b17', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
+     // Ajoutez autant de cases que vous voulez ; si vous voulez une grille complète sans définir
       // toutes les cases, la génération ci-dessous remplira jusqu'à cols*rows avec des cases vides.
     ];
     /* ---------------------------------------------------------------------- */
@@ -178,7 +189,6 @@ Personnalisation (modifier ces sections dans le code):
 
       const hint = document.createElement('div');
       hint.className = 'hint';
-      hint.innerText = box.url ? '→ lien' : '';
 
       el.appendChild(content);
       el.appendChild(hint);
@@ -260,7 +270,6 @@ Personnalisation (modifier ces sections dans le code):
         if(el) el.dataset.url = url;
         // update hint
         const hint = el.querySelector('.hint');
-        hint.innerText = url ? '→ lien' : '';
         // persist url
         const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
         state[id] = state[id] || {};
