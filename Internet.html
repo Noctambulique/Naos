@@ -1,0 +1,181 @@
+<!--
+Minimalist editable link grid
+Tout est personnalisable dans le code ci-dessous. Il n'y a aucun contrôle visible dans l'interface.
+Instructions d'utilisation (interface):
+ - Clic simple sur une case : ouvre l'URL associée (attribuée dans le code).
+ - Double-clic sur une case : passe en mode édition pour écrire/modifier le contenu.
+ - Appuyez sur Entrée ou cliquez en dehors pour quitter le mode édition (sauvegarde localStorage).
+ - Les modifications sont persistées en localStorage (pour usage local uniquement).
+
+Personnalisation (modifier ces sections dans le code):
+ - `GRID_CONFIG` : nombre de lignes/colonnes, taille des cases, gap
+ - `BOXES` : tableau d'objets {id, title, url, placeholder} pour définir chaque case
+ - Styles CSS dans la section <style> : couleurs, typographie, bordures
+-->
+
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Grille éditable minimaliste</title>
+  <style>
+    /* -- Personnalisez ici -- */
+    :root{
+      --bg: #ffffff; /* fond de la page */
+      --gap: 12px;    /* espace entre cases */
+      --box-size: 140px; /* taille par défaut des cases (width/height) */
+      --radius: 8px;
+      --border: 1px solid rgba(0,0,0,0.06);
+      --shadow: 0 2px 6px rgba(0,0,0,0.04);
+      --font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      --text-color: #111111;
+      --muted: rgba(0,0,0,0.45);
+    }
+
+    html,body{height:100%;}
+    body{
+      margin:0;
+      padding:24px;
+      background:var(--bg);
+      font-family:var(--font-family);
+      color:var(--text-color);
+      -webkit-font-smoothing:antialiased;
+    }
+
+    .grid-wrap{
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(var(--cols, 6), var(--box-size));
+      grid-auto-rows: var(--box-size);
+      gap: var(--gap);
+    }
+
+    .box{
+      background:transparent;
+      border:var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
+      min-width:var(--box-size);
+      min-height:var(--box-size);
+      cursor:pointer;
+      user-select:none;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .box:active{transform:translateY(1px);}
+
+    .content{
+      width:100%;
+      height:100%;
+      outline:none;
+      font-size:14px;
+      line-height:1.2;
+      text-align:center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px;
+      word-break:break-word;
+      color:var(--text-color);
+    }
+
+    .placeholder{ color:var(--muted); }
+
+    /* Indicateur discret en bas-right quand la case a une URL */
+    .hint{
+      position:absolute;
+      right:8px;
+      bottom:8px;
+      font-size:11px;
+      color:var(--muted);
+      opacity:0.9;
+    }
+
+    /* Mode édition visuel: aucune UI supplémentaire, juste une légère bordure accentuée */
+    .editing{ box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.14); }
+
+    /* Responsive : réduire taille des cases sur petits écrans */
+    @media (max-width:640px){
+      :root{ --box-size: 100px; --cols: 3; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="grid-wrap">
+    <div id="grid" class="grid" aria-label="Grille de cases éditables"></div>
+  </div>
+
+  <script>
+    /* -------------------- CONFIGURATION (MODIFIEZ ICI) -------------------- */
+    const GRID_CONFIG = {
+      cols: 6,              // nombre de colonnes
+      rows: 4,              // nombre de lignes (utile pour générer un certain nombre de cases)
+      boxSizePx: 140,       // taille des cases (px) -> reflété dans CSS custom property
+      gapPx: 12,            // espacement (px)
+    };
+
+    /* Définissez les cases ici. L'ordre correspond à l'ordre dans la grille.
+       id: identifiant unique, title: texte affiché par défaut, url: lien à ouvrir
+       placeholder: texte d'aide si vide. Vous pouvez ajouter d'autres propriétés.
+    */
+    const BOXES = [
+      { id: 'b1', title: 'Calendrier', url: 'https://calendar.google.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b2', title: 'Mail', url: 'https://mail.google.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b3', title: 'Docs', url: 'https://docs.google.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b4', title: 'Tâches', url: 'https://todo.google.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b5', title: 'Notes', url: 'https://www.evernote.com', placeholder:'Double-clic pour éditer' },
+      { id: 'b6', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
+      // Ajoutez autant de cases que vous voulez ; si vous voulez une grille complète sans définir
+      // toutes les cases, la génération ci-dessous remplira jusqu'à cols*rows avec des cases vides.
+    ];
+    /* ---------------------------------------------------------------------- */
+
+    // Apply CSS variables from config
+    const root = document.documentElement;
+    root.style.setProperty('--cols', GRID_CONFIG.cols);
+    root.style.setProperty('--box-size', GRID_CONFIG.boxSizePx + 'px');
+    root.style.setProperty('--gap', GRID_CONFIG.gapPx + 'px');
+
+    const gridEl = document.getElementById('grid');
+
+    // Utility: load saved state
+    const STORAGE_KEY = 'editable-link-grid:v1';
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+
+    // Build full list up to rows*cols
+    const total = GRID_CONFIG.cols * GRID_CONFIG.rows;
+    const fullBoxes = [];
+    for(let i=0;i<total;i++){
+      const fromConfig = BOXES[i] || { id: 'auto_'+i, title: '', url: '', placeholder: 'Double-clic pour éditer' };
+      const persisted = (saved[fromConfig.id] || {});
+      fullBoxes.push({ ...fromConfig, ...persisted });
+    }
+
+    // Render grid
+    fullBoxes.forEach(box => {
+      const el = document.createElement('div');
+      el.className = 'box';
+      el.dataset.id = box.id;
+      el.dataset.url = box.url || '';
+
+      const content = document.createElement('div');
+      content.className = 'content';
+      content.tabIndex = 0; // focusable
+      content.innerText = box.title || '';
+      if(!box.title) content.classList.add('placeholder');
+
+      const hint = document.createElement('div');
+      hint.className = 'hint';
+      hint.innerText = box
