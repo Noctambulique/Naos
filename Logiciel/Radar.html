@@ -3,32 +3,38 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Radar Minimal</title>
+<title>Radar Minimal+</title>
 <style>
   body{font-family:system-ui;margin:0;padding:20px;display:flex;flex-direction:column;gap:14px;max-width:700px;margin:auto}
   h1{font-size:18px;margin:0}
-  textarea,input,button,select{width:100%;padding:8px;font-size:14px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box}
+  input,button,select{width:100%;padding:8px;font-size:14px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box}
   button{cursor:pointer}
-  #canvasWrap{width:100%;height:420px}
+  #canvasWrap{width:100%;height:440px}
   canvas{width:100%;height:100%;background:#fff}
   .row{display:flex;gap:8px}
 </style>
 </head>
 <body>
 
-<h1>Radar Chart Minimal</h1>
+<h1>Radar Chart Minimal+</h1>
 
-<label>Labels (ex: Force,Vitesse,...)</label>
-<textarea id="labels">Force,Vitesse,Agilité,Endurance</textarea>
+<label>Nombre de côtés</label>
+<input id="sides" type="number" value="5" min="3" />
 
-<label>Valeurs (ex: 8,6,7,9)</label>
-<input id="values" value="8,6,7,9" />
+<label>Valeurs (séparées par virgule)</label>
+<input id="values" value="8,6,7,9,5" />
 
 <label>Couleur</label>
 <input type="color" id="color" value="#3b82f6" />
 
+<label>Style</label>
+<select id="style">
+  <option value="soft">Courbes douces</option>
+  <option value="straight">Lignes droites</option>
+  <option value="spiky">Très pointu</option>
+</select>
+
 <div class="row">
-  <button id="update">Mettre à jour</button>
   <button id="pngWhite">PNG fond blanc</button>
   <button id="pngTransparent">PNG transparent</button>
 </div>
@@ -42,37 +48,50 @@
 let chart;
 const ctx = document.getElementById('radar');
 
+function regenLabels(n){ return Array.from({length:n},(_,i)=>"C"+(i+1)); }
+
+function tensionFromStyle(s){
+  if(s==='straight') return 0;
+  if(s==='soft') return 0.35;
+  if(s==='spiky') return 0.8;
+  return 0.35;
+}
+
 function makeChart(bg){
-  const labels = document.getElementById('labels').value.split(',').map(s=>s.trim()).filter(Boolean);
-  const values = document.getElementById('values').value.split(',').map(v=>Number(v)||0);
+  const n = Number(document.getElementById('sides').value)||3;
+  const labels = regenLabels(n);
+  const rawVals = document.getElementById('values').value.split(',').map(v=>Number(v)||0);
+  const values = rawVals.slice(0,n).concat(Array(Math.max(0,n-rawVals.length)).fill(0));
   const color = document.getElementById('color').value;
+  const style = document.getElementById('style').value;
 
   if(chart) chart.destroy();
 
   chart = new Chart(ctx,{
     type:'radar',
-    data:{
-      labels,
-      datasets:[{
-        label:'Données',
-        data:values,
-        borderColor:color,
-        backgroundColor:bg?color+'30':color+'25',
-        fill:true
-      }]
-    },
+    data:{ labels, datasets:[{
+      label:'',
+      data:values,
+      borderColor:color,
+      backgroundColor:bg?color+'30':color+'20',
+      fill:true
+    }]},
     options:{
       animation:false,
       responsive:true,
       maintainAspectRatio:false,
-      scales:{ r:{ beginAtZero:true, suggestedMax:10 } }
+      elements:{ line:{ tension:tensionFromStyle(style) }},
+      scales:{ r:{ beginAtZero:true, suggestedMax:10 }}
     }
   });
 }
 
-makeChart(true);
+// Auto-update on any change
+['sides','values','color','style'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>makeChart(true));
+});
 
-document.getElementById('update').onclick=()=>makeChart(true);
+makeChart(true);
 
 document.getElementById('pngWhite').onclick=()=>{
   const link=document.createElement('a');
@@ -82,13 +101,20 @@ document.getElementById('pngWhite').onclick=()=>{
 };
 
 document.getElementById('pngTransparent').onclick=()=>{
-  const labels = document.getElementById('labels').value.split(',').map(s=>s.trim());
-  const values = document.getElementById('values').value.split(',').map(v=>Number(v)||0);
+  const n = Number(document.getElementById('sides').value)||3;
+  const labels = regenLabels(n);
+  const rawVals = document.getElementById('values').value.split(',').map(v=>Number(v)||0);
+  const values = rawVals.slice(0,n).concat(Array(Math.max(0,n-rawVals.length)).fill(0));
   const color = document.getElementById('color').value;
+  const style = document.getElementById('style').value;
 
   const temp=document.createElement('canvas');
   temp.width=ctx.width; temp.height=ctx.height;
-  new Chart(temp,{type:'radar',data:{labels,datasets:[{label:'',data:values,borderColor:color,backgroundColor:color+'25',fill:true}]},options:{animation:false,responsive:false,maintainAspectRatio:false,scales:{r:{beginAtZero:true,suggestedMax:10}}}});
+  new Chart(temp,{
+    type:'radar',
+    data:{labels,datasets:[{label:'',data:values,borderColor:color,backgroundColor:color+'20',fill:true}]},
+    options:{animation:false,responsive:false,maintainAspectRatio:false,elements:{line:{tension:tensionFromStyle(style)}},scales:{r:{beginAtZero:true,suggestedMax:10}}}
+  );
 
   const link=document.createElement('a');
   link.download='radar_transparent.png';
@@ -96,6 +122,5 @@ document.getElementById('pngTransparent').onclick=()=>{
   link.click();
 };
 </script>
-
 </body>
 </html>
