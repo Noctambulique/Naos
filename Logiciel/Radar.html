@@ -1,214 +1,319 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Radar Minimal++</title>
-<style>
-  body{font-family:system-ui;margin:0;padding:20px;display:flex;flex-direction:column;gap:14px;max-width:720px;margin:auto}
-  h1{font-size:18px;margin:0}
-  textarea,input,button,select{width:100%;padding:8px;font-size:14px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box}
-  button{cursor:pointer}
-  #canvasWrap{width:100%;height:460px}
-  canvas{width:100%;height:100%;background:#fff}
-  .row{display:flex;gap:8px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Radar Chart Builder — Export PNG</title>
+  <style>
+    :root{ --gap:12px; --card-radius:10px; --shadow: 0 6px 18px rgba(0,0,0,.08);}    
+    body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:20px; background:#f5f7fa; color:#0f172a}
+    .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:360px 1fr;gap:var(--gap);}    
+    .card{background:#fff;border-radius:var(--card-radius);padding:16px;box-shadow:var(--shadow)}
+    h1{font-size:18px;margin:0 0 12px}
+    label{display:block;font-size:13px;margin-bottom:6px}
+    input[type="text"], input[type="number"], select{width:100%;padding:8px;border:1px solid #e6e9ef;border-radius:8px;font-size:13px}
+    .row{display:flex;gap:8px;margin-bottom:10px}
+    .controls{display:flex;flex-direction:column;gap:10px}
+    .list{max-height:420px;overflow:auto;padding-right:6px}
+    .axis-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .axis-row input{padding:6px}
+    .btn{background:#0ea5a4;color:white;padding:8px 10px;border-radius:8px;border:none;cursor:pointer}
+    .btn.secondary{background:#334155}
+    .small{font-size:12px;padding:6px 8px}
+    .flex{display:flex;gap:8px;align-items:center}
+    .legend{display:flex;gap:8px;flex-wrap:wrap}
+    canvas{background:transparent;border-radius:10px}
+    .footer{margin-top:12px;display:flex;gap:8px;align-items:center}
+    .muted{color:#64748b;font-size:13px}
+    .color-swatch{width:28px;height:28px;border-radius:6px;border:1px solid rgba(0,0,0,.06)}
+  </style>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Constructeur de Radar — paramètres</h1>
+      <div class="controls">
+        <div>
+          <label>Nombre de axes</label>
+          <div class="row">
+            <input id="axisCount" type="number" min="3" max="12" value="5" />
+            <button id="setCount" class="btn small">Appliquer</button>
+          </div>
+          <div class="muted">Minimum 3, maximum 12. Le formulaire génère automatiquement les noms et valeurs.</div>
+        </div>
 
-<h1>Radar Chart Minimal++</h1>
+        <div>
+          <label>Nom du dataset</label>
+          <input id="datasetName" type="text" value="Mes compétences" />
+        </div>
 
-<label>Nom des coins (séparés par virgules)</label>
-<textarea id="labels">Force,Vitesse,Agilité,Endurance,Technique</textarea>
+        <div>
+          <label>Couleur du remplissage (alpha contrôlable)</label>
+          <div class="row">
+            <input id="fillColor" type="color" value="#06b6d4" />
+            <input id="fillAlpha" type="number" min="0" max="1" step="0.05" value="0.45" style="width:80px" />
+            <div class="muted">opacité</div>
+          </div>
+        </div>
 
-<label>Valeurs (même nombre, séparées par virgules)</label>
-<input id="values" value="8,6,7,9,5" />
+        <div>
+          <label>Couleur du contour</label>
+          <div class="row">
+            <input id="borderColor" type="color" value="#0369a1" />
+            <input id="borderWidth" type="number" min="1" max="6" value="2" style="width:80px" />
+          </div>
+        </div>
 
-<label>Couleur</label>
-<input type="color" id="color" value="#3b82f6" />
+        <div>
+          <label>Fond à exporter</label>
+          <div class="row">
+            <select id="backgroundMode">
+              <option value="transparent">Transparent (PNG sans fond)</option>
+              <option value="white">Blanc</option>
+              <option value="custom">Couleur personnalisée</option>
+            </select>
+            <input id="bgColor" type="color" value="#ffffff" style="display:none" />
+          </div>
+        </div>
 
-<label>Style</label>
-<select id="style">
-  <option value="soft">Courbes douces</option>
-  <option value="straight">Lignes droites</option>
-  <option value="spiky">Très pointu</option>
-</select>
+        <div>
+          <label>Valeurs automatiques / manuelles</label>
+          <div class="row">
+            <button id="randomize" class="btn small">Remplir aléatoire</button>
+            <button id="resetDefaults" class="btn small secondary">Réinitialiser</button>
+          </div>
+        </div>
 
-<div class="row">
-  <button id="pngWhite">PNG fond blanc</button>
-  <button id="pngTransparent">PNG transparent</button>
-</div>
+        <hr />
+        <h1 style="font-size:15px;margin-top:6px">Axes (éditer noms et valeurs)</h1>
+        <div class="list card" id="axesList" style="padding:12px;">
+          <!-- rows générées dynamiquement -->
+        </div>
 
-<div id="canvasWrap">
-  <canvas id="radar"></canvas>
-</div>
+        <div class="footer">
+          <button id="updateChart" class="btn">Mettre à jour le graphique</button>
+          <button id="downloadPNG" class="btn small secondary">Télécharger PNG</button>
+          <div class="muted">Format: PNG. Le fond est appliqué selon la sélection ci-dessus.</div>
+        </div>
+      </div>
+    </div>
 
-<script>
-window.addEventListener("DOMContentLoaded", () => {
-  const canvas = document.getElementById("radarCanvas");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  let radarChart = null;
+    <div class="card">
+      <h1>Aperçu</h1>
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div style="flex:1">
+          <canvas id="radarCanvas" width="640" height="520"></canvas>
+        </div>
+        <div style="width:220px">
+          <div class="card" style="padding:10px">
+            <div class="muted">Légende & options</div>
+            <div style="margin-top:10px" class="flex">
+              <input id="showLegend" type="checkbox" checked />
+              <label for="showLegend">Afficher la légende</label>
+            </div>
+            <div style="margin-top:10px" class="flex">
+              <input id="fillArea" type="checkbox" checked />
+              <label for="fillArea">Remplir l'aire</label>
+            </div>
+            <div style="margin-top:10px" class="flex">
+              <input id="scaleBeginAtZero" type="checkbox" checked />
+              <label for="scaleBeginAtZero">Échelle depuis 0</label>
+            </div>
+            <div style="margin-top:12px">
+              <label>Max échelle</label>
+              <input id="scaleMax" type="number" value="10" min="1" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px" class="muted">Astuce: ajuste les valeurs puis clique sur "Mettre à jour le graphique".</div>
+    </div>
+  </div>
 
-  const sidesInput = document.getElementById("sides");
-  const styleInput = document.getElementById("style");
-  const labelsContainer = document.getElementById("labelsContainer");
-  const downloadWhite = document.getElementById("downloadWhite");
-  const downloadTransparent = document.getElementById("downloadTransparent");
-
-  function regenerateLabels() {
-    labelsContainer.innerHTML = "";
-    const n = parseInt(sidesInput.value) || 3;
-    for (let i = 0; i < n; i++) {
-      const inp = document.createElement("input");
-      inp.type = "text";
-      inp.value = "Axe " + (i + 1);
-      inp.dataset.index = i;
-      inp.className = "labelInput";
-      inp.addEventListener("input", updateChart);
-      labelsContainer.appendChild(inp);
+  <script>
+    // Utilitaires
+    function rgba(hex, alpha){
+      const h = hex.replace('#','');
+      const bigint = parseInt(h,16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }
-  }
 
-  function getLabels() {
-    return [...document.querySelectorAll(".labelInput")].map(i => i.value);
-  }
+    // Plugin Chart.js pour dessiner un fond lors de l'export
+    const bgPlugin = {
+      id: 'backgroundFill',
+      beforeDraw(chart, args, options){
+        const ctx = chart.ctx;
+        const color = options && options.color;
+        if(!color) return;
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.fillRect(0, 0, chart.width, chart.height);
+        ctx.restore();
+      }
+    };
+    Chart.register(bgPlugin);
 
-  function getData() {
-    const n = parseInt(sidesInput.value) || 3;
-    return Array.from({ length: n }, () => Math.floor(Math.random() * 100) + 20);
-  }
+    // état
+    let axisCountInput = document.getElementById('axisCount');
+    let axesList = document.getElementById('axesList');
+    let chart = null;
 
-  function updateChart() {
-    const labels = getLabels();
-    const data = getData();
+    function defaultLabels(n){
+      const base = ['Alpha','Bravo','Charlie','Delta','Echo','Foxtrot','Golf','Hotel','India','Juliet','Kilo','Lima'];
+      return base.slice(0,n);
+    }
 
-    if (radarChart) radarChart.destroy();
+    function createAxisRows(n){
+      axesList.innerHTML = '';
+      const labels = defaultLabels(n);
+      for(let i=0;i<n;i++){
+        const row = document.createElement('div');
+        row.className = 'axis-row';
+        row.innerHTML = `
+          <input class="axis-label" data-index="${i}" type="text" value="${labels[i]}" style="flex:1" />
+          <input class="axis-value" data-index="${i}" type="number" min="0" max="100" value="${Math.round(Math.random()*8)+2}" style="width:80px" />
+        `;
+        axesList.appendChild(row);
+      }
+    }
 
-    let tension = 0.25;
-    if (styleInput.value === "soft") tension = 0.45;
-    if (styleInput.value === "pointy") tension = 0.05;
+    // initial
+    createAxisRows(parseInt(axisCountInput.value,10) || 5);
 
-    radarChart = new Chart(ctx, {
-      type: "radar",
-      data: {
-        labels,
-        datasets: [{ data, pointRadius: 3, borderWidth: 2, fill: true, tension }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: { r: { beginAtZero: true } },
-        animation: false
+    // construire chart
+    function buildConfig(){
+      const labels = Array.from(document.querySelectorAll('.axis-label')).map(i=>i.value || '');
+      const values = Array.from(document.querySelectorAll('.axis-value')).map(i=>Number(i.value));
+      const fillHex = document.getElementById('fillColor').value;
+      const alpha = parseFloat(document.getElementById('fillAlpha').value) || 0.45;
+      const borderHex = document.getElementById('borderColor').value;
+      const borderW = parseInt(document.getElementById('borderWidth').value,10) || 2;
+      const datasetName = document.getElementById('datasetName').value || 'Dataset';
+      const fillArea = document.getElementById('fillArea').checked;
+      const showLegend = document.getElementById('showLegend').checked;
+      const beginZero = document.getElementById('scaleBeginAtZero').checked;
+      const scaleMax = parseFloat(document.getElementById('scaleMax').value) || 10;
+
+      return {
+        type: 'radar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: datasetName,
+            data: values,
+            fill: fillArea,
+            backgroundColor: rgba(fillHex, fillArea? alpha : 0),
+            borderColor: borderHex,
+            borderWidth: borderW,
+            pointBackgroundColor: borderHex,
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: false,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: showLegend }
+          },
+          scales: {
+            r: {
+              beginAtZero: beginZero,
+              suggestedMax: scaleMax,
+              ticks: { stepSize: Math.max(1, Math.round(scaleMax/5)) }
+            }
+          }
+        }
+      };
+    }
+
+    function renderChart(){
+      const ctx = document.getElementById('radarCanvas').getContext('2d');
+      if(chart) chart.destroy();
+      const cfg = buildConfig();
+      chart = new Chart(ctx, cfg);
+    }
+
+    // événements UI
+    document.getElementById('setCount').addEventListener('click', ()=>{
+      let n = parseInt(axisCountInput.value,10);
+      if(isNaN(n) || n<3) n=3; if(n>12) n=12; axisCountInput.value = n;
+      createAxisRows(n);
+    });
+
+    document.getElementById('randomize').addEventListener('click', ()=>{
+      document.querySelectorAll('.axis-value').forEach(i=>{ i.value = Math.round(Math.random()*10); });
+    });
+
+    document.getElementById('resetDefaults').addEventListener('click', ()=>{
+      const n = parseInt(axisCountInput.value,10);
+      createAxisRows(n);
+      document.getElementById('datasetName').value = 'Mes compétences';
+      document.getElementById('fillColor').value = '#06b6d4';
+      document.getElementById('fillAlpha').value = 0.45;
+      document.getElementById('borderColor').value = '#0369a1';
+      document.getElementById('borderWidth').value = 2;
+      document.getElementById('scaleMax').value = 10;
+    });
+
+    document.getElementById('updateChart').addEventListener('click', ()=>{
+      try{ renderChart(); }catch(e){ console.error(e); alert('Erreur lors du rendu : '+e.message); }
+    });
+
+    // background mode
+    const bgMode = document.getElementById('backgroundMode');
+    const bgColor = document.getElementById('bgColor');
+    bgMode.addEventListener('change', ()=>{
+      if(bgMode.value === 'custom') bgColor.style.display = 'inline-block'; else bgColor.style.display = 'none';
+    });
+
+    // téléchargement
+    document.getElementById('downloadPNG').addEventListener('click', ()=>{
+      if(!chart){ renderChart(); }
+      // appliquer le plugin backgroundFill selon le mode
+      const mode = document.getElementById('backgroundMode').value;
+      let color = null;
+      if(mode === 'white') color = '#ffffff';
+      if(mode === 'custom') color = document.getElementById('bgColor').value;
+
+      // sauvegarder option plugin actuelle
+      const plugins = chart.options.plugins || {};
+      const oldBg = plugins.backgroundFill || null;
+
+      // mettre la couleur pour le rendu
+      chart.options.plugins.backgroundFill = { color };
+      // forcer redraw
+      chart.update();
+
+      // créer le dataURL
+      const link = document.createElement('a');
+      link.download = (document.getElementById('datasetName').value || 'radar') + '.png';
+      link.href = document.getElementById('radarCanvas').toDataURL('image/png');
+      link.click();
+
+      // restaurer plugin précédent
+      if(oldBg) chart.options.plugins.backgroundFill = oldBg; else delete chart.options.plugins.backgroundFill;
+      chart.update();
+    });
+
+    // double-clic sur axe pour supprimer (facultatif)
+    axesList.addEventListener('dblclick', (e)=>{
+      const target = e.target;
+      if(target.classList.contains('axis-label') || target.classList.contains('axis-value')){
+        const row = target.closest('.axis-row');
+        if(row) row.remove();
       }
     });
-  }
 
-  downloadWhite.addEventListener("click", () => {
-    const tmp = document.createElement("canvas");
-    tmp.width = canvas.width;
-    tmp.height = canvas.height;
-    const tctx = tmp.getContext("2d");
-    tctx.fillStyle = "#fff";
-    tctx.fillRect(0, 0, tmp.width, tmp.height);
-    tctx.drawImage(canvas, 0, 0);
+    // initial render
+    window.addEventListener('load', ()=>{
+      renderChart();
+    });
 
-    const link = document.createElement("a");
-    link.download = "radar_blanc.png";
-    link.href = tmp.toDataURL();
-    link.click();
-  });
-
-  downloadTransparent.addEventListener("click", () => {
-    const link = document.createElement("a");
-    link.download = "radar_transparent.png";
-    link.href = canvas.toDataURL();
-    link.click();
-  });
-
-  regenerateLabels();
-  updateChart();
-
-  sidesInput.addEventListener("input", () => {
-    regenerateLabels();
-    updateChart();
-  });
-
-  styleInput.addEventListener("input", updateChart);
-});
-</script>
-<script>
-let chart;
-const ctx = document.getElementById('radar');
-
-function tensionFromStyle(s){
-  if(s==='straight') return 0;
-  if(s==='soft') return 0.35;
-  if(s==='spiky') return 0.8;
-  return 0.35;
-}
-
-function makeChart(bg){
-  const labels = document.getElementById('labels').value.split(',').map(s=>s.trim()).filter(Boolean);
-  const rawVals = document.getElementById('values').value.split(',').map(v=>Number(v)||0);
-  const values = rawVals.slice(0, labels.length).concat(Array(Math.max(0,labels.length-rawVals.length)).fill(0));
-  const color = document.getElementById('color').value;
-  const style = document.getElementById('style').value;
-
-  if(chart) chart.destroy();
-
-  chart = new Chart(ctx,{
-    type:'radar',
-    data:{ labels, datasets:[{
-      label:'', data:values,
-      borderColor:color,
-      backgroundColor:bg?color+'30':color+'20',
-      fill:true
-    }]},
-    options:{
-      animation:false,
-      responsive:true,
-      maintainAspectRatio:false,
-      elements:{ line:{ tension:tensionFromStyle(style) }},
-      scales:{ r:{ beginAtZero:true, suggestedMax:10 } }
-    }
-  });
-}
-
-['labels','values','color','style'].forEach(id=>{
-  document.getElementById(id).addEventListener('input',()=>makeChart(true));
-});
-
-makeChart(true);
-
-document.getElementById('pngWhite').onclick=()=>{
-  const link=document.createElement('a');
-  link.download='radar_white.png';
-  link.href=ctx.toDataURL('image/png');
-  link.click();
-};
-
-document.getElementById('pngTransparent').onclick=()=>{
-  const labels=document.getElementById('labels').value.split(',').map(s=>s.trim()).filter(Boolean);
-  const rawVals=document.getElementById('values').value.split(',').map(v=>Number(v)||0);
-  const values=rawVals.slice(0,labels.length).concat(Array(Math.max(0,labels.length-rawVals.length)).fill(0));
-  const color=document.getElementById('color').value;
-  const style=document.getElementById('style').value;
-
-  const temp=document.createElement('canvas');
-  temp.width=ctx.width; temp.height=ctx.height;
-
-  new Chart(temp,{
-    type:'radar',
-    data:{labels,datasets:[{label:'',data:values,borderColor:color,backgroundColor:color+'20',fill:true}]},
-    options:{animation:false,responsive:false,maintainAspectRatio:false,elements:{line:{tension:tensionFromStyle(style)}},scales:{r:{beginAtZero:true,suggestedMax:10}}}
-  );
-
-  const link=document.createElement('a');
-  link.download='radar_transparent.png';
-  link.href=temp.toDataURL('image/png');
-  link.click();
-};
-</script>
+  </script>
 </body>
 </html>
