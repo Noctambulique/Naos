@@ -132,188 +132,180 @@
     </div>
   </div>
 
-  <script>
-    // Utilitaires
-    function rgba(hex, alpha){
-      const h = hex.replace('#','');
-      const bigint = parseInt(h,16);
-      const r = (bigint >> 16) & 255;
-      const g = (bigint >> 8) & 255;
-      const b = bigint & 255;
-      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+<script>
+  function rgba(hex, alpha){
+    const h = hex.replace('#','');
+    const bigint = parseInt(h,16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  const bgPlugin = {
+    id: 'backgroundFill',
+    beforeDraw(chart, args, options){
+      const ctx = chart.ctx;
+      const color = options && options.color;
+      if(!color) return;
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, chart.width, chart.height);
+      ctx.restore();
     }
+  };
+  Chart.register(bgPlugin);
 
-    // Plugin Chart.js pour dessiner un fond lors de l'export
-    const bgPlugin = {
-      id: 'backgroundFill',
-      beforeDraw(chart, args, options){
-        const ctx = chart.ctx;
-        const color = options && options.color;
-        if(!color) return;
-        ctx.save();
-        ctx.fillStyle = color;
-        ctx.fillRect(0, 0, chart.width, chart.height);
-        ctx.restore();
-      }
-    };
-    Chart.register(bgPlugin);
+  let axisCountInput = document.getElementById('axisCount');
+  let axesList = document.getElementById('axesList');
+  let chart = null;
 
-    // état
-    let axisCountInput = document.getElementById('axisCount');
-    let axesList = document.getElementById('axesList');
-    let chart = null;
+  function defaultLabels(n){
+    const base = ['Alpha','Bravo','Charlie','Delta','Echo','Foxtrot','Golf','Hotel','India','Juliet','Kilo','Lima'];
+    return base.slice(0,n);
+  }
 
-    function defaultLabels(n){
-      const base = ['Alpha','Bravo','Charlie','Delta','Echo','Foxtrot','Golf','Hotel','India','Juliet','Kilo','Lima'];
-      return base.slice(0,n);
+  function createAxisRows(n){
+    axesList.innerHTML = '';
+    const labels = defaultLabels(n);
+    for(let i=0;i<n;i++){
+      const row = document.createElement('div');
+      row.className = 'axis-row';
+      row.innerHTML = `
+        <input class="axis-label" data-index="${i}" type="text" value="${labels[i]}" style="flex:1" />
+        <input class="axis-value" data-index="${i}" type="number" min="0" max="100" value="${Math.round(Math.random()*8)+2}" style="width:80px" />
+      `;
+      axesList.appendChild(row);
     }
+  }
 
-    function createAxisRows(n){
-      axesList.innerHTML = '';
-      const labels = defaultLabels(n);
-      for(let i=0;i<n;i++){
-        const row = document.createElement('div');
-        row.className = 'axis-row';
-        row.innerHTML = `
-          <input class="axis-label" data-index="${i}" type="text" value="${labels[i]}" style="flex:1" />
-          <input class="axis-value" data-index="${i}" type="number" min="0" max="100" value="${Math.round(Math.random()*8)+2}" style="width:80px" />
-        `;
-        axesList.appendChild(row);
-      }
-    }
+  createAxisRows(parseInt(axisCountInput.value,10) || 5);
 
-    // initial
-    createAxisRows(parseInt(axisCountInput.value,10) || 5);
+  function buildConfig(){
+    const labels = Array.from(document.querySelectorAll('.axis-label')).map(i=>i.value || '');
+    const values = Array.from(document.querySelectorAll('.axis-value')).map(i=>Number(i.value));
+    const fillHex = document.getElementById('fillColor').value;
+    const alpha = parseFloat(document.getElementById('fillAlpha').value) || 0.45;
+    const borderHex = document.getElementById('borderColor').value;
+    const borderW = parseInt(document.getElementById('borderWidth').value,10) || 2;
+    const datasetName = document.getElementById('datasetName').value || 'Dataset';
+    const fillArea = document.getElementById('fillArea').checked;
+    const showLegend = document.getElementById('showLegend').checked;
+    const beginZero = document.getElementById('scaleBeginAtZero').checked;
+    const scaleMax = parseFloat(document.getElementById('scaleMax').value) || 10;
 
-    // construire chart
-    function buildConfig(){
-      const labels = Array.from(document.querySelectorAll('.axis-label')).map(i=>i.value || '');
-      const values = Array.from(document.querySelectorAll('.axis-value')).map(i=>Number(i.value));
-      const fillHex = document.getElementById('fillColor').value;
-      const alpha = parseFloat(document.getElementById('fillAlpha').value) || 0.45;
-      const borderHex = document.getElementById('borderColor').value;
-      const borderW = parseInt(document.getElementById('borderWidth').value,10) || 2;
-      const datasetName = document.getElementById('datasetName').value || 'Dataset';
-      const fillArea = document.getElementById('fillArea').checked;
-      const showLegend = document.getElementById('showLegend').checked;
-      const beginZero = document.getElementById('scaleBeginAtZero').checked;
-      const scaleMax = parseFloat(document.getElementById('scaleMax').value) || 10;
+    const showTicks = document.getElementById('showTicks').checked; // <--- AJOUT
 
-      return {
-        type: 'radar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: datasetName,
-            data: values,
-            fill: fillArea,
-            backgroundColor: rgba(fillHex, fillArea? alpha : 0),
-            borderColor: borderHex,
-            borderWidth: borderW,
-            pointBackgroundColor: borderHex,
-            pointRadius: 4
-          }]
+    return {
+      type: 'radar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: datasetName,
+          data: values,
+          fill: fillArea,
+          backgroundColor: rgba(fillHex, fillArea? alpha : 0),
+          borderColor: borderHex,
+          borderWidth: borderW,
+          pointBackgroundColor: borderHex,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: showLegend }
         },
-        options: {
-          responsive: false,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: showLegend }
-          },
-          scales: {
-            r: {
-              beginAtZero: beginZero,
-              suggestedMax: scaleMax,
-              ticks: { stepSize: Math.max(1, Math.round(scaleMax/5)) }
+        scales: {
+          r: {
+            beginAtZero: beginZero,
+            suggestedMax: scaleMax,
+            ticks: {
+              display: showTicks,   // <--- CORRECTION
+              stepSize: Math.max(1, Math.round(scaleMax/5))
             }
           }
         }
-      };
-    }
-
-    function renderChart(){
-      const ctx = document.getElementById('radarCanvas').getContext('2d');
-      if(chart) chart.destroy();
-      const cfg = buildConfig();
-      chart = new Chart(ctx, cfg);
-    }
-
-    // événements UI
-    document.getElementById('setCount').addEventListener('click', ()=>{
-      let n = parseInt(axisCountInput.value,10);
-      if(isNaN(n) || n<3) n=3; if(n>12) n=12; axisCountInput.value = n;
-      createAxisRows(n);
-    });
-
-    document.getElementById('randomize').addEventListener('click', ()=>{
-      document.querySelectorAll('.axis-value').forEach(i=>{ i.value = Math.round(Math.random()*10); });
-    });
-
-    document.getElementById('resetDefaults').addEventListener('click', ()=>{
-      const n = parseInt(axisCountInput.value,10);
-      createAxisRows(n);
-      document.getElementById('datasetName').value = 'Mes compétences';
-      document.getElementById('fillColor').value = '#06b6d4';
-      document.getElementById('fillAlpha').value = 0.45;
-      document.getElementById('borderColor').value = '#0369a1';
-      document.getElementById('borderWidth').value = 2;
-      document.getElementById('scaleMax').value = 10;
-    });
-
-    document.getElementById('updateChart').addEventListener('click', ()=>{
-      try{ renderChart(); }catch(e){ console.error(e); alert('Erreur lors du rendu : '+e.message); }
-    });
-
-    // background mode
-    const bgMode = document.getElementById('backgroundMode');
-    const bgColor = document.getElementById('bgColor');
-    bgMode.addEventListener('change', ()=>{
-      if(bgMode.value === 'custom') bgColor.style.display = 'inline-block'; else bgColor.style.display = 'none';
-    });
-
-    // téléchargement
-    document.getElementById('downloadPNG').addEventListener('click', ()=>{
-      if(!chart){ renderChart(); }
-      // appliquer le plugin backgroundFill selon le mode
-      const mode = document.getElementById('backgroundMode').value;
-      let color = null;
-      if(mode === 'white') color = '#ffffff';
-      if(mode === 'custom') color = document.getElementById('bgColor').value;
-
-      // sauvegarder option plugin actuelle
-      const plugins = chart.options.plugins || {};
-      const oldBg = plugins.backgroundFill || null;
-
-      // mettre la couleur pour le rendu
-      chart.options.plugins.backgroundFill = { color };
-      // forcer redraw
-      chart.update();
-
-      // créer le dataURL
-      const link = document.createElement('a');
-      link.download = (document.getElementById('datasetName').value || 'radar') + '.png';
-      link.href = document.getElementById('radarCanvas').toDataURL('image/png');
-      link.click();
-
-      // restaurer plugin précédent
-      if(oldBg) chart.options.plugins.backgroundFill = oldBg; else delete chart.options.plugins.backgroundFill;
-      chart.update();
-    });
-
-    // double-clic sur axe pour supprimer (facultatif)
-    axesList.addEventListener('dblclick', (e)=>{
-      const target = e.target;
-      if(target.classList.contains('axis-label') || target.classList.contains('axis-value')){
-        const row = target.closest('.axis-row');
-        if(row) row.remove();
       }
-    });
+    };
+  }
 
-    // initial render
-    window.addEventListener('load', ()=>{
-      renderChart();
-    });
+  function renderChart(){
+    const ctx = document.getElementById('radarCanvas').getContext('2d');
+    if(chart) chart.destroy();
+    chart = new Chart(ctx, buildConfig());
+  }
 
-  </script>
+  document.getElementById('setCount').addEventListener('click', ()=>{
+    let n = parseInt(axisCountInput.value,10);
+    if(isNaN(n) || n<3) n=3; if(n>12) n=12;
+    axisCountInput.value = n;
+    createAxisRows(n);
+  });
+
+  document.getElementById('randomize').addEventListener('click', ()=>{
+    document.querySelectorAll('.axis-value').forEach(i=>{ i.value = Math.round(Math.random()*10); });
+  });
+
+  document.getElementById('resetDefaults').addEventListener('click', ()=>{
+    const n = parseInt(axisCountInput.value,10);
+    createAxisRows(n);
+    document.getElementById('datasetName').value = 'Mes compétences';
+    document.getElementById('fillColor').value = '#06b6d4';
+    document.getElementById('fillAlpha').value = 0.45;
+    document.getElementById('borderColor').value = '#0369a1';
+    document.getElementById('borderWidth').value = 2;
+    document.getElementById('scaleMax').value = 10;
+  });
+
+  document.getElementById('updateChart').addEventListener('click', ()=>{
+    renderChart();
+  });
+
+  const bgMode = document.getElementById('backgroundMode');
+  const bgColor = document.getElementById('bgColor');
+  bgMode.addEventListener('change', ()=>{
+    if(bgMode.value === 'custom') bgColor.style.display = 'inline-block';
+    else bgColor.style.display = 'none';
+  });
+
+  document.getElementById('downloadPNG').addEventListener('click', ()=>{
+    if(!chart){ renderChart(); }
+
+    const mode = document.getElementById('backgroundMode').value;
+    let color = null;
+    if(mode === 'white') color = '#ffffff';
+    if(mode === 'custom') color = document.getElementById('bgColor').value;
+
+    const plugins = chart.options.plugins || {};
+    const oldBg = plugins.backgroundFill || null;
+
+    chart.options.plugins.backgroundFill = { color };
+    chart.update();
+
+    const link = document.createElement('a');
+    link.download = (document.getElementById('datasetName').value || 'radar') + '.png';
+    link.href = document.getElementById('radarCanvas').toDataURL('image/png');
+    link.click();
+
+    if(oldBg) chart.options.plugins.backgroundFill = oldBg;
+    else delete chart.options.plugins.backgroundFill;
+
+    chart.update();
+  });
+
+  axesList.addEventListener('dblclick', (e)=>{
+    const t = e.target;
+    if(t.classList.contains('axis-label') || t.classList.contains('axis-value')){
+      const row = t.closest('.axis-row');
+      if(row) row.remove();
+    }
+  });
+
+  window.addEventListener('load', ()=>{
+    renderChart();
+  });
+</script>
 </body>
 </html>
