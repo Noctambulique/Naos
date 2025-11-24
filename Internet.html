@@ -178,4 +178,123 @@ Personnalisation (modifier ces sections dans le code):
 
       const hint = document.createElement('div');
       hint.className = 'hint';
-      hint.innerText = box
+      hint.innerText = box.url ? '→ lien' : '';
+
+      el.appendChild(content);
+      el.appendChild(hint);
+      gridEl.appendChild(el);
+
+      // Click: ouvrir lien si défini
+      el.addEventListener('click', (ev)=>{
+        // If currently editing, do not open
+        if(el.classList.contains('editing')) return;
+        const url = el.dataset.url;
+        if(url) {
+          // target blank
+          window.open(url, '_blank');
+        }
+      });
+
+      // Double-click: activer édition inline
+      el.addEventListener('dblclick', (ev)=>{
+        enterEditMode(el);
+      });
+
+      // Keyboard: Enter to open, E to edit while focused
+      content.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          // If editing, commit; else open
+          if(el.classList.contains('editing')){
+            exitEditMode(el);
+          } else {
+            const url = el.dataset.url;
+            if(url) window.open(url, '_blank');
+          }
+        }
+        if(e.key.toLowerCase() === 'e'){
+          e.preventDefault();
+          enterEditMode(el);
+        }
+      });
+
+      // Focus out: commit edit if needed
+      content.addEventListener('blur', ()=>{
+        if(el.classList.contains('editing')) exitEditMode(el);
+      });
+
+    });
+
+    function enterEditMode(el){
+      const content = el.querySelector('.content');
+      el.classList.add('editing');
+      content.contentEditable = 'true';
+      content.classList.remove('placeholder');
+      content.focus();
+      // place caret at end
+      document.execCommand('selectAll', false, null);
+      document.getSelection().collapseToEnd();
+    }
+
+    function exitEditMode(el){
+      const id = el.dataset.id;
+      const content = el.querySelector('.content');
+      el.classList.remove('editing');
+      content.contentEditable = 'false';
+      const newText = content.innerText.trim();
+      if(!newText){
+        content.classList.add('placeholder');
+      }
+
+      // Save title to localStorage under id
+      const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      state[id] = state[id] || {};
+      state[id].title = newText;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    /* API helper dans window pour personnaliser dynamiquement via la console si besoin */
+    window.EditableGrid = {
+      setUrl(id, url){
+        const el = document.querySelector('.box[data-id="'+id+'"]');
+        if(el) el.dataset.url = url;
+        // update hint
+        const hint = el.querySelector('.hint');
+        hint.innerText = url ? '→ lien' : '';
+        // persist url
+        const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        state[id] = state[id] || {};
+        state[id].url = url;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      },
+      setTitle(id, title){
+        const el = document.querySelector('.box[data-id="'+id+'"]');
+        if(el){
+          const content = el.querySelector('.content');
+          content.innerText = title;
+          if(!title) content.classList.add('placeholder'); else content.classList.remove('placeholder');
+          const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+          state[id] = state[id] || {};
+          state[id].title = title;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+      },
+      clearStorage(){ localStorage.removeItem(STORAGE_KEY); location.reload(); }
+    };
+
+    // Pré-remplir state depuis config BOXES (pour url initiales)
+    (function persistInitial(){
+      const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      let changed = false;
+      BOXES.forEach(b=>{
+        if(!state[b.id]){
+          state[b.id] = { title: b.title || '', url: b.url || '' };
+          changed = true;
+        }
+      });
+      if(changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    })();
+
+  </script>
+</body>
+</html>
