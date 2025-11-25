@@ -1,553 +1,70 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Naos</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Galerie irrégulière</title>
+
 <style>
-  :root{
-    --ui-bg: rgba(0,0,0,0.6);
-    --ui-color: #fff;
-    --player-size: 36px;
-    --marker-size: 90px;
+  body{
+    margin:0;
+    padding:20px;
+    background:#fafafa;
+    font-family:sans-serif;
   }
-  html,body{height:100%;margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;}
-  #app{height:100vh;display:flex;flex-direction:column;}
-  #hud{
-    position:fixed; left:10px; top:10px; z-index:30;
-    background:var(--ui-bg); color:var(--ui-color); padding:8px 12px;border-radius:8px;
-    font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,.4);
-    user-select:none;
+
+  .zone{
+    position:relative;
+    width:100%;
+    height:100vh; /* Tu peux augmenter si tu veux plus d’espace */
+    border:2px dashed #ccc;
+    overflow:hidden;
   }
-  #hud b{display:inline-block; min-width:80px;}
-  #viewport{
-    position:relative; flex:1; overflow:hidden; background:#222;
+
+  .zone img{
+    position:absolute;
+    max-width:200px;   /* taille max des images */
+    border-radius:8px;
+    transition:0.3s;
+    cursor:pointer;
   }
-  #viewport{
-    touch-action: none;
-}
-  #map{
-    position:absolute; left:0; top:0;
-    transform-origin:0 0;
-  }
-#player{
-  position:absolute;
-  width:var(--player-size); height:var(--player-size);
-  margin-left: calc(var(--player-size) / -2);
-  margin-top: calc(var(--player-size) / -2);
-  z-index:40;
-  cursor:grab;
-  transition: transform .03s linear;
-  display:none;
-  }
-  #player:active{cursor:grabbing;}
-.marker{
-  position:absolute;
-  width:var(--marker-size);
-  height:var(--marker-size);
-  margin-left: calc(var(--marker-size) / -2);
-  margin-top: calc(var(--marker-size) / -2);
-  z-index:35;
-  pointer-events:auto;
-  user-select:none;
-  object-fit: contain;
-}
-.label-marker{
-  position:absolute;
-  z-index:35;
-  pointer-events:auto;
-}
-  #modal{
-    display:none; position:fixed; inset:0; z-index:100; background: rgba(0,0,0,.7);
-    align-items:center; justify-content:center; padding:20px;
-  }
-  #modal img{max-width:90vw; max-height:90vh; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,.6);}
-  #tips{
-    position:fixed; right:10px; top:10px; z-index:30;
-    background:var(--ui-bg); color:var(--ui-color); padding:8px 12px;border-radius:8px;
-    font-size:13px; max-width:220px;
-  }
-  @media (max-width:600px){
-    #hud {font-size:12px}
-    :root{--player-size:28px; --marker-size:28px;}
+
+  .zone img:hover{
+    transform:scale(1.1);
   }
 </style>
 </head>
+
 <body>
-<div id="app">
-  <div id="hud">
-    <div><b>Position</b> <span id="pos">x:0, y:0</span></div>
-    <div style="margin-top:6px"><b>Map</b> <span id="mapName"></span></div>
-    <div style="margin-top:6px"><b>Lieu</b> <span id="locLabel"></span></div>
-  </div>
 
-  <div id="viewport">
-    <div id="map">
-      <img id="player" src="data:image/svg+xml;utf8,
-        <svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 24 24' fill='none' stroke='%23ffcc00' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='10' r='3.2' /><path d='M12 2v3M12 21v-3M20 12h-3M7 12H4M17.5 6.5L15.5 8.5M8.5 15.5L6.5 17.5M17.5 17.5L15.5 15.5M8.5 8.5L6.5 6.5' /></svg>" alt="player" draggable="false">
-    </div>
-  </div>
+<h2>Galerie d’images placées aléatoirement</h2>
 
-  <div id="modal" onclick="hideModal()"><img id="modalImg" src="" alt="preview"></div>
+<div class="zone" id="zone">
+
+  <!-- 👉 AJOUTE TES IMAGES ICI (autant que tu veux) -->
+  <img src="images/photo1.jpg">
+  <img src="images/photo2.jpg">
+  <img src="images/photo3.jpg">
+  <img src="images/photo4.jpg">
+
 </div>
 
 <script>
-/* ==========================
-   CONFIGURATION
-   ========================== */
-const MAPS = {
-  "ville-centre": {
-    id: "ville-centre",
-    name: "Ville - Centre",
-    bg: "Map/20251024_1225_Carte Mystérieuse Violette_remix_01k8avxhcbetprmp4757n3ah3e (1).png",
-    width: 1700,
-    height: 1700
-  }
-};
+  // Positionnement irrégulier automatique
+  const zone = document.getElementById("zone");
+  const images = zone.querySelectorAll("img");
 
-// Map de départ
-let CURRENT_MAP_ID = "ville-centre";
+  images.forEach(img =>{
+    const zoneW = zone.clientWidth;
+    const zoneH = zone.clientHeight;
 
-/* --- LOCATIONS : marqueurs normaux --- */
-let LOCATIONS = [
-  { x: 390, y: 393, img: "Map/Maison1.png", type: "map", link: "Anecdotes.html", label:"Anecdotes, Roi de ♦️", size: 80 },
-  { x: 366, y: 814, img: "Map/Tholos.png", type: "map", link: "Frise Philo.html", label:"Histoire Philo, Dame de ♦️", size: 80 },
-  { x: 649, y: 1164, img: "Map/Maison1.png", type: "map", link: "Psycho.html", label:"Psycho, Valet de ♦️", size: 80 },
-  { x: 721, y: 1046, img: "Map/Maison1.png", type: "map", link: "Philo.html", label:"Philo-map, 10 de ♦️", size: 80 },
-  { x: 468, y: 590, img: "Map/Maison1.png", type: "map", link: "Biblio.html", label:"Biblio-Map, 9 de ♦️", size: 80 },
-  { x: 1310, y: 723, img: "D hiver/Labo Futuriste.png", type: "map", link: "Cool.html", label:"Trucs cools, 8 de ♦️", size: 90 },
-  { x: 933, y: 1234, img:"Map/Maison1.png", type: "document", link: "Biographie.html", label:"Biographie, Roi de ❤️", size: 80 },
-  { x: 1175, y: 1086, img: "Culture/Belle et Sebastien.png", type: "document", link: "Culture.html", label:"Culture, Dame de ❤️", size: 75 },
-  { x: 280, y: 637, img: "Map/Excel Art.png", type: "document", link: "excelart.html", label:"Excel Culture, Valet de ❤️", size: 100 },
-  { x: 513, y: 1290, img: "Map/Nuage.png", type: "document", link: "Avenir.html", label:"Oracle, 10 de ❤️", size: 80 },
-  { x: 1329, y: 823, img: "Map/pngegg (3).png", type: "document", label:"Galerie, 9 de ❤️", size: 1 },
-  { x: 1042, y: 778, img: "Map/pngegg (3).png", type: "document", label:"Sexualité, 8 de ❤️", size: 1 },
-  { x: 1114, y: 1199, img: "Map/Boutique Rose.png", type: "document", link: "Dressing.html", label:"Dressing, 7 de ❤️", size: 90 },
-  { x: 1129, y: 412, img: "Map/Coffre.png", type: "document", link: "Artefact.html", label:"Artefact, 6 de ❤️", size: 90  },
-  { x: 1183, y: 823, img: "Map/Basilic.png", type: "document", link: "Plante.html", label:"Plantes, 5 de ❤️", size: 60 },
-  { x: 1439, y: 981, img: "Map/Maison1.png", type: "document", link: "Galerie.html", label:"Galerie, 4 de ❤️", size: 60 },
-  { x: 750, y: 830, img: "Map/Tour.png", size: 200 },
-  { x: 750, y: 850, img: "Map/pngegg (3).png", type: "document", link: "D hiver/Symboles.png", label:"Symboles, Roi de ♠️", size: 1 },
-  { x: 750, y: 810, img: "Map/pngegg (3).png", type: "document", link: "Conversation.html", label:"Conversation, Dame de ♠️", size: 1 },
-  { x: 643, y: 289, img: "Map/Maison1.png", type: "map", link: "Triade.html", label:"Triade, Valet de ♠️", size: 80 },
-  { x: 262, y: 1039, img: "Map/Iceberg.png", type: "document", link: "Iceberg.html", label:"Iceberg, 10 de ♠️", size: 90 },
-  { x: 941, y: 629, img: "Map/Statue de glace.png", type: "document", link: "Gens.html", label:"Gens, 9 de ♠️", size: 85 },
-  { x: 1013, y: 968, img: "Map/Maison1.png", type: "document", link: "Lubies.html", label:"Lubies, 8 de ♠️", size: 80 },
-  { x: 1335, y: 937, img: "Map/Maison1.png", type: "document", link: "Plan.html", label:"Plan, 7 de ♠️", size: 80 },
-  { x: 873, y: 247, img: "Map/Maison1.png", type: "document", link: "Logiciel.html", label:"Logiciel, Dame de ♣️", size: 80 },
-  { x: 1036, y: 275, img: "Map/Maison1.png", type: "document", link: "Log.html", label:"Log, Valet de ♣️", size: 80 },
-  { x: 1175, y: 669, img: "Map/Maison1.png", type: "document", link: "Jeux de langage.html", label:"Question, 10 de ♣️", size: 80 },
-  { x: 1295, y: 1111, img: "Map/Maison1.png", type: "document", link: "Musique.html", label:"Musique, 9 de ♣️", size: 80 },
-  { x: 643, y: 592, img: "Map/Maison1.png", type: "document", link: "Octavie.html", label:"Octavie, 8 de ♣️", size: 80 },
-  { x: 1436, y: 850, img: "Map/Maison1.png", type: "document", link: "Internet.html", label:"Internet, 7 de ♣️", size: 80 },
-];
+    const x = Math.random() * (zoneW - 200); // 200px = largeur max
+    const y = Math.random() * (zoneH - 200);
 
-const PLAYER_SPEED = 800;
-const CLICK_RADIUS = 40;
-const DETECTION_RADIUS = 60; // distance à laquelle le label apparaît
-
-/* ========================== */
-let state = {
-  mapObj: null,
-  player: { x: 100, y: 100 },
-  keys: {},
-  lastTs: null,
-  dragging: false
-};
-
-let modeDeplacement = false; // 👈 au départ le déplacement est désactivé
-let modeLabel = false;       // Touche B : affiche texte à la place des icônes
-
-// 🔎 Filtrage par symboles (touche C)
-let filterStep = -1; // -1 = aucun filtre actif
-const SUITS = ["♦️", "♠️", "♣️", "❤️"];
-
-/* --- CURSEURS PERSONNALISÉS --- 
-   Défini ici les curseurs qui s'affichent quand on appuie sur D */
-let CUSTOM_CURSORS = [
-  { x: 917, y: 1209, icon: "D hiver/Map_Pin.png", image: "D hiver/[B] Assemblage 1.png" },
-  { x: 735, y: 854, icon: "D hiver/Map_Pin.png", image: "D hiver/Ville de Nuit.png" }
-];
-
-/* DOM elements */
-const viewport = document.getElementById('viewport');
-const mapEl = document.getElementById('map');
-const playerEl = document.getElementById('player');
-const posEl = document.getElementById('pos');
-const mapNameEl = document.getElementById('mapName');
-const locLabelEl = document.getElementById('locLabel');
-const modal = document.getElementById('modal');
-const modalImg = document.getElementById('modalImg');
-playerEl.style.display = 'none';
-
-/* Charger une map */
-function loadMap(mapIdOrObj){
-  const mapObj = (typeof mapIdOrObj === 'string') ? MAPS[mapIdOrObj] : mapIdOrObj;
-  if(!mapObj){
-    console.error("Map introuvable :", mapIdOrObj);
-    return;
-  }
-  state.mapObj = mapObj;
-  mapEl.style.width = mapObj.width + "px";
-  mapEl.style.height = mapObj.height + "px";
-  mapEl.style.backgroundImage = `url("${mapObj.bg}")`;
-  mapEl.style.backgroundSize = "cover";
-  mapNameEl.textContent = mapObj.name || mapObj.id || "";
-  renderMarkers();
-  clampPlayer();
-  centerOnPlayer();
-}
-
-/* RENDERMARKERS : affiche les marqueurs normaux (LOCATIONS) */
-function renderMarkers(){
-  // On supprime les anciens marqueurs
-  const old = mapEl.querySelectorAll('.marker, .label-marker');
-  old.forEach(n => n.remove());
-
-  // Appliquer le filtrage en fonction du symbole sélectionné
-  let filteredLocations = LOCATIONS;
-  if (filterStep >= 0) {
-    const suit = SUITS[filterStep];
-    filteredLocations = LOCATIONS.filter(loc => loc.label && loc.label.includes(suit));
-  }
-
-  filteredLocations.forEach((loc, idx) => {
-    let element;
-
-    if(modeLabel) {
-      // Mode Label : afficher le texte
-      element = document.createElement('div');
-      element.className = 'label-marker';
-      element.textContent = loc.label;
-      element.style.position = 'absolute';
-      element.style.transform = 'translate(-50%, -50%)';
-      element.style.padding = '4px 8px';
-      element.style.borderRadius = '6px';
-      element.style.background = 'rgba(0,0,0,0.6)';
-      element.style.color = 'white';
-      element.style.fontSize = '14px';
-      element.style.whiteSpace = 'nowrap';
-    } else {
-      // Mode normal : afficher l'image
-      element = document.createElement('img');
-      element.src = loc.img;
-      element.className = 'marker';
-      const sizeVal = loc.size || getComputedStyle(document.documentElement).getPropertyValue('--marker-size').trim();
-      // sizeVal peut contenir "90px" : on essaie d'extraire un nombre proprement
-      let size = parseInt(sizeVal, 10);
-      if(Number.isNaN(size)) size = loc.size || 90;
-      element.style.width = size + 'px';
-      element.style.height = size + 'px';
-      element.style.marginLeft = `calc(${size}px / -2)`;
-      element.style.marginTop = `calc(${size}px / -2)`;
-      element.style.objectFit = 'contain';
-    }
-
-    // Positionnement
-    element.style.left = loc.x + 'px';
-    element.style.top = loc.y + 'px';
-    element.dataset.idx = idx;
-
-    // Interaction
-    element.addEventListener('click', ev => {
-      ev.stopPropagation();
-      handleLocationClick(loc);
-    });
-    element.addEventListener('mouseenter', () => locLabelEl.textContent = loc.label || "");
-    element.addEventListener('mouseleave', () => locLabelEl.textContent = "");
-
-    mapEl.appendChild(element);
+    img.style.left = x + "px";
+    img.style.top = y + "px";
   });
-}
-
-/* --- Curseurs personnalisés : affichés lorsque l’on appuie sur D --- */
-function showCustomCursors() {
-  // retirer anciens marqueurs
-  const old = mapEl.querySelectorAll('.marker, .label-marker');
-  old.forEach(n => n.remove());
-
-  // ajouter les curseurs
-  CUSTOM_CURSORS.forEach((c, idx) => {
-    const el = document.createElement("img");
-    el.src = c.icon;
-    el.className = "marker";
-    // taille plus petite pour curseurs (optionnel)
-    el.style.width = '48px';
-    el.style.height = '48px';
-    el.style.marginLeft = `calc(48px / -2)`;
-    el.style.marginTop = `calc(48px / -2)`;
-    el.style.left = c.x + "px";
-    el.style.top = c.y + "px";
-    el.dataset.idx = idx;
-
-    el.addEventListener("click", ev => {
-      ev.stopPropagation();
-      // ouvre l'image liée au curseur dans la modal
-      showModal(c.image);
-    });
-
-    el.addEventListener('mouseenter', () => locLabelEl.textContent = c.image);
-    el.addEventListener('mouseleave', () => locLabelEl.textContent = "");
-
-    mapEl.appendChild(el);
-  });
-}
-
-/* Click sur la map */
-function handleMapClick(clientX, clientY){
-  const mapRect = mapEl.getBoundingClientRect();
-  const mx = (clientX - mapRect.left);
-  const my = (clientY - mapRect.top);
-  let best = null; let bestDist = Infinity;
-  LOCATIONS.forEach(loc => {
-    const d = Math.hypot(mx - loc.x, my - loc.y);
-    if(d < bestDist){ bestDist = d; best = loc; }
-  });
-  if(best && bestDist <= CLICK_RADIUS){
-    handleLocationClick(best);
-  }
-}
-
-/* Action selon le type */
-function handleLocationClick(loc){
-  if(!loc) return;
-  switch(loc.type){
-    case 'image':
-      showModal(loc.link);
-      break;
-    case 'document':
-    case 'external':
-      window.open(loc.link, '_blank');
-      break;
-    case 'map':
-      if(MAPS[loc.link]) {
-        loadMap(loc.link);
-      } else if (loc.link && loc.link.endsWith('.html')) {
-        window.location.href = loc.link;
-      } else {
-        console.warn("Map cible introuvable :", loc.link);
-      }
-      break;
-    default:
-      console.warn("Type non géré:", loc.type);
-  }
-}
-
-/* Modal */
-function showModal(url){ modalImg.src = url; modal.style.display = 'flex'; }
-function hideModal(){ modal.style.display = 'none'; modalImg.src = ''; }
-
-/* Centrage */
-function centerOnPlayer(){
-  const vpW = viewport.clientWidth;
-  const vpH = viewport.clientHeight;
-  const mapW = mapEl.clientWidth;
-  const mapH = mapEl.clientHeight;
-  let offsetX = vpW/2 - state.player.x;
-  let offsetY = vpH/2 - state.player.y;
-  offsetX = Math.min(0, Math.max(vpW - mapW, offsetX));
-  offsetY = Math.min(0, Math.max(vpH - mapH, offsetY));
-  mapEl.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-  playerEl.style.left = state.player.x + 'px';
-  playerEl.style.top = state.player.y + 'px';
-}
-
-/* Limiter le joueur */
-function clampPlayer(){
-  if(!state.mapObj) return;
-  state.player.x = Math.max(0, Math.min(state.mapObj.width, state.player.x));
-  state.player.y = Math.max(0, Math.min(state.mapObj.height, state.player.y));
-}
-
-/* Déplacement clavier */
-window.addEventListener('keydown', (e) => {
-  const key = e.key.toLowerCase();
-
-  // 🔄 Toggle mode déplacement (touche A)
-  if (key === 'a') {
-    modeDeplacement = !modeDeplacement;
-    // afficher / cacher le curseur
-    playerEl.style.display = modeDeplacement ? 'block' : 'none';
-    return; // stoppe ici
-  }
-
-  // 🔄 Toggle mode affichage des labels (touche B)
-  if (key === 'b') {
-    modeLabel = !modeLabel;
-    renderMarkers();
-    return;
-  }
-
-  // Filtre (touche C)
-  if (key === 'c') {
-    filterStep = (filterStep + 1) % (SUITS.length + 1);
-    if (filterStep === SUITS.length) {
-      filterStep = -1;
-    }
-    renderMarkers();
-    return;
-  }
-
-  // --- Touche D : afficher les curseurs personnalisés ---
-  if (key === 'd') {
-    showCustomCursors();
-    console.log("Mode curseurs activé.");
-    return;
-  }
-
-  // Activer mouvements uniquement si modeDeplacement actif
-  if (modeDeplacement) {
-    state.keys[key] = true;
-  }
-});
-
-window.addEventListener('keyup', (e) => {
-  const key = e.key.toLowerCase();
-  state.keys[key] = false;
-});
-
-/* Drag du player */
-let dragOffset = {x:0,y:0};
-playerEl.addEventListener('pointerdown', (ev)=>{
-  ev.preventDefault();
-  playerEl.setPointerCapture(ev.pointerId);
-  state.dragging = true;
-  dragOffset.x = ev.clientX;
-  dragOffset.y = ev.clientY;
-});
-playerEl.addEventListener('pointermove', (ev)=>{
-  if(!state.dragging) return;
-  const dx = ev.clientX - dragOffset.x;
-  const dy = ev.clientY - dragOffset.y;
-  state.player.x += dx;
-  state.player.y += dy;
-  dragOffset.x = ev.clientX;
-  dragOffset.y = ev.clientY;
-  clampPlayer();
-  centerOnPlayer();
-  updateHUD();
-});
-playerEl.addEventListener('pointerup', (ev)=>{
-  state.dragging = false;
-  try{ playerEl.releasePointerCapture(ev.pointerId);}catch(e){}
-});
-
-/* ============================================
-   DRAG DEPLACEMENT DE LA MAP (SOURIS / TOUCH)
-   Fonctionnel même si A n'est pas activé
-   ============================================ */
-let isPanning = false;
-let panStart = { x: 0, y: 0 };
-let mapStart = { x: 0, y: 0 };
-
-viewport.addEventListener('pointerdown', ev => {
-  // ⛔ Empêcher de drag si on clique sur un marker ou un label
-  if (ev.target.classList.contains('marker') || ev.target.classList.contains('label-marker')) {
-    return;
-  }
-
-  // Commencer à glisser la map
-  isPanning = true;
-  panStart.x = ev.clientX;
-  panStart.y = ev.clientY;
-
-  // Récupérer la position actuelle du translate()
-  const style = window.getComputedStyle(mapEl);
-  const matrix = new DOMMatrixReadOnly(style.transform);
-  mapStart.x = matrix.m41;
-  mapStart.y = matrix.m42;
-
-  viewport.setPointerCapture(ev.pointerId);
-});
-
-viewport.addEventListener('pointermove', ev => {
-  if (!isPanning) return;
-
-  const dx = ev.clientX - panStart.x;
-  const dy = ev.clientY - panStart.y;
-
-  let newX = mapStart.x + dx;
-  let newY = mapStart.y + dy;
-
-  // Limiter mouvement à l’intérieur de la map
-  const vpW = viewport.clientWidth;
-  const vpH = viewport.clientHeight;
-  const mapW = mapEl.clientWidth;
-  const mapH = mapEl.clientHeight;
-
-  newX = Math.min(0, Math.max(vpW - mapW, newX));
-  newY = Math.min(0, Math.max(vpH - mapH, newY));
-
-  mapEl.style.transform = `translate(${newX}px, ${newY}px)`;
-});
-
-viewport.addEventListener('pointerup', ev => {
-  isPanning = false;
-  try { viewport.releasePointerCapture(ev.pointerId); } catch(e){}
-});
-
-  
-mapEl.addEventListener('click', (ev)=> handleMapClick(ev.clientX, ev.clientY));
-
-/* Boucle principale */
-function loop(ts){
-  if(!state.lastTs) state.lastTs = ts;
-  const dt = (ts - state.lastTs) / 1000;
-  state.lastTs = ts;
-  let dx = 0, dy = 0;
-  if(state.keys['arrowup'] || state.keys['w']) dy -= 1;
-  if(state.keys['arrowdown'] || state.keys['s']) dy += 1;
-  if(state.keys['arrowleft'] || state.keys['a']) dx -= 1;
-  if(state.keys['arrowright'] || state.keys['d']) dx += 1;
-
-  if(modeDeplacement) {
-    if(dx || dy){
-      const len = Math.hypot(dx,dy) || 1;
-      state.player.x += (dx/len) * PLAYER_SPEED * dt;
-      state.player.y += (dy/len) * PLAYER_SPEED * dt;
-      clampPlayer();
-      centerOnPlayer();
-    }
-  }
-
-  updateHUD();
-  requestAnimationFrame(loop);
-}
-
-/* HUD dynamique */
-function updateHUD(){
-  posEl.textContent = `x:${Math.round(state.player.x)} y:${Math.round(state.player.y)}`;
-
-  // Trouver le lieu le plus proche
-  let nearest = null;
-  let bestDist = Infinity;
-  LOCATIONS.forEach(loc => {
-    const d = Math.hypot(state.player.x - loc.x, state.player.y - loc.y);
-    if (d < bestDist) {
-      bestDist = d;
-      nearest = loc;
-    }
-  });
-
-  // Affichage du label si assez proche
-  if (nearest && bestDist < DETECTION_RADIUS) {
-    locLabelEl.textContent = nearest.label;
-  } else if (!state.dragging) {
-    // On efface seulement si le joueur ne traîne pas un marker
-    locLabelEl.textContent = "";
-  }
-}
-
-/* Initialisation */
-function init(){
-  loadMap(CURRENT_MAP_ID);
-  state.player.x = state.mapObj.width/2;
-  state.player.y = state.mapObj.height/2;
-  centerOnPlayer();
-  updateHUD();
-  requestAnimationFrame(loop);
-}
-init();
 </script>
+
 </body>
 </html>
