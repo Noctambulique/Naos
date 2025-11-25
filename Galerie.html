@@ -62,19 +62,16 @@
   const zone = document.getElementById("zone");
   const imgs = [...zone.querySelectorAll("img")];
 
-  // Taille des cases (sécurisée pour toutes les images)
-  const cellW = 350;
-  const cellH = 350;
+  // Cellules beaucoup plus grandes pour espacer fortement
+  const cellW = 480;
+  const cellH = 480;
 
-  // Colonnes possibles selon la largeur de l'écran
   const zoneW = zone.clientWidth;
   const cols = Math.max(1, Math.floor(zoneW / cellW));
-
-  // Nombre de lignes nécessaires
   const rows = Math.ceil(imgs.length / cols);
 
-  // Hauteur totale
-  zone.style.height = (rows * cellH + 200) + "px";
+  // Hauteur de la zone (grande marge supplémentaire)
+  zone.style.height = (rows * cellH + 300) + "px";
 
   async function layout(){
     let index = 0;
@@ -85,13 +82,12 @@
       const col = index % cols;
       const row = Math.floor(index / cols);
 
-      // Position de base (case)
       const baseX = col * cellW;
       const baseY = row * cellH;
 
-      // On décale aléatoirement dans la case
-      const maxOffsetX = Math.max(0, cellW - img.width - 20);
-      const maxOffsetY = Math.max(0, cellH - img.height - 20);
+      // Grand espace interne dans chaque cellule
+      const maxOffsetX = Math.max(0, cellW - img.width - 80);
+      const maxOffsetY = Math.max(0, cellH - img.height - 80);
 
       const offsetX = Math.random() * maxOffsetX;
       const offsetY = Math.random() * maxOffsetY;
