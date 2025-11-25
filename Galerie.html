@@ -16,14 +16,14 @@
   .zone{
     position:relative;
     width:100%;
-    height:100vh; /* Tu peux augmenter si tu veux plus d’espace */
+    height:100vh;
     border:2px dashed #ccc;
     overflow:hidden;
   }
 
   .zone img{
     position:absolute;
-    max-width:200px;   /* taille max des images */
+    max-width:200px;
     border-radius:8px;
     transition:0.3s;
     cursor:pointer;
@@ -41,7 +41,6 @@
 
 <div class="zone" id="zone">
 
-  <!-- 👉 AJOUTE TES IMAGES ICI (autant que tu veux) -->
   <img src="D hiver/20200905_151240.jpg">
   <img src="D hiver/FB_IMG_1544732149112.jpg">
   <img src="D hiver/IMG_20210826_005412.jpg">
@@ -56,20 +55,54 @@
 </div>
 
 <script>
-  // Positionnement irrégulier automatique
   const zone = document.getElementById("zone");
-  const images = zone.querySelectorAll("img");
+  const images = Array.from(zone.querySelectorAll("img"));
+  const maxSize = 200;
 
-  images.forEach(img =>{
+  // Fonction pour vérifier si deux rectangles se chevauchent
+  function overlap(r1, r2){
+    return !(
+      r1.left + r1.width  < r2.left ||
+      r2.left + r2.width  < r1.left ||
+      r1.top  + r1.height < r2.top  ||
+      r2.top  + r2.height < r1.top
+    );
+  }
+
+  const placed = [];
+
+  images.forEach(img => {
     const zoneW = zone.clientWidth;
     const zoneH = zone.clientHeight;
 
-    const x = Math.random() * (zoneW - 200); // 200px = largeur max
-    const y = Math.random() * (zoneH - 200);
+    let tries = 0;
+    let rect;
+    let ok = false;
 
-    img.style.left = x + "px";
-    img.style.top = y + "px";
+    while(!ok && tries < 500){
+      tries++;
+
+      const x = Math.random() * (zoneW - maxSize);
+      const y = Math.random() * (zoneH - maxSize);
+
+      rect = {
+        left:x,
+        top:y,
+        width:maxSize,
+        height:maxSize
+      };
+
+      // Vérifier collision
+      ok = placed.every(p => !overlap(rect, p));
+    }
+
+    // Appliquer position trouvée
+    img.style.left = rect.left + "px";
+    img.style.top = rect.top + "px";
+
+    placed.push(rect);
   });
+
 </script>
 
 </body>
