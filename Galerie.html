@@ -1,637 +1,70 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Placement d'images — Zone libre & export PNG</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Galerie irrégulière</title>
+
 <style>
-  :root{
-    --bg: #111827;
-    --panel: #0b1220;
-    --accent: #06b6d4;
-    --muted: #9ca3af;
-    --card-radius: 12px;
-    --gap: 14px;
-    --ui-width: 320px;
-    --max-stage-width: 1200px;
-    --max-stage-height: 800px;
+  body{
+    margin:0;
+    padding:20px;
+    background:#fafafa;
+    font-family:sans-serif;
   }
-  html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Roboto,system-ui,Arial;}
-  body{display:flex;gap:16px;background:linear-gradient(180deg,#071024 0%, #041226 60%);color:#e6eef6;padding:18px;box-sizing:border-box}
-  .wrap{display:flex;gap:16px;width:100%;align-items:flex-start;justify-content:center}
-  .stage-card{
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
-    border-radius:var(--card-radius);
-    padding:12px;
-    box-shadow:0 6px 30px rgba(2,6,23,0.6);
-    width: calc(100% - var(--ui-width) - 64px);
-    max-width: var(--max-stage-width);
-    min-height: 520px;
-    max-height: var(--max-stage-height);
-    display:flex;flex-direction:column;
-  }
-  .toolbar{
-    display:flex;gap:10px;align-items:center;margin-bottom:10px;
-  }
-  button,input[type=checkbox],select{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
-  button:hover{border-color:var(--accent);color:#fff}
-  .stage{
+
+  .zone{
     position:relative;
-    flex:1;
-    background: repeating-linear-gradient(45deg, rgba(255,255,255,0.01) 0 2px, transparent 2px 24px);
-    border-radius:10px;
+    width:100%;
+    height:100vh; /* Tu peux augmenter si tu veux plus d’espace */
+    border:2px dashed #ccc;
     overflow:hidden;
-    border:1px dashed rgba(255,255,255,0.03);
-    display:flex;align-items:flex-start;justify-content:flex-start;
   }
-  .drop-hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;color:rgba(255,255,255,0.12);pointer-events:none}
-  .drop-hint strong{color:rgba(255,255,255,0.3);display:block;margin-bottom:6px;font-size:18px}
-  .thumb{
+
+  .zone img{
     position:absolute;
-    touch-action:none;
-    user-select:none;
-    transform-origin:center center;
-    transition:box-shadow 120ms ease;
-    will-change:transform,left,top,width,height;
+    max-width:200px;   /* taille max des images */
+    border-radius:8px;
+    transition:0.3s;
+    cursor:pointer;
   }
-  .thumb img{display:block;width:100%;height:100%;object-fit:cover;border-radius:6px;box-shadow:0 6px 12px rgba(2,6,23,0.6)}
-  .thumb.selected{box-shadow:0 10px 30px rgba(2,6,23,0.65), 0 1px 0 rgba(255,255,255,0.02) inset}
-  /* handles */
-  .handle{
-    position:absolute;width:14px;height:14px;border-radius:6px;background:var(--panel);border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;
-  }
-  .handle.rotate{top:-22px;left:50%;transform:translateX(-50%);cursor-grab}
-  .handle.resize{right:-10px;bottom:-10px;cursor-se-resize}
-  .ui-panel{
-    width:var(--ui-width);
-    min-height:520px;
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04));
-    border-radius:var(--card-radius);
-    padding:14px;
-    box-shadow:0 6px 20px rgba(2,6,23,0.6);
-    display:flex;flex-direction:column;gap:12px;color:var(--muted);
-  }
-  .ui-panel h3{margin:0;color:#fff}
-  label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
-  .row{display:flex;gap:8px;align-items:center}
-  input[type=range]{width:100%}
-  .small{font-size:13px;color:var(--muted)}
-  .list{display:flex;flex-direction:column;gap:8px;overflow:auto;max-height:220px;padding-right:6px}
-  .item-mini{display:flex;align-items:center;gap:8px;padding:6px;border-radius:8px;background:rgba(255,255,255,0.01)}
-  .item-mini img{width:40px;height:28px;object-fit:cover;border-radius:6px}
-  .muted{color:var(--muted);font-size:13px}
-  footer{font-size:12px;color:var(--muted);margin-top:auto;display:flex;gap:8px;align-items:center;}
-  .btn-danger{background:linear-gradient(180deg,#7f1d1d,#4c0f0f);border:0;color:white;padding:8px 10px;border-radius:8px}
-  .btn-primary{background:linear-gradient(180deg,#06b6d4,#0891a6);border:0;color:#042; padding:8px 10px;border-radius:8px}
-  /* small responsive */
-  @media (max-width:980px){
-    .wrap{flex-direction:column;align-items:stretch}
-    .stage-card{width:100%}
+
+  .zone img:hover{
+    transform:scale(1.1);
   }
 </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="stage-card">
-      <div class="toolbar">
-        <label class="btn-primary" title="Ajouter images">
-          Ajouter des images
-          <input id="fileInput" type="file" accept="image/*" multiple style="display:none">
-        </label>
-        <button id="clearBtn" title="Supprimer toutes les images">Vider</button>
-        <button id="exportBtn" title="Exporter en PNG">Exporter PNG</button>
-        <label style="display:flex;align-items:center;gap:6px;margin-left:auto">
-          <input id="transparentBg" type="checkbox" /> Fond transparent
-        </label>
-      </div>
 
-      <div id="stage" class="stage" tabindex="0" aria-label="Zone d'images">
-        <div class="drop-hint"><strong>Glisser-déposer des images</strong> ou cliquez sur <em>Ajouter des images</em></div>
-      </div>
-    </div>
+<h2>Galerie d’images placées aléatoirement</h2>
 
-    <aside class="ui-panel" aria-label="Panneau de configuration">
-      <h3>Propriétés sélection</h3>
-      <div id="noSelection" class="muted">Aucune image sélectionnée — clique sur une image pour l'éditer.</div>
-      <div id="selectionControls" style="display:none">
-        <label>Nom / alt</label>
-        <input id="selName" type="text" placeholder="Nom (alt)"/>
-        <label>Opacité</label>
-        <input id="selOpacity" type="range" min="0.1" max="1" step="0.01" value="1"/>
-        <label>Rotation (deg)</label>
-        <input id="selRotate" type="range" min="-180" max="180" step="1" value="0"/>
-        <label>Taille (%)</label>
-        <input id="selScale" type="range" min="10" max="300" step="1" value="100"/>
-        <div class="row" style="margin-top:6px">
-          <button id="bringFront">Avant</button>
-          <button id="sendBack">Arrière</button>
-          <button id="deleteSel" class="btn-danger">Suppr</button>
-        </div>
-      </div>
+<div class="zone" id="zone">
 
-      <hr>
-      <h3>Images ajoutées</h3>
-      <div id="thumbList" class="list"></div>
+  <!-- 👉 AJOUTE TES IMAGES ICI (autant que tu veux) -->
+  <img src="images/photo1.jpg">
+  <img src="images/photo2.jpg">
+  <img src="images/photo3.jpg">
+  <img src="images/photo4.jpg">
 
-      <hr>
-      <h3>Configuration (éditer dans le code)</h3>
-      <p class="small muted">
-        Pour personnaliser par défaut : modifie l'objet <code>CONFIG</code> dans la balise &lt;script&gt;. Paramètres : taille initiale, tolérance chevauchement, marges, etc.
-      </p>
-
-      <footer>
-        <div>Astuce : sélection → touches flèche pour déplacer finement, Del pour supprimer.</div>
-      </footer>
-    </aside>
-  </div>
+</div>
 
 <script>
-/*
-  CONFIG : personnalise ici les comportements par défaut.
-  - initialScalePct : taille initiale en % (100 = taille à l'importation)
-  - minScale / maxScale : limites du redimensionnement (%)
-  - overlapTolerance : si true on évite le chevauchement initial autant que possible
-  - paddingStage : marge à respecter lors de placement initial (px)
-  - tryPlacementAttempts : nombre d'essais pour trouver une position non chevauchante
-*/
-const CONFIG = {
-  initialScalePct: 100,
-  minScale: 20,
-  maxScale: 300,
-  overlapTolerance: true,
-  paddingStage: 16,
-  tryPlacementAttempts: 80,
-};
+  // Positionnement irrégulier automatique
+  const zone = document.getElementById("zone");
+  const images = zone.querySelectorAll("img");
 
-const stage = document.getElementById('stage');
-const fileInput = document.getElementById('fileInput');
-const dropHint = stage.querySelector('.drop-hint');
-const thumbList = document.getElementById('thumbList');
+  images.forEach(img =>{
+    const zoneW = zone.clientWidth;
+    const zoneH = zone.clientHeight;
 
-let state = {
-  items: [], // {id, img, url, x,y,w,h,rotation,scale,opacity,z}
-  selectedId: null,
-  zCounter: 1,
-};
+    const x = Math.random() * (zoneW - 200); // 200px = largeur max
+    const y = Math.random() * (zoneH - 200);
 
-// ---- Utilitaires ----
-const uid = (n=6)=> Math.random().toString(36).slice(2,2+n);
-const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
-function rectsOverlap(a,b){
-  return !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y);
-}
-
-// Place image at random position, try to avoid overlaps if CONFIG.overlapTolerance
-function placeInitial(img, naturalW, naturalH){
-  const stageRect = stage.getBoundingClientRect();
-  const pad = CONFIG.paddingStage;
-  const maxW = stageRect.width - pad*2;
-  const maxH = stageRect.height - pad*2;
-  // scale to fit area if image too big
-  let scale = CONFIG.initialScalePct / 100;
-  let w = naturalW * scale;
-  let h = naturalH * scale;
-  // clamp to stage
-  const maxAllowedW = Math.min(w, maxW * 0.6);
-  const maxAllowedH = Math.min(h, maxH * 0.6);
-  if (w > maxAllowedW || h > maxAllowedH) {
-    const ratio = Math.min(maxAllowedW / w, maxAllowedH / h);
-    scale *= ratio;
-    w = naturalW * scale;
-    h = naturalH * scale;
-  }
-  // attempt placements
-  const attempts = CONFIG.tryPlacementAttempts;
-  for(let t=0;t<attempts;t++){
-    const x = pad + Math.random() * (Math.max(0, stageRect.width - pad*2 - w));
-    const y = pad + Math.random() * (Math.max(0, stageRect.height - pad*2 - h));
-    const candidate = {x,y,w,h};
-    if (!CONFIG.overlapTolerance) return {x,y,w,h,scale};
-    let ok = true;
-    for(const it of state.items){
-      const r = {x:it.x,y:it.y,w:it.w,h:it.h};
-      if (rectsOverlap(candidate,r)){ ok=false; break; }
-    }
-    if(ok) return {x,y,w,h,scale};
-  }
-  // fallback: random without caring
-  return {x:pad + Math.random() * Math.max(0, stageRect.width - pad*2 - w),
-          y:pad + Math.random() * Math.max(0, stageRect.height - pad*2 - h),
-          w,h,scale};
-}
-
-// ---- DOM creation for a thumb ----
-function createThumbObject({id,url,naturalW,naturalH}){
-  const place = placeInitial(null,naturalW,naturalH);
-  const el = document.createElement('div');
-  el.className = 'thumb';
-  el.style.left = place.x + 'px';
-  el.style.top  = place.y + 'px';
-  el.style.width = place.w + 'px';
-  el.style.height = place.h + 'px';
-  el.style.transform = 'rotate(0deg)';
-  el.dataset.id = id;
-
-  // image element
-  const img = document.createElement('img');
-  img.draggable = false;
-  img.src = url;
-  el.appendChild(img);
-
-  // rotate handle
-  const hRotate = document.createElement('div');
-  hRotate.className = 'handle rotate';
-  hRotate.title = 'Pivoter';
-  hRotate.innerHTML = '⟳';
-  el.appendChild(hRotate);
-
-  // resize handle
-  const hResize = document.createElement('div');
-  hResize.className = 'handle resize';
-  hResize.title = 'Redimensionner';
-  hResize.innerHTML = '⤢';
-  el.appendChild(hResize);
-
-  // make events
-  makeDraggableResizable(el, img, hResize, hRotate);
-
-  stage.appendChild(el);
-
-  // add to state
-  const z = ++state.zCounter;
-  const item = {
-    id, url, el, img, x:place.x, y:place.y, w:place.w, h:place.h,
-    rotation:0, scale:place.scale, opacity:1, z
-  };
-  el.style.zIndex = z;
-  state.items.push(item);
-  addToList(item);
-  selectItem(id);
-  return item;
-}
-
-// ---- List UI ----
-function addToList(item){
-  const row = document.createElement('div');
-  row.className='item-mini';
-  row.id = 'list-' + item.id;
-  row.innerHTML = `<img src="${item.url}" alt=""><div style="flex:1"><div style="color:#fff;font-size:13px">Image</div><div class="small muted">ID: ${item.id}</div></div>`;
-  row.onclick = ()=> selectItem(item.id);
-  thumbList.prepend(row);
-}
-
-// update list item highlight
-function highlightList(id){
-  thumbList.querySelectorAll('.item-mini').forEach(el=>{
-    el.style.outline = el.id === 'list-' + id ? '2px solid rgba(6,182,212,0.14)' : 'none';
+    img.style.left = x + "px";
+    img.style.top = y + "px";
   });
-}
-
-// ---- Selection and controls ----
-const selectionControls = document.getElementById('selectionControls');
-const noSelection = document.getElementById('noSelection');
-const selName = document.getElementById('selName');
-const selOpacity = document.getElementById('selOpacity');
-const selRotate = document.getElementById('selRotate');
-const selScale = document.getElementById('selScale');
-const bringFront = document.getElementById('bringFront');
-const sendBack = document.getElementById('sendBack');
-const deleteSel = document.getElementById('deleteSel');
-
-function selectItem(id){
-  state.selectedId = id;
-  state.items.forEach(it=>{
-    if(it.id === id){
-      it.el.classList.add('selected');
-      selectionControls.style.display = 'block';
-      noSelection.style.display = 'none';
-      selName.value = it.img.alt || '';
-      selOpacity.value = it.opacity;
-      selRotate.value = it.rotation;
-      selScale.value = Math.round(it.scale * 100);
-      highlightList(id);
-    } else {
-      it.el.classList.remove('selected');
-    }
-  });
-}
-
-function clearSelection(){
-  state.selectedId = null;
-  selectionControls.style.display = 'none';
-  noSelection.style.display = 'block';
-  thumbList.querySelectorAll('.item-mini').forEach(n=>n.style.outline='none');
-}
-
-// control handlers
-selOpacity.addEventListener('input',()=>{
-  const it = state.items.find(i=>i.id===state.selectedId); if(!it) return;
-  it.opacity = parseFloat(selOpacity.value);
-  it.el.style.opacity = it.opacity;
-});
-selRotate.addEventListener('input',()=>{
-  const it = state.items.find(i=>i.id===state.selectedId); if(!it) return;
-  it.rotation = parseFloat(selRotate.value);
-  it.el.style.transform = `rotate(${it.rotation}deg)`;
-});
-selScale.addEventListener('input',()=>{
-  const it = state.items.find(i=>i.id===state.selectedId); if(!it) return;
-  const pct = parseFloat(selScale.value);
-  it.scale = pct/100;
-  it.el.style.width = (it.w * it.scale) + 'px';
-  it.el.style.height = (it.h * it.scale) + 'px';
-});
-selName.addEventListener('change',()=>{
-  const it = state.items.find(i=>i.id===state.selectedId); if(!it) return;
-  it.img.alt = selName.value;
-});
-bringFront.addEventListener('click',()=>{
-  const it = state.items.find(i=>i.id===state.selectedId); if(!it) return;
-  it.z = ++state.zCounter;
-  it.el.style.zIndex = it.z;
-});
-sendBack.addEventListener('click',()=>{
-  const it = state.items.find(i=>i.id===state.selectedId); if(!it) return;
-  it.z = 1;
-  it.el.style.zIndex = it.z;
-});
-deleteSel.addEventListener('click', deleteSelected);
-
-function deleteSelected(){
-  const itIndex = state.items.findIndex(i=>i.id===state.selectedId);
-  if(itIndex === -1) return;
-  const it = state.items[itIndex];
-  it.el.remove();
-  const listRow = document.getElementById('list-' + it.id);
-  if(listRow) listRow.remove();
-  state.items.splice(itIndex,1);
-  clearSelection();
-}
-
-// allow arrow keys to nudge selection
-stage.addEventListener('keydown', (ev)=>{
-  if(!state.selectedId) return;
-  const it = state.items.find(i=>i.id===state.selectedId); if(!it) return;
-  const step = ev.shiftKey ? 10 : 1;
-  if(ev.key === 'ArrowLeft'){ it.x -= step; it.el.style.left = it.x + 'px'; ev.preventDefault(); }
-  if(ev.key === 'ArrowRight'){ it.x += step; it.el.style.left = it.x + 'px'; ev.preventDefault(); }
-  if(ev.key === 'ArrowUp'){ it.y -= step; it.el.style.top = it.y + 'px'; ev.preventDefault(); }
-  if(ev.key === 'ArrowDown'){ it.y += step; it.el.style.top = it.y + 'px'; ev.preventDefault(); }
-  if(ev.key === 'Delete'){ deleteSelected(); ev.preventDefault(); }
-});
-
-// ---- Drag / resize / rotate implementation ----
-function makeDraggableResizable(el, imgEl, resizeHandle, rotateHandle){
-  // local state for pointer dragging
-  let dragging = false, resizing = false, rotating = false;
-  let startX, startY, startLeft, startTop, startW, startH, startRot, centerX, centerY;
-
-  // pointer down to drag
-  el.addEventListener('pointerdown', (e)=>{
-    if(e.target === resizeHandle || e.target === rotateHandle) return;
-    dragging = true;
-    el.setPointerCapture(e.pointerId);
-    startX = e.clientX; startY = e.clientY;
-    startLeft = parseFloat(el.style.left || 0);
-    startTop  = parseFloat(el.style.top || 0);
-    selectItem(el.dataset.id);
-    e.preventDefault();
-  });
-
-  // resize
-  resizeHandle.addEventListener('pointerdown', (e)=>{
-    resizing = true;
-    resizeHandle.setPointerCapture(e.pointerId);
-    startX = e.clientX; startY = e.clientY;
-    startW = el.getBoundingClientRect().width;
-    startH = el.getBoundingClientRect().height;
-    const it = state.items.find(i=>i.id===el.dataset.id);
-    if(it){ startW = it.w * it.scale; startH = it.h * it.scale; }
-    e.preventDefault();
-  });
-
-  // rotate
-  rotateHandle.addEventListener('pointerdown', (e)=>{
-    rotating = true;
-    rotateHandle.setPointerCapture(e.pointerId);
-    const bb = el.getBoundingClientRect();
-    centerX = bb.left + bb.width/2;
-    centerY = bb.top + bb.height/2;
-    startRot = parseFloat(getItem(el.dataset.id).rotation||0);
-    e.preventDefault();
-  });
-
-  function getItem(id){ return state.items.find(i=>i.id===id); }
-
-  window.addEventListener('pointermove', (e)=>{
-    if(dragging){
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-      const nx = startLeft + dx;
-      const ny = startTop + dy;
-      el.style.left = nx + 'px';
-      el.style.top = ny + 'px';
-      const it = getItem(el.dataset.id);
-      if(it){ it.x = nx; it.y = ny; }
-    } else if(resizing){
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-      const delta = Math.max(dx, dy);
-      let nw = Math.max(24, startW + delta);
-      let nh = Math.max(24, startH + delta);
-      const it = getItem(el.dataset.id);
-      if(it){
-        // compute new scale relative to original w/h
-        const newScale = clamp(nw / it.w, CONFIG.minScale/100, CONFIG.maxScale/100);
-        it.scale = newScale;
-        el.style.width = (it.w * it.scale) + 'px';
-        el.style.height = (it.h * it.scale) + 'px';
-        selScale.value = Math.round(it.scale*100);
-      } else {
-        el.style.width = nw + 'px';
-        el.style.height = nh + 'px';
-      }
-    } else if(rotating){
-      const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
-      const deg = angle + 90; // offset so handle at top corresponds rotation 0
-      const it = getItem(el.dataset.id);
-      if(it){
-        it.rotation = Math.round(deg);
-        el.style.transform = `rotate(${it.rotation}deg)`;
-        selRotate.value = it.rotation;
-      }
-    }
-  });
-
-  window.addEventListener('pointerup', (e)=>{
-    if(dragging){
-      dragging = false;
-      try{ el.releasePointerCapture && el.releasePointerCapture(e.pointerId); }catch(e){}
-    }
-    if(resizing){
-      resizing = false;
-      try{ resizeHandle.releasePointerCapture && resizeHandle.releasePointerCapture(e.pointerId); }catch(e){}
-    }
-    if(rotating){
-      rotating = false;
-      try{ rotateHandle.releasePointerCapture && rotateHandle.releasePointerCapture(e.pointerId); }catch(e){}
-    }
-  });
-
-  // click to select
-  el.addEventListener('click', (ev)=>{
-    selectItem(el.dataset.id);
-    ev.stopPropagation();
-  });
-
-  // update state when pointerup (commit size/pos)
-  el.addEventListener('pointerup', ()=>{
-    const it = getItem(el.dataset.id);
-    if(it){
-      const bb = el.getBoundingClientRect();
-      // compute w/h relative to original image size if not set
-      it.w = it.w; it.h = it.h; // original dims preserved; scale used already
-      // maintain x/y from style
-      it.x = parseFloat(el.style.left || 0);
-      it.y = parseFloat(el.style.top || 0);
-      it.el.style.transform = `rotate(${it.rotation}deg)`;
-      it.el.style.opacity = it.opacity;
-    }
-  });
-}
-
-// ---- File handling ----
-fileInput.addEventListener('change', (e)=>{
-  const files = Array.from(e.target.files);
-  handleFiles(files);
-  fileInput.value = '';
-});
-
-['dragenter','dragover'].forEach(ev=>{
-  stage.addEventListener(ev,(e)=>{ e.preventDefault(); dropHint.style.opacity=0.25; });
-});
-['dragleave','drop'].forEach(ev=>{
-  stage.addEventListener(ev,(e)=>{ e.preventDefault(); dropHint.style.opacity=1; });
-});
-stage.addEventListener('drop',(e)=>{
-  const dt = e.dataTransfer;
-  const files = Array.from(dt.files).filter(f=>f.type.startsWith('image/'));
-  handleFiles(files);
-});
-
-function handleFiles(files){
-  if(!files.length) return;
-  files.forEach(file=>{
-    const reader = new FileReader();
-    reader.onload = (ev)=>{
-      const url = ev.target.result;
-      // get natural size
-      const img = new Image();
-      img.onload = ()=>{
-        const id = uid(8);
-        const obj = createThumbObject({id,url,naturalW:img.naturalWidth, naturalH:img.naturalHeight});
-        obj.img.alt = file.name;
-        // store original dims for scale computations
-        obj.w = img.naturalWidth;
-        obj.h = img.naturalHeight;
-        // convert displayed width/height to initial scaled dims
-        const displayedW = parseFloat(obj.el.style.width);
-        const displayedH = parseFloat(obj.el.style.height);
-        // store original logical w/h for scale math (as base)
-        obj.w = displayedW;
-        obj.h = displayedH;
-        obj.scale = (displayedW / img.naturalWidth) || 1;
-        obj.img = obj.el.querySelector('img');
-      };
-      img.src = url;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-// ---- Export to PNG (draw each image to canvas respecting transforms) ----
-const exportBtn = document.getElementById('exportBtn');
-const transparentBg = document.getElementById('transparentBg');
-exportBtn.addEventListener('click', async ()=>{
-  // compute bounding area from stage
-  const stageRect = stage.getBoundingClientRect();
-  // create canvas same size as stage
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.round(stageRect.width);
-  canvas.height = Math.round(stageRect.height);
-  const ctx = canvas.getContext('2d');
-
-  // optionally draw background
-  if(!transparentBg.checked){
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-  } else {
-    // if transparent, leave as is
-  }
-
-  // draw each item by ascending z (so z higher appears on top)
-  const itemsSorted = state.items.slice().sort((a,b)=> (a.z||0) - (b.z||0));
-  for(const it of itemsSorted){
-    // create Image object to draw
-    const img = new Image();
-    img.src = it.img.src;
-    await new Promise(res => {
-      img.onload = ()=> res();
-      img.onerror = ()=> res();
-    });
-    // compute position and size on canvas
-    const sx = Math.round(it.x);
-    const sy = Math.round(it.y);
-    const sw = Math.round((it.w) * (it.scale || 1));
-    const sh = Math.round((it.h) * (it.scale || 1));
-    // save, apply transform for rotation about center
-    ctx.save();
-    ctx.globalAlpha = it.opacity || 1;
-    // translate to center, rotate, draw centered, restore
-    ctx.translate(sx + sw/2, sy + sh/2);
-    const angle = (it.rotation || 0) * Math.PI / 180;
-    ctx.rotate(angle);
-    ctx.drawImage(img, -sw/2, -sh/2, sw, sh);
-    ctx.restore();
-  }
-
-  // download
-  canvas.toBlob((blob)=>{
-    const a = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    a.href = url;
-    a.download = 'composition.png';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }, 'image/png');
-});
-
-// ---- Clear all ----
-document.getElementById('clearBtn').addEventListener('click', ()=>{
-  if(!confirm('Supprimer toutes les images de la zone ?')) return;
-  state.items.forEach(it=> it.el.remove());
-  state.items = [];
-  thumbList.innerHTML = '';
-  clearSelection();
-});
-
-// deselect on stage click
-stage.addEventListener('click', (e)=>{
-  if(e.target === stage || e.target === dropHint) clearSelection();
-});
-
-// keyboard global
-window.addEventListener('keydown', (e)=>{
-  if(e.key === 'Delete' && state.selectedId) deleteSelected();
-});
-
-// ---- Initialize small demo image if none (optional) ----
-(function initDemoHint(){
-  // nothing: user will add images
-})();
-
 </script>
+
 </body>
 </html>
