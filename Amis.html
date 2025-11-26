@@ -135,16 +135,20 @@
       // Draw radar on canvas
       drawRadar(cvs, contact.radar || [50,50,50,50]);
 
-      // Allow live-edit of radar via prompt on click (conserve original behaviour: contacts defined in code)
-      cvs.style.cursor = 'pointer';
-      cvs.title = 'Cliquez pour modifier les 4 valeurs du radar (0-100)';
-      
-        if(!input) return;
-        const arr = input.split(',').map(s=>parseFloat(s.trim())).slice(0,4);
-        if(arr.length!==4 || arr.some(v=>Number.isNaN(v))){ alert('Format invalide — 4 nombres séparés par des virgules'); return; }
-        contact.radar = arr.map(v=>Math.max(0,Math.min(100,v)));
-        drawRadar(cvs, contact.radar);
-      });
+  cvs.style.cursor = 'pointer';
+cvs.title = 'Cliquez pour modifier les 4 valeurs du radar (0-100)';
+
+cvs.addEventListener('click', ()=>{
+  const input = prompt("Entrez 4 valeurs séparées par des virgules (0-100) :", contact.radar.join(', '));
+  if(!input) return;
+  const arr = input.split(',').map(s=>parseFloat(s.trim())).slice(0,4);
+  if(arr.length!==4 || arr.some(v=>Number.isNaN(v))){
+    alert('Format invalide — 4 nombres séparés par des virgules');
+    return;
+  }
+  contact.radar = arr.map(v=>Math.max(0,Math.min(100,v)));
+  drawRadar(cvs, contact.radar);
+});
 
       // When user edits rectangles, keep it in memory of the page (not saved to file). Useful for temporary notes.
       [r1,r2].forEach(el=>{
