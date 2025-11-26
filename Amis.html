@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Carnet de contacts — Bleu/Vert + Radar</title>
 <style>
+  /* Désactive la création via interface : consultation seulement */
+  .creator, #create-contact-form, .create-zone { display:none !important; }
   :root{ --bg:#f6f8fa; --card:#fff; --muted:#6b7280; }
   *{box-sizing:border-box}
   body{margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;background:var(--bg);color:#111}
@@ -166,22 +168,23 @@
 // === CONFIGURATION SIMPLIFIÉE POUR CRÉER DES FICHES PERSONNALISÉES ===
 // Vous pouvez modifier facilement ce modèle : ajoutez, retirez ou renommez ce que vous voulez.
 // Le reste de l'application s'adapte automatiquement.
-const CONTACT_TEMPLATE =
-    {
-    name: "Alice",
-    color: "blue",
-    radar: [80, 40, 60, 90],
-    rect1: "Calme",
-    rect2: "Réfléchie"
-  },
-  {
-    name: "Benoît",
-    color: "green",
-    radar: [30, 70, 50, 20],
-    rect1: "Dynamique",
-    rect2: "Créatif"
-  }
+// === Contacts définis directement dans le code ===
+// Ajoutez ici toutes vos fiches ; l'interface ne sert qu'à les consulter
+const PRESET_CONTACTS = [
+  // Exemple :
+  // { id: uid(), name:"Alice", color:"blue", radar:[80,40,60,90], rect1:"Calme", rect2:"Réfléchie" },
 ];
+
+// Injection automatique
+localStorage.setItem("contacts", JSON.stringify(PRESET_CONTACTS));
+
+const CONTACT_TEMPLATE = {
+  name: "",
+  color: "blue",
+  radar: [50,50,50,50],
+  rect1: "",
+  rect2: ""
+};
 
 // --- Helpers & storage ---
 const STORAGE_KEY = 'carnet_contacts_v1';
