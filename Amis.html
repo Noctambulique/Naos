@@ -9,28 +9,34 @@
     *{box-sizing:border-box}
     body{
       margin:0; padding:24px; font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-      background:var(--bg); color:#111; 
+      background:var(--bg); color:#111;
     }
     .wrap{width:100%; max-width:var(--max-width)}
     h1{margin:0 0 18px 0; font-weight:600}
 
     .grid{
-      display:grid; gap:var(--gap); grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      display:grid; gap:var(--gap);
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     }
 
     .card{
-      background:#fff; border-radius:var(--card-radius); padding:14px; box-shadow:0 6px 18px rgba(8,12,20,0.06);
-      display:flex; gap:12px; align-items:flex-start; transition:transform .12s ease;
+      background:#fff; border-radius:var(--card-radius);
+      padding:14px; box-shadow:0 6px 18px rgba(8,12,20,0.06);
+      display:flex; gap:12px; align-items:flex-start;
+      transition:transform .12s ease;
     }
     .card:hover{transform:translateY(-6px)}
 
     .left{
-      width:120px; display:flex; flex-direction:column; gap:10px; align-items:center;
+      width:120px; display:flex; flex-direction:column;
+      gap:10px; align-items:center;
     }
 
     .avatar{
-      width:86px; height:86px; border-radius:10px; background:linear-gradient(135deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02));
-      display:flex; align-items:center; justify-content:center; font-weight:700; color:rgba(0,0,0,0.6);
+      width:86px; height:86px; border-radius:10px;
+      background:linear-gradient(135deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02));
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; color:rgba(0,0,0,0.6);
     }
 
     .radar-wrap{width:100%; display:flex; justify-content:center}
@@ -42,226 +48,200 @@
     .name{font-weight:600}
 
     .rects{display:flex; gap:8px}
-    .rect{flex:1; min-height:56px; border-radius:10px; padding:8px; background:rgba(0,0,0,0.03); outline:none}
-    .rect[contenteditable="true"]{cursor:text}
+    .rect{
+      flex:1; min-height:56px; border-radius:10px; padding:8px;
+      background:rgba(0,0,0,0.03); outline:none;
+    }
 
-    .meta{display:flex; gap:8px; align-items:center; margin-top:6px}
+    .meta{
+      display:flex; gap:8px; align-items:center;
+      margin-top:6px;
+    }
 
-    label{font-size:13px; color:#444}
-    input[type="color"]{border:none;background:none;padding:0;width:36px;height:28px;cursor:pointer}
-
-    /* helper area */
-    .help{margin:14px 0 20px 0; padding:12px; border-radius:10px; background:#fff}
-    .code-sample{font-family:monospace; font-size:13px; background:#0f1724; color:#e6eef8; padding:8px; border-radius:8px; overflow:auto}
-
-    @media (max-width:520px){ .rects{flex-direction:column} .left{width:86px} .card{padding:10px} }
+    @media (max-width:520px){
+      .rects{flex-direction:column}
+      .left{width:86px}
+      .card{padding:10px}
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    
 
-    
-    </div>
-
-    <div id="cards" class="grid" aria-live="polite"></div>
-  </div>
+  <div class="wrap"></div>
+  <div id="cards" class="grid" aria-live="polite"></div>
 
   <script>
     /* ========================
-       DÉFINISSEZ VOS CONTACTS ICI
-       - id : identifiant unique
-       - name : titre visible
-       - rect1, rect2 : texte (utilisez \n pour sauts de ligne)
-       - radar : tableau de 4 valeurs (0..100)
-       - color : couleur hex initiale de la fiche
-       Exemple :
-       { id: 'p1', name: 'Nom', rect1: 'Note 1', rect2: 'Note 2', radar: [10,20,30,40], color:'#ffeadb' }
+       CONTACTS PERSONNALISABLES
     ==========================*/
 
     const contacts = [
-{ id: 'aldrin_n', name: 'Aldrin N', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'amandine_cp', name: 'Amandine CP', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'chara_f', name: 'Chara F', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'david_cp', name: 'David CP', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'dimitri_f', name: 'Dimitri F', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'dounia', name: 'Dounia', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'esperance_cp', name: 'Esperance CP', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'gauthier_f', name: 'Gauthier F', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'jeanne', name: 'Jeanne', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'juliette_f', name: 'Juliette F', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'kalanie_f', name: 'Kalanie F', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'laurene', name: 'Laurène', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'leny_f', name: 'Leny F', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'lili_f', name: 'Lili F', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'lisa', name: 'Lisa', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'lucas_p', name: 'Lucas', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'ludovic_p', name: 'Ludovic F', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'mael_p', name: 'Mael F', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'martha_k', name: 'Martha CP', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'nathalie_v', name: 'Nathalie CP', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'octavie', name: 'Octavie', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'poly_l', name: 'Poly CP', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'saoussen_b', name: 'Saoussen', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'solene_f', name: 'Solène CP', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'yasmine_m', name: 'Yasmine', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'milena_l', name: 'Miléna L', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'chloe_F', name: 'Chloé F', rect1: '', rect2: '', radar: [50,50,50,50], color:'#4F9359' },
-{ id: 'vincent_cp', name: 'Vincent CP', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' },
-{ id: 'marie_noel_cp', name: 'Marie-Noel CP', rect1: '', rect2: '', radar: [50,50,50,50], color:'#3F917F' }
+{ id: 'aldrin_n', name: 'Aldrin N', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'amandine_cp', name: 'Amandine CP', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'chara_f', name: 'Chara F', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'david_cp', name: 'David CP', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'dimitri_f', name: 'Dimitri F', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'dounia', name: 'Dounia', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'esperance_cp', name: 'Esperance CP', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'gauthier_f', name: 'Gauthier F', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'jeanne', name: 'Jeanne', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'juliette_f', name: 'Juliette F', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'kalanie_f', name: 'Kalanie F', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'laurene', name: 'Laurène', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'leny_f', name: 'Leny F', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'lili_f', name: 'Lili F', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'lisa', name: 'Lisa', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'lucas_p', name: 'Lucas', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'ludovic_p', name: 'Ludovic F', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'mael_p', name: 'Mael F', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'martha_k', name: 'Martha CP', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'nathalie_v', name: 'Nathalie CP', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'octavie', name: 'Octavie', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'poly_l', name: 'Poly CP', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'saoussen_b', name: 'Saoussen', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'solene_f', name: 'Solène CP', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'yasmine_m', name: 'Yasmine', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'milena_l', name: 'Miléna L', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'chloe_F', name: 'Chloé F', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'vincent_cp', name: 'Vincent CP', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'marie_noel_cp', name: 'Marie-Noel CP', rect1: '', rect2: '', radar: [50,50,50,50,50,50], color:'#3F917F' }
     ];
-
-    /* ===== ne modifiez pas le code ci-dessous sauf pour personnaliser l'apparence ===== */
 
     const cardsRoot = document.getElementById('cards');
 
     function createCard(contact){
       const card = document.createElement('article');
       card.className = 'card';
-      card.style.background = contact.color || '#fff';
+      card.style.background = contact.color;
       card.dataset.id = contact.id;
 
-      // Left: avatar + radar
       const left = document.createElement('div'); left.className='left';
       const avatar = document.createElement('div'); avatar.className='avatar';
-      // initials from name
-      const initials = (contact.name || '').split(' ').map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
-      avatar.textContent = initials || '👤';
+
+      avatar.textContent = (contact.name||'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
       left.appendChild(avatar);
 
       const radarWrap = document.createElement('div'); radarWrap.className='radar-wrap';
-      const cvs = document.createElement('canvas'); cvs.className='radar'; cvs.width = 200; cvs.height = 200; // high res for crisp drawing
+      const cvs = document.createElement('canvas'); cvs.className='radar'; cvs.width = 200; cvs.height = 200;
       radarWrap.appendChild(cvs);
       left.appendChild(radarWrap);
 
-      // Right: content
       const content = document.createElement('div'); content.className='content';
       const titleRow = document.createElement('div'); titleRow.className='title-row';
-      const name = document.createElement('div'); name.className='name'; name.textContent = contact.name || 'Sans nom';
-      const colorLabel = document.createElement('label'); colorLabel.title = 'Changer la couleur de la fiche';
-      const colorInput = document.createElement('input'); colorInput.type='color'; colorInput.disabled=true; colorInput.value = contact.color || '#ffffff';
-      
-      colorLabel.appendChild(colorInput);
-      titleRow.appendChild(name); titleRow.appendChild(colorLabel);
+      const name = document.createElement('div'); name.className='name'; name.textContent = contact.name;
+      titleRow.appendChild(name);
 
       const rects = document.createElement('div'); rects.className='rects';
-      const r1 = document.createElement('div'); r1.className='rect'; r1.contentEditable = false; r1.spellcheck = false; r1.dataset.field='rect1'; r1.innerHTML = (contact.rect1||'').replace(/\n/g,'<br>');
-      const r2 = document.createElement('div'); r2.className='rect'; r2.contentEditable = false; r2.spellcheck = false; r2.dataset.field='rect2'; r2.innerHTML = (contact.rect2||'').replace(/\n/g,'<br>');
+      const r1 = document.createElement('div'); r1.className='rect'; r1.innerHTML = (contact.rect1 || '').replace(/\n/g,'<br>');
+      const r2 = document.createElement('div'); r2.className='rect'; r2.innerHTML = (contact.rect2 || '').replace(/\n/g,'<br>');
       rects.appendChild(r1); rects.appendChild(r2);
 
       const meta = document.createElement('div'); meta.className='meta';
-      const editNote = document.createElement('div'); editNote.style.fontSize='13px'; editNote.style.color='rgba(0,0,0,0.55)'; editNote.textContent='Éditez les zones directement';
-      const radarLabel = document.createElement('div'); radarLabel.style.marginLeft='auto'; radarLabel.style.fontSize='13px'; radarLabel.style.color='rgba(0,0,0,0.55)';
-      radarLabel.textContent = 'Radar 4 pts';
-      meta.appendChild(editNote); meta.appendChild(radarLabel);
+      const radarLabel = document.createElement('div');
+      radarLabel.style.fontSize='13px'; radarLabel.style.color='rgba(0,0,0,0.55)';
+      radarLabel.style.marginLeft='auto';
+      radarLabel.textContent = 'Radar 6 pts';
 
-      content.appendChild(titleRow); content.appendChild(rects); content.appendChild(meta);
+      meta.appendChild(radarLabel);
 
-      card.appendChild(left); card.appendChild(content);
+      content.appendChild(titleRow);
+      content.appendChild(rects);
+      content.appendChild(meta);
 
-      // Draw radar on canvas
-      drawRadar(cvs, contact.radar || [50,50,50,50]);
+      card.appendChild(left);
+      card.appendChild(content);
 
-  cvs.style.cursor = 'pointer';
-cvs.title = 'Cliquez pour modifier les 4 valeurs du radar (0-100)';
+      drawRadar(cvs, contact.radar);
 
-cvs.addEventListener('click', ()=>{
-  const input = prompt("Entrez 4 valeurs séparées par des virgules (0-100) :", contact.radar.join(', '));
-  if(!input) return;
-  const arr = input.split(',').map(s=>parseFloat(s.trim())).slice(0,4);
-  if(arr.length!==4 || arr.some(v=>Number.isNaN(v))){
-    alert('Format invalide — 4 nombres séparés par des virgules');
-    return;
-  }
-  contact.radar = arr.map(v=>Math.max(0,Math.min(100,v)));
-  drawRadar(cvs, contact.radar);
-});
+      // clic pour modifier les 6 valeurs
+      cvs.style.cursor='pointer';
+      cvs.title='Cliquez pour modifier les 6 valeurs du radar (0-100)';
 
-      // When user edits rectangles, keep it in memory of the page (not saved to file). Useful for temporary notes.
-      [r1,r2].forEach(el=>{
-        el.addEventListener('input', ()=>{
-          const txt = el.innerHTML.replace(/<br>/g,'\n');
-          if(el.dataset.field === 'rect1') contact.rect1 = txt;
-          else contact.rect2 = txt;
-        });
+      cvs.addEventListener('click', ()=>{
+        const input = prompt("Entrez 6 valeurs séparées par des virgules (0-100) :", contact.radar.join(', '));
+        if(!input) return;
+        const arr = input.split(',').map(s=>parseFloat(s.trim())).slice(0,6);
+        if(arr.length!==6 || arr.some(v=>Number.isNaN(v))){
+          alert('Format invalide — 6 nombres séparés par des virgules');
+          return;
+        }
+        contact.radar = arr.map(v=>Math.max(0,Math.min(100,v)));
+        drawRadar(cvs, contact.radar);
       });
 
       return card;
     }
 
+    /* ===================
+         RADAR 6 POINTS
+    ====================*/
     function drawRadar(canvas, values){
-      // values = [v0,v1,v2,v3] each 0..100
       const ctx = canvas.getContext('2d');
-      const DPR = window.devicePixelRatio || 1;
-      const w = canvas.width; const h = canvas.height;
-      // clear
+      const w = canvas.width, h = canvas.height;
       ctx.clearRect(0,0,w,h);
-      // use center and radius
-      const cx = w/2, cy = h/2, radius = Math.min(w,h)*0.36;
 
-      // grid
-      ctx.save();
-      ctx.scale(1,1);
-      ctx.translate(0,0);
-      ctx.lineWidth = 1.2;
-      ctx.strokeStyle = 'rgba(0,0,0,0.08)';
-      ctx.fillStyle = 'rgba(0,0,0,0.02)';
-      // concentric rings
-      for(let i=4;i>=1;i--){
+      const cx = w/2, cy = h/2;
+      const radius = Math.min(w,h)*0.36;
+      const N = 6;
+      const fillViolet = 'rgba(150, 80, 200, 0.18)';
+      const strokeViolet = 'rgba(150, 80, 200, 0.95)';
+
+      // grille
+      ctx.strokeStyle='rgba(0,0,0,0.1)';
+      ctx.lineWidth=1.1;
+      for(let r=4;r>=1;r--){
         ctx.beginPath();
-        const r = radius * (i/4);
-        for(let j=0;j<4;j++){
-          const angle = Math.PI/2 + j*(Math.PI*2/4);
-          const x = cx + Math.cos(angle)*r;
-          const y = cy - Math.sin(angle)*r;
-          if(j===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        const rr = radius*(r/4);
+        for(let i=0;i<N;i++){
+          const a = Math.PI/2 + i*(Math.PI*2/N);
+          const x = cx + Math.cos(a)*rr;
+          const y = cy - Math.sin(a)*rr;
+          if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
         }
         ctx.closePath(); ctx.stroke();
       }
+
       // axes
-      for(let j=0;j<4;j++){
-        const angle = Math.PI/2 + j*(Math.PI*2/4);
-        const x = cx + Math.cos(angle)*radius;
-        const y = cy - Math.sin(angle)*radius;
-        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
+      for(let i=0;i<N;i++){
+        const a = Math.PI/2 + i*(Math.PI*2/N);
+        const x = cx + Math.cos(a)*radius;
+        const y = cy - Math.sin(a)*radius;
+        ctx.beginPath();
+        ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
       }
 
-      // polygon
+      // polygone violet
       ctx.beginPath();
-      for(let j=0;j<4;j++){
-        const v = Math.max(0,Math.min(100, Number(values[j]||0)))/100; // 0..1
-        const angle = Math.PI/2 + j*(Math.PI*2/4);
-        const x = cx + Math.cos(angle)*radius*v;
-        const y = cy - Math.sin(angle)*radius*v;
-        if(j===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      for(let i=0;i<N;i++){
+        const v = Math.max(0,Math.min(100, Number(values[i]||0)))/100;
+        const a = Math.PI/2 + i*(Math.PI*2/N);
+        const x = cx + Math.cos(a)*radius*v;
+        const y = cy - Math.sin(a)*radius*v;
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
       }
       ctx.closePath();
-      ctx.fillStyle = 'rgba(0,120,200,0.12)'; ctx.fill();
-      ctx.strokeStyle = 'rgba(0,120,200,0.9)'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle=fillViolet; ctx.fill();
+      ctx.strokeStyle=strokeViolet; ctx.lineWidth=2; ctx.stroke();
 
-      // small dots
-      for(let j=0;j<4;j++){
-        const v = Math.max(0,Math.min(100, Number(values[j]||0)))/100;
-        const angle = Math.PI/2 + j*(Math.PI*2/4);
-        const x = cx + Math.cos(angle)*radius*v;
-        const y = cy - Math.sin(angle)*radius*v;
-        ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fillStyle='rgba(0,120,200,0.95)'; ctx.fill();
+      // points violets
+      for(let i=0;i<N;i++){
+        const v = Math.max(0,Math.min(100, Number(values[i]||0)))/100;
+        const a = Math.PI/2 + i*(Math.PI*2/N);
+        const x = cx + Math.cos(a)*radius*v;
+        const y = cy - Math.sin(a)*radius*v;
+        ctx.beginPath();
+        ctx.arc(x,y,4,0,Math.PI*2);
+        ctx.fillStyle=strokeViolet;
+        ctx.fill();
       }
-
-      ctx.restore();
     }
 
     function renderAll(){
-      cardsRoot.innerHTML = '';
-      contacts.forEach(c=>{
-        cardsRoot.appendChild(createCard(c));
-      });
+      cardsRoot.innerHTML='';
+      contacts.forEach(c=> cardsRoot.appendChild(createCard(c)));
     }
 
-    // initial render
     renderAll();
-
-    // Helpful: expose contacts to window for quick editing in devtools
     window.CARNET_CONTACTS = contacts;
   </script>
 </body>
