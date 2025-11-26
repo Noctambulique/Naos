@@ -112,14 +112,14 @@
       const titleRow = document.createElement('div'); titleRow.className='title-row';
       const name = document.createElement('div'); name.className='name'; name.textContent = contact.name || 'Sans nom';
       const colorLabel = document.createElement('label'); colorLabel.title = 'Changer la couleur de la fiche';
-      const colorInput = document.createElement('input'); colorInput.type='color'; colorInput.value = contact.color || '#ffffff';
-      colorInput.addEventListener('input', (e)=>{ card.style.background = e.target.value; });
+      const colorInput = document.createElement('input'); colorInput.type='color'; colorInput.disabled=true; colorInput.value = contact.color || '#ffffff';
+      
       colorLabel.appendChild(colorInput);
       titleRow.appendChild(name); titleRow.appendChild(colorLabel);
 
       const rects = document.createElement('div'); rects.className='rects';
-      const r1 = document.createElement('div'); r1.className='rect'; r1.contentEditable = true; r1.spellcheck = false; r1.dataset.field='rect1'; r1.innerHTML = (contact.rect1||'').replace(/\n/g,'<br>');
-      const r2 = document.createElement('div'); r2.className='rect'; r2.contentEditable = true; r2.spellcheck = false; r2.dataset.field='rect2'; r2.innerHTML = (contact.rect2||'').replace(/\n/g,'<br>');
+      const r1 = document.createElement('div'); r1.className='rect'; r1.contentEditable = false; r1.spellcheck = false; r1.dataset.field='rect1'; r1.innerHTML = (contact.rect1||'').replace(/\n/g,'<br>');
+      const r2 = document.createElement('div'); r2.className='rect'; r2.contentEditable = false; r2.spellcheck = false; r2.dataset.field='rect2'; r2.innerHTML = (contact.rect2||'').replace(/\n/g,'<br>');
       rects.appendChild(r1); rects.appendChild(r2);
 
       const meta = document.createElement('div'); meta.className='meta';
@@ -138,9 +138,7 @@
       // Allow live-edit of radar via prompt on click (conserve original behaviour: contacts defined in code)
       cvs.style.cursor = 'pointer';
       cvs.title = 'Cliquez pour modifier les 4 valeurs du radar (0-100)';
-      cvs.addEventListener('click', ()=>{
-        const current = contact.radar ? contact.radar.slice() : [50,50,50,50];
-        const input = prompt('Entrez 4 valeurs séparées par des virgules (ex: 80,60,40,90)', current.join(','));
+      
         if(!input) return;
         const arr = input.split(',').map(s=>parseFloat(s.trim())).slice(0,4);
         if(arr.length!==4 || arr.some(v=>Number.isNaN(v))){ alert('Format invalide — 4 nombres séparés par des virgules'); return; }
