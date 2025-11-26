@@ -1,362 +1,247 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Carnet de contacts — Bleu/Vert + Radar</title>
-<style>
-  body{
-    margin:0;
-    padding:20px;
-    background:#ffffff;
-    font-family:sans-serif;
-    color:#000;
-  }
-  h1{
-    font-size:22px;
-    margin-bottom:15px;
-    font-weight:600;
-  }
-  .list{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
-  .item{
-    border:1px solid #ddd;
-    padding:12px;
-    border-radius:8px;
-    cursor:pointer;
-    background:#fafafa;
-  }
-  .item:hover{
-    background:#f0f0f0;
-  }
-  .details{
-    margin-top:20px;
-    padding:15px;
-    border:1px solid #ddd;
-    border-radius:8px;
-    background:#fafafa;
-  }
-  button{
-    padding:6px 12px;
-    border:1px solid #ccc;
-    background:#fff;
-    cursor:pointer;
-    border-radius:6px;
-  }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Carnet de contacts — Fiches personnalisables</title>
+  <style>
+    :root{ --bg:#f7f7f9; --card-radius:12px; --gap:14px; --max-width:1100px; }
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding:24px; font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background:var(--bg); color:#111; display:flex; justify-content:center;
+    }
+    .wrap{width:100%; max-width:var(--max-width)}
+    h1{margin:0 0 18px 0; font-weight:600}
+
+    .grid{
+      display:grid; gap:var(--gap); grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    }
+
+    .card{
+      background:#fff; border-radius:var(--card-radius); padding:14px; box-shadow:0 6px 18px rgba(8,12,20,0.06);
+      display:flex; gap:12px; align-items:flex-start; transition:transform .12s ease;
+    }
+    .card:hover{transform:translateY(-6px)}
+
+    .left{
+      width:120px; display:flex; flex-direction:column; gap:10px; align-items:center;
+    }
+
+    .avatar{
+      width:86px; height:86px; border-radius:10px; background:linear-gradient(135deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02));
+      display:flex; align-items:center; justify-content:center; font-weight:700; color:rgba(0,0,0,0.6);
+    }
+
+    .radar-wrap{width:100%; display:flex; justify-content:center}
+    canvas.radar{width:96px; height:96px}
+
+    .content{flex:1; display:flex; flex-direction:column; gap:8px}
+
+    .title-row{display:flex; justify-content:space-between; align-items:center}
+    .name{font-weight:600}
+
+    .rects{display:flex; gap:8px}
+    .rect{flex:1; min-height:56px; border-radius:10px; padding:8px; background:rgba(0,0,0,0.03); outline:none}
+    .rect[contenteditable="true"]{cursor:text}
+
+    .meta{display:flex; gap:8px; align-items:center; margin-top:6px}
+
+    label{font-size:13px; color:#444}
+    input[type="color"]{border:none;background:none;padding:0;width:36px;height:28px;cursor:pointer}
+
+    /* helper area */
+    .help{margin:14px 0 20px 0; padding:12px; border-radius:10px; background:#fff}
+    .code-sample{font-family:monospace; font-size:13px; background:#0f1724; color:#e6eef8; padding:8px; border-radius:8px; overflow:auto}
+
+    @media (max-width:520px){ .rects{flex-direction:column} .left{width:86px} .card{padding:10px} }
+  </style>
 </head>
 <body>
-<header>
-  <h1>Carnet — fiches colorées + Radar (4 points) + 2 rectangles</h1>
-</header>
-<div class="wrap">
-  <aside class="left">
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div class="tiny">Rechercher par initiale</div>
-          <div class="alphabet" id="alphabet"></div>
-        </div>
-        <div style="text-align:right">
-          <div class="tiny">Contacts: <span id="count">0</span></div>
-        </div>
-      </div>
+  <div class="wrap">
+    <h1>Carnet de contacts — fiches personnalisables</h1>
 
-      <hr style="border:none;height:8px;background:transparent"/>
-
-      <form id="form" class="new-contact" onsubmit="return false">
-        <input required id="name" placeholder="Nom du contact" type="text" />
-
-        <label class="tiny">Couleur de la fiche</label>
-        <select id="color">
-          <option value="blue">Bleu</option>
-          <option value="green">Vert</option>
-        </select>
-
-        <div class="row">
-          <div class="col">
-            <label class="tiny">Point 1 (0-100)</label>
-            <input type="number" id="p1" min="0" max="100" value="50" />
-          </div>
-          <div class="col">
-            <label class="tiny">Point 2 (0-100)</label>
-            <input type="number" id="p2" min="0" max="100" value="50" />
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <label class="tiny">Point 3 (0-100)</label>
-            <input type="number" id="p3" min="0" max="100" value="50" />
-          </div>
-          <div class="col">
-            <label class="tiny">Point 4 (0-100)</label>
-            <input type="number" id="p4" min="0" max="100" value="50" />
-          </div>
-        </div>
-
-        <label class="tiny">Texte rectangle 1</label>
-        <input id="r1" placeholder="Quelques mots..." type="text" />
-        <label class="tiny">Texte rectangle 2</label>
-        <input id="r2" placeholder="Quelques mots..." type="text" />
-
-        <div class="actions">
-          <button id="saveBtn" class="primary">Enregistrer</button>
-          <button id="clearBtn" class="ghost" type="button">Réinitialiser</button>
-        </div>
-      </form>
-
-      <div class="contacts-list" id="contacts"></div>
-    </div>
-  </aside>
-
-  <main class="main">
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div class="tiny">Fiche ouverte</div>
-          <div id="openName" style="font-weight:700;font-size:18px">— Aucune —</div>
-        </div>
-        <div>
-          <button id="deleteBtn" class="ghost">Supprimer</button>
-        </div>
-      </div>
-
-      <hr style="border:none;height:12px;background:transparent"/>
-
-      <div class="panel">
-        <div class="block">
-          <canvas id="radar" class="radar-canvas" width="600" height="400"></canvas>
-          <div class="controls">
-            <div class="tiny">Personnaliser les 4 points (0-100)</div>
-            <div class="row">
-              <div class="col"><input type="number" id="edit_p1" min="0" max="100" value="50" /></div>
-              <div class="col"><input type="number" id="edit_p2" min="0" max="100" value="50" /></div>
-              <div class="col"><input type="number" id="edit_p3" min="0" max="100" value="50" /></div>
-              <div class="col"><input type="number" id="edit_p4" min="0" max="100" value="50" /></div>
-            </div>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button id="updateRadar" class="primary">Mettre à jour Radar</button>
-              <button id="exportPNG" class="ghost">Exporter PNG</button>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div class="block">
-            <div class="tiny">Rectangle 1 (editable)</div>
-            <div id="rect1" class="rect-edit" contenteditable="true">Double-cliquez pour modifier ce texte.</div>
-          </div>
-
-          <div class="block" style="margin-top:12px">
-            <div class="tiny">Rectangle 2 (editable)</div>
-            <div id="rect2" class="rect-edit" contenteditable="true">Double-cliquez pour modifier ce texte.</div>
-          </div>
-
-          <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
-            <button id="saveOpen" class="primary">Sauvegarder la fiche</button>
-            <button id="cloneBtn" class="ghost">Dupliquer</button>
-          </div>
-        </div>
-      </div>
-
+    <div class="help">
+      <p><strong>Mode d'emploi rapide :</strong></p>
+      <ol>
+        <li>Ouvrez ce fichier et trouvez le tableau <code>const contacts = [...]</code> en haut du script (zone <em>« DÉFINISSEZ VOS CONTACTS ICI »</em>).</li>
+        <li>Pour ajouter / modifier une fiche, éditez simplement un objet : <code>{ id, name, rect1, rect2, radar: [a,b,c,d], color }</code>.</li>
+        <li>Les fiches sont créées depuis le code (pas besoin d'interface pour enregistrer). Vous pouvez toutefois éditer les rectangles directement sur la page.</li>
+      </ol>
+      <p>Exemple (copiez-collez dans le tableau <code>contacts</code>) :</p>
+      <div class="code-sample">{ id: 'pierre', name: 'Pierre Dupont', rect1: 'Téléphone\n+33 6 12 34 56 78', rect2: 'Adresse\nParis', radar: [80,60,40,90], color: '#ffd6a5' }</div>
     </div>
 
-    <footer>
-      Les contacts sont stockés localement dans votre navigateur (localStorage). Vous pouvez exporter une fiche en PNG depuis le radar.
-    </footer>
-  </main>
-</div>
+    <div id="cards" class="grid" aria-live="polite"></div>
+  </div>
 
-<script>
-// === CONFIGURATION SIMPLIFIÉE POUR CRÉER DES FICHES PERSONNALISÉES ===
-// Vous pouvez modifier facilement ce modèle : ajoutez, retirez ou renommez ce que vous voulez.
-// Le reste de l'application s'adapte automatiquement.
-// === Contacts définis directement dans le code ===
-// Ajoutez ici toutes vos fiches ; l'interface ne sert qu'à les consulter
-const PRESET_CONTACTS = [
-  // Exemple :
-  // { id: uid(), name:"Alice", color:"blue", radar:[80,40,60,90], rect1:"Calme", rect2:"Réfléchie" },
-];
+  <script>
+    /* ========================
+       DÉFINISSEZ VOS CONTACTS ICI
+       - id : identifiant unique
+       - name : titre visible
+       - rect1, rect2 : texte (utilisez \n pour sauts de ligne)
+       - radar : tableau de 4 valeurs (0..100)
+       - color : couleur hex initiale de la fiche
+       Exemple :
+       { id: 'p1', name: 'Nom', rect1: 'Note 1', rect2: 'Note 2', radar: [10,20,30,40], color:'#ffeadb' }
+    ==========================*/
 
-// Injection automatique
-localStorage.setItem("contacts", JSON.stringify(PRESET_CONTACTS));
+    const contacts = [
+      { id: 'pierre', name: 'Pierre Dupont', rect1: 'Téléphone\n+33 6 12 34 56 78', rect2: 'Adresse\nParis', radar: [80,60,40,90], color: '#ffd6a5' },
+      { id: 'marie', name: 'Marie Martin', rect1: 'Téléphone\n+33 7 98 76 54 32', rect2: 'Notes\nAime le café', radar: [50,70,60,30], color: '#d0f0c0' }
+    ];
 
-const CONTACT_TEMPLATE = {
-  name: "",
-  color: "blue",
-  radar: [50,50,50,50],
-  rect1: "",
-  rect2: ""
-};
+    /* ===== ne modifiez pas le code ci-dessous sauf pour personnaliser l'apparence ===== */
 
-// --- Helpers & storage ---
-const STORAGE_KEY = 'carnet_contacts_v1';
-let contacts = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-let current = null; // id of opened contact
+    const cardsRoot = document.getElementById('cards');
 
-function saveAll(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts)); renderList(); updateCount(); }
-function uid(){ return 'id_'+Math.random().toString(36).slice(2,9); }
+    function createCard(contact){
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.style.background = contact.color || '#fff';
+      card.dataset.id = contact.id;
 
-// --- Alphabet bar ---
-const alphabetEl = document.getElementById('alphabet');
-const letters = Array.from(Array(26)).map((_,i)=>String.fromCharCode(65+i));
-letters.forEach(l=>{
-  const btn = document.createElement('button'); btn.textContent = l; btn.onclick = ()=>filterByLetter(l); alphabetEl.appendChild(btn);
-});
+      // Left: avatar + radar
+      const left = document.createElement('div'); left.className='left';
+      const avatar = document.createElement('div'); avatar.className='avatar';
+      // initials from name
+      const initials = (contact.name || '').split(' ').map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
+      avatar.textContent = initials || '👤';
+      left.appendChild(avatar);
 
-function filterByLetter(letter){
-  // highlight
-  Array.from(alphabetEl.children).forEach(b=>b.classList.toggle('active', b.textContent===letter));
-  renderList(letter);
-}
+      const radarWrap = document.createElement('div'); radarWrap.className='radar-wrap';
+      const cvs = document.createElement('canvas'); cvs.className='radar'; cvs.width = 200; cvs.height = 200; // high res for crisp drawing
+      radarWrap.appendChild(cvs);
+      left.appendChild(radarWrap);
 
-// --- Render list ---
-const contactsEl = document.getElementById('contacts');
-const countEl = document.getElementById('count');
-function renderList(filter){
-  contactsEl.innerHTML='';
-  const list = filter ? contacts.filter(c=>c.name.toUpperCase().startsWith(filter)) : contacts.slice().sort((a,b)=>a.name.localeCompare(b.name));
-  list.forEach(c=>{
-    const it = document.createElement('div'); it.className='contact-item';
-    const meta = document.createElement('div'); meta.className='contact-meta';
-    const dot = document.createElement('div'); dot.className='dot'; dot.style.background = c.color==='green'? '#34d399' : '#60a5fa';
-    const name = document.createElement('div'); name.className='contact-name'; name.textContent = c.name;
-    meta.appendChild(dot); meta.appendChild(name);
-    const actions = document.createElement('div');
-    const open = document.createElement('button'); open.className='ghost'; open.textContent='Ouvrir'; open.onclick = ()=>openContact(c.id);
-    actions.appendChild(open);
-    it.appendChild(meta); it.appendChild(actions);
-    contactsEl.appendChild(it);
-  });
-}
+      // Right: content
+      const content = document.createElement('div'); content.className='content';
+      const titleRow = document.createElement('div'); titleRow.className='title-row';
+      const name = document.createElement('div'); name.className='name'; name.textContent = contact.name || 'Sans nom';
+      const colorLabel = document.createElement('label'); colorLabel.title = 'Changer la couleur de la fiche';
+      const colorInput = document.createElement('input'); colorInput.type='color'; colorInput.value = contact.color || '#ffffff';
+      colorInput.addEventListener('input', (e)=>{ card.style.background = e.target.value; });
+      colorLabel.appendChild(colorInput);
+      titleRow.appendChild(name); titleRow.appendChild(colorLabel);
 
-function updateCount(){ countEl.textContent = contacts.length }
+      const rects = document.createElement('div'); rects.className='rects';
+      const r1 = document.createElement('div'); r1.className='rect'; r1.contentEditable = true; r1.spellcheck = false; r1.dataset.field='rect1'; r1.innerHTML = (contact.rect1||'').replace(/\n/g,'<br>');
+      const r2 = document.createElement('div'); r2.className='rect'; r2.contentEditable = true; r2.spellcheck = false; r2.dataset.field='rect2'; r2.innerHTML = (contact.rect2||'').replace(/\n/g,'<br>');
+      rects.appendChild(r1); rects.appendChild(r2);
 
-// --- Form create ---
-document.getElementById('saveBtn').addEventListener('click', ()=>{
-  const name = document.getElementById('name').value.trim(); if(!name) return alert('Donnez un nom');
-  const c = JSON.parse(JSON.stringify(CONTACT_TEMPLATE));
-  c.id = uid();
-  c.name = name;
-  c.color = document.getElementById('color').value;
-  c.radar = [+p1.value||0,+p2.value||0,+p3.value||0,+p4.value||0];||0,+p2.value||0,+p3.value||0,+p4.value||0], rect1: r1.value||'', rect2: r2.value||'' };
-  contacts.push(c); saveAll(); document.getElementById('form').reset(); // keep defaults
-});
+      const meta = document.createElement('div'); meta.className='meta';
+      const editNote = document.createElement('div'); editNote.style.fontSize='13px'; editNote.style.color='rgba(0,0,0,0.55)'; editNote.textContent='Éditez les zones directement';
+      const radarLabel = document.createElement('div'); radarLabel.style.marginLeft='auto'; radarLabel.style.fontSize='13px'; radarLabel.style.color='rgba(0,0,0,0.55)';
+      radarLabel.textContent = 'Radar 4 pts';
+      meta.appendChild(editNote); meta.appendChild(radarLabel);
 
-document.getElementById('clearBtn').addEventListener('click', ()=>{ document.getElementById('form').reset(); });
+      content.appendChild(titleRow); content.appendChild(rects); content.appendChild(meta);
 
-// --- Open / edit ---
-function openContact(id){
-  const c = contacts.find(x=>x.id===id); if(!c) return;
-  current = id;
-  document.getElementById('openName').textContent = c.name;
-  // populate editor
-  document.getElementById('edit_p1').value = c.radar[0];
-  document.getElementById('edit_p2').value = c.radar[1];
-  document.getElementById('edit_p3').value = c.radar[2];
-  document.getElementById('edit_p4').value = c.radar[3];
-  document.getElementById('rect1').textContent = c.rect1 || 'Double-cliquez pour modifier ce texte.';
-  document.getElementById('rect2').textContent = c.rect2 || 'Double-cliquez pour modifier ce texte.';
-  // set color style
-  const dot = document.querySelector('.dot'); if(dot) dot.style.background = c.color==='green'? '#34d399' : '#60a5fa';
-  drawRadar();
-}
+      card.appendChild(left); card.appendChild(content);
 
-// Save open
-document.getElementById('saveOpen').addEventListener('click', ()=>{
-  if(!current) return alert('Aucune fiche ouverte');
-  const c = contacts.find(x=>x.id===current); if(!c) return;
-  c.radar = [+edit_p1.value||0,+edit_p2.value||0,+edit_p3.value||0,+edit_p4.value||0];
-  c.rect1 = document.getElementById('rect1').textContent;
-  c.rect2 = document.getElementById('rect2').textContent;
-  saveAll(); alert('Fiche sauvegardée.');
-});
+      // Draw radar on canvas
+      drawRadar(cvs, contact.radar || [50,50,50,50]);
 
-// Delete
-document.getElementById('deleteBtn').addEventListener('click', ()=>{
-  if(!current) return alert('Aucune fiche ouverte');
-  if(!confirm('Supprimer cette fiche ?')) return;
-  contacts = contacts.filter(c=>c.id!==current);
-  current = null; document.getElementById('openName').textContent='— Aucune —'; saveAll();
-});
+      // Allow live-edit of radar via prompt on click (conserve original behaviour: contacts defined in code)
+      cvs.style.cursor = 'pointer';
+      cvs.title = 'Cliquez pour modifier les 4 valeurs du radar (0-100)';
+      cvs.addEventListener('click', ()=>{
+        const current = contact.radar ? contact.radar.slice() : [50,50,50,50];
+        const input = prompt('Entrez 4 valeurs séparées par des virgules (ex: 80,60,40,90)', current.join(','));
+        if(!input) return;
+        const arr = input.split(',').map(s=>parseFloat(s.trim())).slice(0,4);
+        if(arr.length!==4 || arr.some(v=>Number.isNaN(v))){ alert('Format invalide — 4 nombres séparés par des virgules'); return; }
+        contact.radar = arr.map(v=>Math.max(0,Math.min(100,v)));
+        drawRadar(cvs, contact.radar);
+      });
 
-// Duplicate
-document.getElementById('cloneBtn').addEventListener('click', ()=>{
-  if(!current) return alert('Aucune fiche ouverte');
-  const c = contacts.find(x=>x.id===current); if(!c) return;
-  const copy = JSON.parse(JSON.stringify(c)); copy.id = uid(); copy.name = c.name + ' (copie)'; contacts.push(copy); saveAll();
-});
+      // When user edits rectangles, keep it in memory of the page (not saved to file). Useful for temporary notes.
+      [r1,r2].forEach(el=>{
+        el.addEventListener('input', ()=>{
+          const txt = el.innerHTML.replace(/<br>/g,'\n');
+          if(el.dataset.field === 'rect1') contact.rect1 = txt;
+          else contact.rect2 = txt;
+        });
+      });
 
-// --- Radar drawing ---
-const canvas = document.getElementById('radar'); const ctx = canvas.getContext('2d');
-function drawRadar(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  // background grid
-  const cx = canvas.width/2; const cy = 160; const maxR = 120;
-  ctx.save(); ctx.translate(0,0);
-  ctx.lineWidth=1; ctx.strokeStyle='#e6edf3'; ctx.fillStyle='#fff';
-  for(let r=1;r<=4;r++){
-    ctx.beginPath(); ctx.ellipse(cx,cy,(maxR*r)/4,(maxR*r)/4,0,0,Math.PI*2); ctx.stroke();
-  }
-  // axes
-  const labels = ['P1','P2','P3','P4'];
-  for(let i=0;i<4;i++){
-    const ang = -Math.PI/2 + (i*(Math.PI*2)/4);
-    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(ang)*maxR, cy+Math.sin(ang)*maxR); ctx.stroke();
-    // label
-    const lx = cx+Math.cos(ang)*(maxR+20); const ly = cy+Math.sin(ang)*(maxR+20);
-    ctx.fillStyle='#111'; ctx.font='13px sans-serif'; ctx.textAlign = lx>cx? 'left': lx<cx? 'right':'center'; ctx.textBaseline='middle'; ctx.fillText(labels[i], lx, ly);
-  }
-  // polygon
-  const vals = current ? contacts.find(c=>c.id===current).radar : [+document.getElementById('p1').value||50,+document.getElementById('p2').value||50,+document.getElementById('p3').value||50,+document.getElementById('p4').value||50];
-  // normalize
-  const points = vals.map((v,i)=>{
-    const ang = -Math.PI/2 + (i*(Math.PI*2)/4);
-    const r = Math.max(0,Math.min(100, v))/100 * maxR;
-    return {x: cx+Math.cos(ang)*r, y: cy+Math.sin(ang)*r};
-  });
-  // fill
-  ctx.beginPath(); points.forEach((p,i)=> i===0? ctx.moveTo(p.x,p.y): ctx.lineTo(p.x,p.y)); ctx.closePath();
-  ctx.fillStyle = 'rgba(96,165,250,0.25)'; ctx.fill(); ctx.strokeStyle='rgba(96,165,250,0.9)'; ctx.lineWidth=2; ctx.stroke();
-  // points
-  points.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,5,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill(); ctx.strokeStyle='rgba(96,165,250,0.95)'; ctx.stroke(); });
-  ctx.restore();
-}
+      return card;
+    }
 
-// attach update button
-document.getElementById('updateRadar').addEventListener('click', ()=>{
-  if(current){
-    // update preview from edit inputs but do not save to contact until user clicks save
-    drawRadar();
-  } else {
-    drawRadar();
-  }
-});
+    function drawRadar(canvas, values){
+      // values = [v0,v1,v2,v3] each 0..100
+      const ctx = canvas.getContext('2d');
+      const DPR = window.devicePixelRatio || 1;
+      const w = canvas.width; const h = canvas.height;
+      // clear
+      ctx.clearRect(0,0,w,h);
+      // use center and radius
+      const cx = w/2, cy = h/2, radius = Math.min(w,h)*0.36;
 
-// export PNG
-document.getElementById('exportPNG').addEventListener('click', ()=>{
-  const url = canvas.toDataURL('image/png');
-  const a = document.createElement('a'); a.href = url; a.download = (current? contacts.find(c=>c.id===current).name : 'radar') + '.png'; a.click();
-});
+      // grid
+      ctx.save();
+      ctx.scale(1,1);
+      ctx.translate(0,0);
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+      ctx.fillStyle = 'rgba(0,0,0,0.02)';
+      // concentric rings
+      for(let i=4;i>=1;i--){
+        ctx.beginPath();
+        const r = radius * (i/4);
+        for(let j=0;j<4;j++){
+          const angle = Math.PI/2 + j*(Math.PI*2/4);
+          const x = cx + Math.cos(angle)*r;
+          const y = cy - Math.sin(angle)*r;
+          if(j===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.closePath(); ctx.stroke();
+      }
+      // axes
+      for(let j=0;j<4;j++){
+        const angle = Math.PI/2 + j*(Math.PI*2/4);
+        const x = cx + Math.cos(angle)*radius;
+        const y = cy - Math.sin(angle)*radius;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
+      }
 
-// initialize
-function init(){ renderList(); updateCount(); drawRadar(); }
-init();
+      // polygon
+      ctx.beginPath();
+      for(let j=0;j<4;j++){
+        const v = Math.max(0,Math.min(100, Number(values[j]||0)))/100; // 0..1
+        const angle = Math.PI/2 + j*(Math.PI*2/4);
+        const x = cx + Math.cos(angle)*radius*v;
+        const y = cy - Math.sin(angle)*radius*v;
+        if(j===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0,120,200,0.12)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(0,120,200,0.9)'; ctx.lineWidth = 2; ctx.stroke();
 
-// expose some elements to window for convenience
-const p1 = document.getElementById('p1'), p2 = document.getElementById('p2'), p3 = document.getElementById('p3'), p4 = document.getElementById('p4');
-const r1 = document.getElementById('r1'), r2 = document.getElementById('r2');
-const edit_p1 = document.getElementById('edit_p1'), edit_p2 = document.getElementById('edit_p2'), edit_p3 = document.getElementById('edit_p3'), edit_p4 = document.getElementById('edit_p4');
+      // small dots
+      for(let j=0;j<4;j++){
+        const v = Math.max(0,Math.min(100, Number(values[j]||0)))/100;
+        const angle = Math.PI/2 + j*(Math.PI*2/4);
+        const x = cx + Math.cos(angle)*radius*v;
+        const y = cy - Math.sin(angle)*radius*v;
+        ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fillStyle='rgba(0,120,200,0.95)'; ctx.fill();
+      }
 
-// keep radar live when edit inputs change
-[edit_p1,edit_p2,edit_p3,edit_p4].forEach(inp=>inp.addEventListener('input', ()=>drawRadar()));
+      ctx.restore();
+    }
 
-// when there is no opened contact, radar preview uses the form values
-[p1,p2,p3,p4].forEach(inp=>inp.addEventListener('input', ()=>{ if(!current) drawRadar(); }));
+    function renderAll(){
+      cardsRoot.innerHTML = '';
+      contacts.forEach(c=>{
+        cardsRoot.appendChild(createCard(c));
+      });
+    }
 
-</script>
+    // initial render
+    renderAll();
+
+    // Helpful: expose contacts to window for quick editing in devtools
+    window.CARNET_CONTACTS = contacts;
+  </script>
 </body>
 </html>
