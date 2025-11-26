@@ -116,10 +116,6 @@
       card.dataset.id = contact.id;
 
       const left = document.createElement('div'); left.className='left';
-      const avatar = document.createElement('div'); avatar.className='avatar';
-
-      avatar.textContent = (contact.name||'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      left.appendChild(avatar);
 
       const radarWrap = document.createElement('div'); radarWrap.className='radar-wrap';
       const cvs = document.createElement('canvas'); cvs.className='radar'; cvs.width = 200; cvs.height = 200;
