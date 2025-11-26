@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Carnet de contacts — Bleu/Vert + Radar</title>
+<style>
+  :root{ --bg:#f6f8fa; --card:#fff; --muted:#6b7280; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;background:var(--bg);color:#111}
+  header{padding:14px 20px;background:linear-gradient(90deg,#0ea5a4, #60a5fa);color:white}
+  header h1{margin:0;font-size:18px}
+  .wrap{display:flex;gap:20px;padding:20px}
+  .left{width:300px}
+  .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+  .alphabet{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .alphabet button{width:28px;height:28px;border-radius:6px;border:1px solid #e6e9ee;background:white;cursor:pointer}
+  .alphabet button.active{background:#111;color:white;border-color:transparent}
+  .new-contact{display:flex;flex-direction:column;gap:8px}
+  .new-contact input[type=text], .new-contact input[type=number], .new-contact textarea, .new-contact select{width:100%;padding:8px;border-radius:8px;border:1px solid #e5e7eb}
+  .contacts-list{margin-top:12px;max-height:560px;overflow:auto;padding-right:6px}
+  .contact-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:8px;border:1px solid #eef2f7;margin-bottom:8px;background:linear-gradient(180deg,rgba(255,255,255,.95), rgba(250,250,250,.95))}
+  .contact-meta{display:flex;gap:10px;align-items:center}
+  .dot{width:14px;height:14px;border-radius:4px}
+  .contact-name{font-weight:600}
+  .main{flex:1}
+  .panel{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .panel .block{background:var(--card);padding:12px;border-radius:12px;min-height:120px}
+  .radar-canvas{width:100%;height:260px}
+  .controls{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .row{display:flex;gap:8px}
+  .row .col{flex:1}
+  .tiny{font-size:12px;color:var(--muted)}
+  .rect-edit{min-height:60px;border-radius:8px;padding:8px;border:1px dashed #dbeafe;background:linear-gradient(180deg,#fff,#f8fafc)}
+  .actions{display:flex;gap:8px;margin-top:8px}
+  button.primary{background:#0ea5a4;color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+  button.ghost{background:transparent;border:1px solid #cbd5e1;padding:8px 12px;border-radius:8px;cursor:pointer}
+  .muted{color:var(--muted)}
+  footer{padding:12px;text-align:center;color:var(--muted);font-size:13px}
+  @media (max-width:900px){.wrap{flex-direction:column}.left{width:100%}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Carnet — fiches colorées + Radar (4 points) + 2 rectangles</h1>
+</header>
+<div class="wrap">
+  <aside class="left">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="tiny">Rechercher par initiale</div>
+          <div class="alphabet" id="alphabet"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="tiny">Contacts: <span id="count">0</span></div>
+        </div>
+      </div>
+
+      <hr style="border:none;height:8px;background:transparent"/>
+
+      <form id="form" class="new-contact" onsubmit="return false">
+        <input required id="name" placeholder="Nom du contact" type="text" />
+
+        <label class="tiny">Couleur de la fiche</label>
+        <select id="color">
+          <option value="blue">Bleu</option>
+          <option value="green">Vert</option>
+        </select>
+
+        <div class="row">
+          <div class="col">
+            <label class="tiny">Point 1 (0-100)</label>
+            <input type="number" id="p1" min="0" max="100" value="50" />
+          </div>
+          <div class="col">
+            <label class="tiny">Point 2 (0-100)</label>
+            <input type="number" id="p2" min="0" max="100" value="50" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label class="tiny">Point 3 (0-100)</label>
+            <input type="number" id="p3" min="0" max="100" value="50" />
+          </div>
+          <div class="col">
+            <label class="tiny">Point 4 (0-100)</label>
+            <input type="number" id="p4" min="0" max="100" value="50" />
+          </div>
+        </div>
+
+        <label class="tiny">Texte rectangle 1</label>
+        <input id="r1" placeholder="Quelques mots..." type="text" />
+        <label class="tiny">Texte rectangle 2</label>
+        <input id="r2" placeholder="Quelques mots..." type="text" />
+
+        <div class="actions">
+          <button id="saveBtn" class="primary">Enregistrer</button>
+          <button id="clearBtn" class="ghost" type="button">Réinitialiser</button>
+        </div>
+      </form>
+
+      <div class="contacts-list" id="contacts"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="tiny">Fiche ouverte</div>
+          <div id="openName" style="font-weight:700;font-size:18px">— Aucune —</div>
+        </div>
+        <div>
+          <button id="deleteBtn" class="ghost">Supprimer</button>
+        </div>
+      </div>
+
+      <hr style="border:none;height:12px;background:transparent"/>
+
+      <div class="panel">
+        <div class="block">
+          <canvas id="radar" class="radar-canvas" width="600" height="400"></canvas>
+          <div class="controls">
+            <div class="tiny">Personnaliser les 4 points (0-100)</div>
+            <div class="row">
+              <div class="col"><input type="number" id="edit_p1" min="0" max="100" value="50" /></div>
+              <div class="col"><input type="number" id="edit_p2" min="0" max="100" value="50" /></div>
+              <div class="col"><input type="number" id="edit_p3" min="0" max="100" value="50" /></div>
+              <div class="col"><input type="number" id="edit_p4" min="0" max="100" value="50" /></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button id="updateRadar" class="primary">Mettre à jour Radar</button>
+              <button id="exportPNG" class="ghost">Exporter PNG</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="block">
+            <div class="tiny">Rectangle 1 (editable)</div>
+            <div id="rect1" class="rect-edit" contenteditable="true">Double-cliquez pour modifier ce texte.</div>
+          </div>
+
+          <div class="block" style="margin-top:12px">
+            <div class="tiny">Rectangle 2 (editable)</div>
+            <div id="rect2" class="rect-edit" contenteditable="true">Double-cliquez pour modifier ce texte.</div>
+          </div>
+
+          <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+            <button id="saveOpen" class="primary">Sauvegarder la fiche</button>
+            <button id="cloneBtn" class="ghost">Dupliquer</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      Les contacts sont stockés localement dans votre navigateur (localStorage). Vous pouvez exporter une fiche en PNG depuis le radar.
+    </footer>
+  </main>
+</div>
+
+<script>
+// === CONFIGURATION SIMPLIFIÉE POUR CRÉER DES FICHES PERSONNALISÉES ===
+// Vous pouvez modifier facilement ce modèle : ajoutez, retirez ou renommez ce que vous voulez.
+// Le reste de l'application s'adapte automatiquement.
+const CONTACT_TEMPLATE =
+    {
+    name: "Alice",
+    color: "blue",
+    radar: [80, 40, 60, 90],
+    rect1: "Calme",
+    rect2: "Réfléchie"
+  },
+  {
+    name: "Benoît",
+    color: "green",
+    radar: [30, 70, 50, 20],
+    rect1: "Dynamique",
+    rect2: "Créatif"
+  }
+];
+
+// --- Helpers & storage ---
+const STORAGE_KEY = 'carnet_contacts_v1';
+let contacts = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+let current = null; // id of opened contact
+
+function saveAll(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts)); renderList(); updateCount(); }
+function uid(){ return 'id_'+Math.random().toString(36).slice(2,9); }
+
+// --- Alphabet bar ---
+const alphabetEl = document.getElementById('alphabet');
+const letters = Array.from(Array(26)).map((_,i)=>String.fromCharCode(65+i));
+letters.forEach(l=>{
+  const btn = document.createElement('button'); btn.textContent = l; btn.onclick = ()=>filterByLetter(l); alphabetEl.appendChild(btn);
+});
+
+function filterByLetter(letter){
+  // highlight
+  Array.from(alphabetEl.children).forEach(b=>b.classList.toggle('active', b.textContent===letter));
+  renderList(letter);
+}
+
+// --- Render list ---
+const contactsEl = document.getElementById('contacts');
+const countEl = document.getElementById('count');
+function renderList(filter){
+  contactsEl.innerHTML='';
+  const list = filter ? contacts.filter(c=>c.name.toUpperCase().startsWith(filter)) : contacts.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  list.forEach(c=>{
+    const it = document.createElement('div'); it.className='contact-item';
+    const meta = document.createElement('div'); meta.className='contact-meta';
+    const dot = document.createElement('div'); dot.className='dot'; dot.style.background = c.color==='green'? '#34d399' : '#60a5fa';
+    const name = document.createElement('div'); name.className='contact-name'; name.textContent = c.name;
+    meta.appendChild(dot); meta.appendChild(name);
+    const actions = document.createElement('div');
+    const open = document.createElement('button'); open.className='ghost'; open.textContent='Ouvrir'; open.onclick = ()=>openContact(c.id);
+    actions.appendChild(open);
+    it.appendChild(meta); it.appendChild(actions);
+    contactsEl.appendChild(it);
+  });
+}
+
+function updateCount(){ countEl.textContent = contacts.length }
+
+// --- Form create ---
+document.getElementById('saveBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('name').value.trim(); if(!name) return alert('Donnez un nom');
+  const c = JSON.parse(JSON.stringify(CONTACT_TEMPLATE));
+  c.id = uid();
+  c.name = name;
+  c.color = document.getElementById('color').value;
+  c.radar = [+p1.value||0,+p2.value||0,+p3.value||0,+p4.value||0];||0,+p2.value||0,+p3.value||0,+p4.value||0], rect1: r1.value||'', rect2: r2.value||'' };
+  contacts.push(c); saveAll(); document.getElementById('form').reset(); // keep defaults
+});
+
+document.getElementById('clearBtn').addEventListener('click', ()=>{ document.getElementById('form').reset(); });
+
+// --- Open / edit ---
+function openContact(id){
+  const c = contacts.find(x=>x.id===id); if(!c) return;
+  current = id;
+  document.getElementById('openName').textContent = c.name;
+  // populate editor
+  document.getElementById('edit_p1').value = c.radar[0];
+  document.getElementById('edit_p2').value = c.radar[1];
+  document.getElementById('edit_p3').value = c.radar[2];
+  document.getElementById('edit_p4').value = c.radar[3];
+  document.getElementById('rect1').textContent = c.rect1 || 'Double-cliquez pour modifier ce texte.';
+  document.getElementById('rect2').textContent = c.rect2 || 'Double-cliquez pour modifier ce texte.';
+  // set color style
+  const dot = document.querySelector('.dot'); if(dot) dot.style.background = c.color==='green'? '#34d399' : '#60a5fa';
+  drawRadar();
+}
+
+// Save open
+document.getElementById('saveOpen').addEventListener('click', ()=>{
+  if(!current) return alert('Aucune fiche ouverte');
+  const c = contacts.find(x=>x.id===current); if(!c) return;
+  c.radar = [+edit_p1.value||0,+edit_p2.value||0,+edit_p3.value||0,+edit_p4.value||0];
+  c.rect1 = document.getElementById('rect1').textContent;
+  c.rect2 = document.getElementById('rect2').textContent;
+  saveAll(); alert('Fiche sauvegardée.');
+});
+
+// Delete
+document.getElementById('deleteBtn').addEventListener('click', ()=>{
+  if(!current) return alert('Aucune fiche ouverte');
+  if(!confirm('Supprimer cette fiche ?')) return;
+  contacts = contacts.filter(c=>c.id!==current);
+  current = null; document.getElementById('openName').textContent='— Aucune —'; saveAll();
+});
+
+// Duplicate
+document.getElementById('cloneBtn').addEventListener('click', ()=>{
+  if(!current) return alert('Aucune fiche ouverte');
+  const c = contacts.find(x=>x.id===current); if(!c) return;
+  const copy = JSON.parse(JSON.stringify(c)); copy.id = uid(); copy.name = c.name + ' (copie)'; contacts.push(copy); saveAll();
+});
+
+// --- Radar drawing ---
+const canvas = document.getElementById('radar'); const ctx = canvas.getContext('2d');
+function drawRadar(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // background grid
+  const cx = canvas.width/2; const cy = 160; const maxR = 120;
+  ctx.save(); ctx.translate(0,0);
+  ctx.lineWidth=1; ctx.strokeStyle='#e6edf3'; ctx.fillStyle='#fff';
+  for(let r=1;r<=4;r++){
+    ctx.beginPath(); ctx.ellipse(cx,cy,(maxR*r)/4,(maxR*r)/4,0,0,Math.PI*2); ctx.stroke();
+  }
+  // axes
+  const labels = ['P1','P2','P3','P4'];
+  for(let i=0;i<4;i++){
+    const ang = -Math.PI/2 + (i*(Math.PI*2)/4);
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(ang)*maxR, cy+Math.sin(ang)*maxR); ctx.stroke();
+    // label
+    const lx = cx+Math.cos(ang)*(maxR+20); const ly = cy+Math.sin(ang)*(maxR+20);
+    ctx.fillStyle='#111'; ctx.font='13px sans-serif'; ctx.textAlign = lx>cx? 'left': lx<cx? 'right':'center'; ctx.textBaseline='middle'; ctx.fillText(labels[i], lx, ly);
+  }
+  // polygon
+  const vals = current ? contacts.find(c=>c.id===current).radar : [+document.getElementById('p1').value||50,+document.getElementById('p2').value||50,+document.getElementById('p3').value||50,+document.getElementById('p4').value||50];
+  // normalize
+  const points = vals.map((v,i)=>{
+    const ang = -Math.PI/2 + (i*(Math.PI*2)/4);
+    const r = Math.max(0,Math.min(100, v))/100 * maxR;
+    return {x: cx+Math.cos(ang)*r, y: cy+Math.sin(ang)*r};
+  });
+  // fill
+  ctx.beginPath(); points.forEach((p,i)=> i===0? ctx.moveTo(p.x,p.y): ctx.lineTo(p.x,p.y)); ctx.closePath();
+  ctx.fillStyle = 'rgba(96,165,250,0.25)'; ctx.fill(); ctx.strokeStyle='rgba(96,165,250,0.9)'; ctx.lineWidth=2; ctx.stroke();
+  // points
+  points.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,5,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill(); ctx.strokeStyle='rgba(96,165,250,0.95)'; ctx.stroke(); });
+  ctx.restore();
+}
+
+// attach update button
+document.getElementById('updateRadar').addEventListener('click', ()=>{
+  if(current){
+    // update preview from edit inputs but do not save to contact until user clicks save
+    drawRadar();
+  } else {
+    drawRadar();
+  }
+});
+
+// export PNG
+document.getElementById('exportPNG').addEventListener('click', ()=>{
+  const url = canvas.toDataURL('image/png');
+  const a = document.createElement('a'); a.href = url; a.download = (current? contacts.find(c=>c.id===current).name : 'radar') + '.png'; a.click();
+});
+
+// initialize
+function init(){ renderList(); updateCount(); drawRadar(); }
+init();
+
+// expose some elements to window for convenience
+const p1 = document.getElementById('p1'), p2 = document.getElementById('p2'), p3 = document.getElementById('p3'), p4 = document.getElementById('p4');
+const r1 = document.getElementById('r1'), r2 = document.getElementById('r2');
+const edit_p1 = document.getElementById('edit_p1'), edit_p2 = document.getElementById('edit_p2'), edit_p3 = document.getElementById('edit_p3'), edit_p4 = document.getElementById('edit_p4');
+
+// keep radar live when edit inputs change
+[edit_p1,edit_p2,edit_p3,edit_p4].forEach(inp=>inp.addEventListener('input', ()=>drawRadar()));
+
+// when there is no opened contact, radar preview uses the form values
+[p1,p2,p3,p4].forEach(inp=>inp.addEventListener('input', ()=>{ if(!current) drawRadar(); }));
+
+</script>
+</body>
+</html>
