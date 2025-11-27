@@ -4,67 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Carte Personnalisable</title>
+
   <style>
     body {
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
+      align-items: flex-start;
+      padding: 20px;
       margin: 0;
       background-color: #f0f0f0;
       font-family: Arial, sans-serif;
+      font-size: 12px; /* 🔽 Police réduite */
     }
 
     #map {
       display: grid;
-      grid-template-columns: repeat(8, 100px);
-      gap: 2px;
+      grid-template-columns: repeat(8, 130px); /* 🔼 Cases plus larges */
+      gap: 4px;
       justify-content: center;
     }
 
     .cell {
-      width: 100px;
-      height: 50px;
+      width: 130px;   /* 🔼 Largeur augmentée */
+      height: 70px;   /* 🔼 Hauteur augmentée */
       display: flex;
       justify-content: center;
       align-items: center;
       background-color: #bebff1;
-
       border: 1px solid #ccc;
       cursor: pointer;
       transition: background-color 0.3s;
+      font-size: 12px; /* 🔽 Police plus petite dans les cases */
     }
-body {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; /* Pour éviter que ça soit tout centré verticalement */
-  padding: 20px;
-  background-color: #f0f0f0;
-  margin: 0;
-}
 
-#map {
-  display: grid;
-  grid-template-columns: repeat(8, 100px);
-  gap: 4px;
-  justify-content: center;
-}
-
-.cell {
-  width: 100px;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #bebff1;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-    
     .cell:hover {
       background-color: #e0e0e0;
     }
+
     #infoBox {
       position: fixed;
       top: 20px;
@@ -74,10 +50,12 @@ body {
       border: 1px solid #ccc;
       display: none;
       max-width: 200px;
+      font-size: 12px; /* cohérent avec la taille globale */
     }
   </style>
 </head>
 <body>
+
 <div id="map"></div>
   <div id="infoBox"></div>
 
@@ -87,7 +65,7 @@ body {
       { label: "Les années collège.", text: "Les années collège.", color: "#bebff1" },
       { label: "‎", text: "Dejeuner péniblement devant M6", color: "#bebff1" },
       { label: "‎", text: "Le cartable me creuse les épaules", color: "#bebff1" },
-      { label: "‎", text: "Collège, ce géant de béton", color: "#bebff1" },
+      { label: "‎", text: "Collège, ce géant en béton", color: "#bebff1" },
       { label: "‎", text: "Vivre au rythme des sonneries", color: "#bebff1" },
       { label: "‎", text: "Un dernier regard vers l'école, perdre ses repères", color: "#bebff1" },
       { label: "‎", text: "Vivre au rythme des sonneries", color: "#bebff1" },
