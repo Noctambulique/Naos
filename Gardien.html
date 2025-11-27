@@ -1,227 +1,95 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Dialogue — Jeu</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dialogue</title>
 <style>
-:root{
-  --bg1:#08101a;
-  --bg2:#04202b;
-  --accent:#00f6ff;
-  --panel:#071826;
-  --glass:rgba(255,255,255,0.03);
-  --text:#dff7fb;
-  --shadow:0 8px 30px rgba(0,0,0,0.7);
-  --mono: "Courier New", Courier, monospace;
-  --size:18px;
-  --radius:12px;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:var(--mono);background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--text);-webkit-font-smoothing:antialiased}
-.app{
-  min-height:100vh;
+body{
+  margin:0;
+  background:#ffffff;
+  font-family:'Courier New', monospace;
   display:flex;
   align-items:flex-end;
   justify-content:center;
-  padding:40px;
-  gap:24px;
-  background-image:
-    radial-gradient(ellipse at 15% 20%, rgba(0,246,255,0.03) 0 120px, transparent 121px),
-    radial-gradient(ellipse at 85% 80%, rgba(255,0,200,0.02) 0 200px, transparent 201px);
+  height:100vh;
+  padding:20px;
 }
-.hud{
-  width:min(1100px,96vw);
-  display:grid;
-  grid-template-columns: 160px 1fr;
-  gap:20px;
-  align-items:end;
-}
-.avatar{
-  height:160px;
-  background:linear-gradient(180deg,#07172a00,#051826);
-  border-radius:16px;
-  padding:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  filter:drop-shadow(0 10px 30px rgba(0,0,0,0.6));
-}
-.avatar .face{
-  width:120px;height:120px;border-radius:12px;background:
-  linear-gradient(120deg,#0ff 0%,#8cf 40%,#3fb 100%);
-  display:flex;align-items:center;justify-content:center;font-weight:700;
-  font-size:36px;color:#022;letter-spacing:2px;text-shadow:0 1px 0 rgba(255,255,255,0.05);
-  transform:skewX(-6deg) rotate(-2deg);
-}
-.panel{
-  background:linear-gradient(180deg, rgba(255,255,255,0.02), var(--panel));
-  border-radius:18px;padding:18px 22px;box-shadow:var(--shadow);
-  position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.03);
-}
-.panel:before{
-  content:"";position:absolute;inset:0;border-radius:18px;pointer-events:none;
-  background:linear-gradient(90deg, rgba(0,246,255,0.02), transparent 30%, rgba(255,0,200,0.01));
-}
-.dialog{
-  min-height:120px;display:flex;flex-direction:column;justify-content:center;gap:12px;
-  padding-right:8px;
+.box{
+  width:100%;
+  max-width:900px;
+  background:#f4f4f4;
+  border:3px solid #000;
+  border-radius:6px;
+  padding:20px;
+  box-shadow:0 0 0 4px #000, 0 0 0 8px #999;
 }
 .speaker{
-  display:flex;align-items:center;gap:12px;font-size:13px;font-weight:700;color:var(--accent);
-  letter-spacing:1px;text-transform:uppercase;
+  font-weight:bold;
+  margin-bottom:10px;
+  font-size:16px;
+  color:#000;
 }
-.bubble{
-  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
-  border-radius:12px;padding:14px 18px;line-height:1.35;font-size:var(--size);
-  box-shadow:0 6px 18px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
-  white-space:pre-wrap;font-family:var(--mono);color:var(--text);
-  position:relative;min-height:72px;
-  -webkit-user-select:none;user-select:none;
-}
-.bubble .text{display:block;opacity:0}
-.prompt{
-  display:flex;justify-content:space-between;align-items:center;margin-top:6px;color:rgba(223,247,251,0.55);
-  font-size:13px;
+.text{
+  white-space:pre-wrap;
+  min-height:80px;
+  color:#000;
+  font-size:17px;
 }
 .hint{
-  display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);
-}
-.enter{
-  display:inline-grid;place-items:center;width:44px;height:28px;border-radius:8px;background:var(--glass);
-  border:1px solid rgba(255,255,255,0.03);backdrop-filter:blur(4px);
-  box-shadow:0 4px 10px rgba(2,8,12,0.6);
-  font-weight:700;color:var(--text);
-  animation:blink 1.2s infinite;
-}
-@keyframes blink{0%{opacity:1}50%{opacity:.25}100%{opacity:1}}
-.progress{
-  height:6px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden;margin-top:12px;
-}
-.progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#9bfffd);transition:width 550ms cubic-bezier(.2,.9,.2,1)}
-.footer{
-  display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12px;color:rgba(223,247,251,0.45);
-}
-.meta{display:flex;gap:12px;align-items:center}
-.timestamp{font-family:var(--mono);opacity:.6}
-.centered{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;
-}
-.vignette{
-  position:absolute;inset:0;pointer-events:none;background:
-  radial-gradient(600px 200px at 50% 100%, rgba(0,0,0,0.45), transparent 30%),
-  linear-gradient(180deg, rgba(0,0,0,0.15), transparent 30%);
-  mix-blend-mode:multiply;
-}
-@media(max-width:720px){
-  .hud{grid-template-columns: 1fr;align-items:stretch}
-  .avatar{order:2;justify-self:center}
+  text-align:right;
+  font-size:13px;
+  color:#444;
+  margin-top:12px;
+  font-weight:bold;
 }
 </style>
 </head>
 <body>
-<div class="app" tabindex="0" id="app">
-  <div class="hud">
-    <div class="avatar">
-      <div class="face">BG</div>
-    </div>
-    <div class="panel" role="region" aria-label="Dialogue">
-      <div class="dialog">
-        <div class="speaker" id="speaker">Protagoniste</div>
-        <div class="bubble" id="bubble">
-          <span class="text" id="text"></span>
-        </div>
-        <div class="progress" aria-hidden="true"><i id="bar"></i></div>
-        <div class="prompt">
-          <div class="hint">Appuyez sur Entrée pour continuer</div>
-          <div class="enter">Entrée</div>
-        </div>
-      </div>
-      <div class="footer">
-        <div class="meta"><span id="lineIndex">0/0</span></div>
-        <div class="timestamp" id="timestamp"></div>
-      </div>
-      <div class="vignette"></div>
-    </div>
-  </div>
+<div class="box">
+  <div class="speaker" id="speaker"></div>
+  <div class="text" id="text"></div>
+  <div class="hint">Entrée</div>
 </div>
+
 <script>
 const lines=[
-  {speaker:"Sergent",text:"Mission : infiltrer la base ennemie.\nRestez discret, caporal."},
-  {speaker:"Caporal",text:"Reçu. J’ai analysé les patrouilles — fenêtre d’action dans 2 minutes."},
-  {speaker:"Sergent",text:"Parfait. Activation du mode ombre.\nNe faites aucun bruit."},
-  {speaker:"Caporal",text:"Compris. Feinte vers le sud, je couvre votre avance."},
-  {speaker:"Sergent",text:"On y va. Bonne chance."}
+  {s:"Garde",t:"Halte. Cette section de la ville est verrouillée."},
+  {s:"Garde",t:"Personne n’entre. Même les  n’ont plus accès."},
+  {s:"Garde",t:"Les raisons ne concernent pas le public.\nFaites demi-tour immédiatement."}
 ];
-let idx=0;
-const app=document.getElementById('app');
-const textEl=document.getElementById('text');
-const speakerEl=document.getElementById('speaker');
-const bar=document.getElementById('bar');
-const lineIndex=document.getElementById('lineIndex');
-const timestamp=document.getElementById('timestamp');
-const TYPE_SPEED=18;
-let typing=false;
-let charIndex=0;
-let currentLine="";
-function showLine(i){
-  if(i<0||i>=lines.length)return;
-  idx=i;
-  speakerEl.textContent=lines[i].speaker;
-  currentLine=lines[i].text;
-  textEl.style.opacity=1;
-  textEl.textContent="";
-  charIndex=0;
-  typing=true;
-  updateProgress(0);
-  tick();
-  lineIndex.textContent=`${i+1}/${lines.length}`;
-  timestamp.textContent=new Date().toLocaleTimeString();
+  
+let i=0, typing=false, pos=0;
+
+function showLine(){
+  const L=lines[i];
+  document.getElementById("speaker").textContent=L.s;
+  const el=document.getElementById("text");
+  el.textContent="";
+  pos=0; typing=true;
+  type(L.t,el);
 }
-function tick(){
+
+function type(str,el){
   if(!typing) return;
-  const next = currentLine.charAt(charIndex++);
-  textEl.textContent += next;
-  updateProgress((charIndex/currentLine.length)*100);
-  if(charIndex < currentLine.length){
-    setTimeout(tick, TYPE_SPEED + Math.random()*6);
-  } else {
-    typing=false;
-    updateProgress(100);
-  }
+  el.textContent=str.slice(0,pos++);
+  if(pos<=str.length) setTimeout(()=>type(str,el),16);
+  else typing=false;
 }
-function updateProgress(p){
-  bar.style.width = Math.max(2, Math.min(100, p)) + "%";
-}
-function advance(){
+
+function next(){
   if(typing){
     typing=false;
-    textEl.textContent = currentLine;
-    updateProgress(100);
+    document.getElementById("text").textContent=lines[i].t;
     return;
   }
-  if(idx < lines.length - 1){
-    showLine(idx+1);
-  } else {
-    showEnd();
-  }
+  i++;
+  if(i<lines.length) showLine();
 }
-function showEnd(){
-  speakerEl.textContent="Système";
-  currentLine="Fin du dialogue.";
-  textEl.textContent=currentLine;
-  updateProgress(100);
-  lineIndex.textContent=`${lines.length}/${lines.length}`;
-}
-document.addEventListener('keydown', (e)=>{
-  if(e.key === "Enter"){
-    e.preventDefault();
-    advance();
-  }
-});
-app.addEventListener('click', ()=>advance());
-showLine(0);
-app.focus();
+
+document.addEventListener("keydown",e=>{ if(e.key==="Enter") next(); });
+
+showLine();
 </script>
 </body>
 </html>
