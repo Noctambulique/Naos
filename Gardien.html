@@ -10,8 +10,8 @@ body{
   background:#ffffff;
   font-family:'Courier New', monospace;
   display:flex;
-  align-items:flex-end;
-  justify-content:center;
+  align-items:center;        /* centrage vertical */
+  justify-content:center;    /* centrage horizontal */
   height:100vh;
   padding:20px;
 }
@@ -21,26 +21,27 @@ body{
   background:#f4f4f4;
   border:3px solid #000;
   border-radius:6px;
-  padding:20px;
+  padding:28px;              /* un peu plus large */
   box-shadow:0 0 0 4px #000, 0 0 0 8px #999;
 }
 .speaker{
   font-weight:bold;
-  margin-bottom:10px;
-  font-size:16px;
+  margin-bottom:14px;
+  font-size:22px;            /* police plus grande */
   color:#000;
 }
 .text{
   white-space:pre-wrap;
-  min-height:80px;
+  min-height:100px;
   color:#000;
-  font-size:17px;
+  font-size:24px;            /* police augmentée */
+  line-height:1.45;
 }
 .hint{
   text-align:right;
-  font-size:13px;
+  font-size:16px;            /* légèrement plus grand */
   color:#444;
-  margin-top:12px;
+  margin-top:14px;
   font-weight:bold;
 }
 </style>
@@ -55,7 +56,7 @@ body{
 <script>
 const lines=[
   {s:"Garde",t:"Halte. Cette section de la ville est verrouillée."},
-  {s:"Garde",t:"Personne n’entre. Même les  n’ont plus accès."},
+  {s:"Garde",t:"Personne n’entre. Même les autorités n’ont plus accès."},
   {s:"Garde",t:"Les raisons ne concernent pas le public.\nFaites demi-tour immédiatement."}
 ];
   
