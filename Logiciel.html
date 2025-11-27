@@ -2,27 +2,33 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rectangles Cliquables</title>
+
+  <!-- Police gamer -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
     body{
       margin:0;
       background:#fafafa;
-      font-family:sans-serif;
+      font-family:'Orbitron', sans-serif;
     }
 
     .rect{
       width:100%;
-      height:140px; /* faible hauteur, long horizontalement */
+      height:140px;
       margin:12px 0;
       background:#eaeaea;
-      overflow:hidden;
       cursor:pointer;
       transition:transform .25s ease, box-shadow .25s ease;
       display:flex;
       align-items:center;
       justify-content:center;
+      font-size:32px;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      color:#111;
     }
 
     .rect:hover{
@@ -30,10 +36,8 @@
       box-shadow:0 6px 20px rgba(0,0,0,0.12);
     }
 
-    .rect img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
+    a{
+      text-decoration:none;
     }
   </style>
 </head>
@@ -42,38 +46,28 @@
 
   <!-- Convertisseur Excel -->
   <a href="Logiciel/Convertisseur Excel.html">
-    <div class="rect">
-      <img src="D hiver/Excel.png" alt="">
-    </div>
+    <div class="rect">Convertisseur Excel</div>
   </a>
 
-  <!-- Rectangle 2 -->
+  <!-- Convertisseur Slash N -->
   <a href="Logiciel/Convertisseur slash N.html">
-    <div class="rect">
-      <img src="D hiver/Convertisseur.png" alt="">
-    </div>
+    <div class="rect">Convertisseur Slash N</div>
   </a>
 
-  <!-- Rectangle 3 -->
+  <!-- Emploi du Temps -->
   <a href="Logiciel/Emploi du Temps.html">
-    <div class="rect">
-      <img src="D hiver/Edt.png" alt="">
-    </div>
+    <div class="rect">Emploi du Temps</div>
   </a>
 
-    <!-- Rectangle 4 -->
+  <!-- EDT 2 -->
   <a href="Logiciel/Edt2">
-    <div class="rect">
-      <img src="D hiver/Edt2.png" alt="">
-    </div>
+    <div class="rect">EDT 2</div>
   </a>
-  
-      <!-- Rectangle 4 -->
+
+  <!-- Radar -->
   <a href="Logiciel/Radar.html">
-    <div class="rect">
-      <img src="D hiver/Radar.png" alt="">
-    </div>
+    <div class="rect">Radar</div>
   </a>
-  
+
 </body>
 </html>
