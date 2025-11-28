@@ -13,7 +13,7 @@
     margin: 0;
     font-family: 'Montserrat', sans-serif;
     background: #000;
-    color: black;
+    color: white;
   }
 
   #map {
@@ -25,7 +25,6 @@
     transition: opacity 0.8s ease;
   }
 
-  /* Canvas pour les traits */
   #lines {
     position: absolute;
     top: 0;
@@ -35,6 +34,7 @@
     pointer-events: none;
   }
 
+  /* ÉTIQUETTES → texte noir */
   .point {
     position: absolute;
     cursor: pointer;
@@ -43,10 +43,11 @@
     border-radius: 8px;
     font-size: 18px;
     transform: translate(-50%, -50%);
-    border: 2px solid #0f0; /* bordure verte */
+    border: 2px solid #0f0;
     white-space: nowrap;
     transition: 0.25s;
     font-weight: 600;
+    color: black;              /* <- TEXTE NOIR ICI */
   }
 
   .point:hover {
@@ -54,7 +55,7 @@
     transform: translate(-50%, -50%) scale(1.07);
   }
 
-  /* Zone de texte finale */
+  /* TEXTE APRÈS CLIC → blanc */
   #textDisplay {
     display: none;
     opacity: 0;
@@ -63,8 +64,9 @@
     font-size: 22px;
     line-height: 1.7;
     white-space: pre-wrap;
+    color: white;               /* <- TEXTE BLANC ICI */
+    background: #000;           /* garde le fond noir propre */
   }
-
 </style>
 </head>
 <body>
@@ -76,7 +78,7 @@
 <div id="textDisplay"></div>
 
 <script>
-/* --- Déclare ici les points et textes --- */
+/* --- Déclare ici les points --- */
 const points = [
      { title: 'Barthes', text: 'L’autre est en état de perpétuel départ, de voyage ; il est, par vocation, migrateur, fuyant ; je suis, moi qui aime, par vocation inverse, sédentaire, immobile, à disposition, en attente, tassé sur place, en souffrance, comme un paquet dans un coin perdu de gare. \n \n Je tiens sans fin à l’absent le discours de son absence ; situation en somme inouïe ; l’autre est absent comme référent, présent comme allocutaire. De cette distorsion singulière, naît une sorte de présent insoutenable ; je suis coincé entre deux temps, le temps de la référence et le temps de l’allocution : tu es parti (de quoi je me plains), tu es là (puisque je m’adresse à toi). Je sais alors ce qu’est le présent, ce temps difficile : un pur morceau d’angoisse\n \n Je m’installe seul, dans un café ; on vient m’y saluer ; je me sens entouré, demandé, flatté. Mais l’autre est absent ; je le convoque en moi même pour qu’il me retienne au bord de cette complaisance mondaine, qui me guette. J’en appelle à sa « vérité » (la vérité dont il me donne la sensation) contre l’hystérie de séduction où je me sens glisser. Je rends l’absence de l’autre responsable de ma mondanité : j’invoque sa protection, son retour : que l’autre apparaisse, qu’il me retire' },
       { title: 'Loin de moi', text: 'René Girard signale un cas particulier de cette identité par procuration, qu’il classe comme variante de ce qu’il appelle la « médiation réciproque » et concerne la coquetterie. On peut résumer ainsi la formule de ce cas : A s’aime en imitant B qui l’aime ; et B à son tour aime A, en imitant A qui s’aime lui-même. \n \n La coquette est  entièrement tributaire de l’autre ; mais l’amant aussi. De tels cas sont  fréquents dans la vie et dans la littérature, par exemple chez Molière et  Marivaux. Le conflit propre à la coquetterie, où A se dérobe afin de perpétuer le sentiment illusoire qu’a B de l’identité autonome de A est ainsi moins un conflit de personnes qu’une trop grande entente, moins l’effet d’une incompatibilité d’humeur que celui d’une trop parfaite identité d’humeur, – contrairement à ce qu’en laisserait croire une observation superficielle. \n \n René Girard analyse très bien la source imitative, et non conflictuelle, de ce conflit : « Le “désespoir” de l’amant et la coquetterie de l’aimée grandissent de concert car les deux sentiments sont copiés l’un sur l’autre. C’est un même désir, toujours plus intense, qui circule entre les deux partenaires. \n \n Si les amants ne sont jamais d’accord, ce n’est pas parce qu’ils sont trop “différents” comme l’affirment le sens commun et les romans sentimentaux, c’est parce qu’ils sont trop semblables l’un à l’autre, c’est parce qu’ils sont tous des copies les uns des autres. » \n \n En bref, et contrairement à ce que prétend un proverbe bien connu, ce qui se ressemble ne s’assemble pas, ceux qui s’entendent sur toute chose n’ont pas vocation à s’entendre entre eux.' },
@@ -92,7 +94,6 @@ const points = [
       { title: 'Ecriture des pensées', text: 'System for Writing: How an Unconventional Approach to Note-Making Can Help You Capture Ideas & Think de Bob Doto présente une vision très large et cohérente de l’écriture en montrant que celle-ci n’est pas simplement un acte de produire du texte, mais un système complet de pensée. Écrire commence par capter des idées, se poursuit en les transformant en notes, puis en les reliant pour créer un réseau dynamique qui nourrit ensuite la rédaction. L’auteur insiste sur le fait que lire, penser, noter et écrire forment une boucle continue, où chaque étape enrichit les autres. Le zettelkasten se trouve au cœur de ce processus : présenté non comme un outil de rangement, mais comme un dispositif vivant destiné à faire émerger des idées, à faire mûrir la pensée, et à aider l’auteur à développer des projets d’écriture de manière organique.\n \n Au centre de ce système se trouvent trois types de notes. Les notes fugitives sont des captures rapides qui évitent de perdre une idée ou une intuition. Les notes de référence extraient des éléments de lectures ou de contenus, mais sans chercher à tout résumer : l’important est de retenir ce qui résonne, même de manière surprenante. Les notes principales, elles, constituent le véritable moteur intellectuel : chacune contient une seule idée formulée avec clarté, reliée à au moins une autre note, et intentionnellement reformulée dans les mots de l’auteur. L’objectif n’est pas de stocker des informations, mais d’engager sa propre pensée et de bâtir un réseau de concepts interconnectés. Ce réseau n’a rien de hiérarchique : les identifiants ne servent qu’à localiser les notes, et non à structurer une classification. Les liens entre notes contribuent à faire émerger des séquences, des grappes d’idées et des zones révélant l’évolution d’un thème.\n \n Le livre met en garde contre une mauvaise utilisation du zettelkasten : croire qu’il peut écrire à la place de l’auteur conduit à des textes incohérents ou désincarnés. Le rôle de la boîte n’est pas de générer automatiquement du contenu, mais de fournir un matériau intellectuel riche qui doit ensuite être réinterprété et reconstruit dans le cadre d’un projet d’écriture. C’est pour cela que l’auteur propose une méthode claire pour transformer le réseau de notes en un texte structuré. Il décrit un processus en plusieurs étapes : vider spontanément ses idées dans un premier plan, développer ces blocs en approfondissant chaque section, découper ce plan en chapitres ou parties cohérentes, puis naviguer constamment entre notes, plan et rédaction. L’écriture devient un aller-retour permanent, où le texte se clarifie au fur et à mesure, porté par la densité croissante des idées.\n \n L’organisation du travail d’écriture occupe également une place importante. L’auteur propose des stratégies pour avancer régulièrement : définir des projets avec des étapes claires, attribuer des dates d’action précises, consigner quotidiennement l’avancement, et maintenir un journal qui documente le processus créatif. Ce suivi renforce la continuité du travail et évite la dispersion. L’ensemble du système vise à inscrire l’auteur dans un cycle créatif plus vaste : lire nourrit l’esprit, les notes transforment la lecture en pensée personnelle, l’écriture matérialise cette pensée, et être lu relance à son tour la dynamique. L’objectif n’est donc pas seulement de produire plus de texte, mais d’entrer dans une relation vivante avec les idées et avec l’expression de soi.\n \n L’ouvrage propose enfin une série de clarifications essentielles : un zettelkasten n’est pas un second cerveau et ne doit pas contenir toute sa vie, mais seulement ce qui soutient la pensée. Il n’est pas nécessaire d’accumuler des milliers de notes : la qualité du travail est déterminée par la manière dont on interagit avec elles, pas par leur nombre. Il n’est pas utile non plus de faire preuve d’originalité à chaque note : c’est la structure globale, les liens et les résonances qui créent une véritable nouveauté intellectuelle. De même, il ne sert à rien de convertir massivement de vieilles notes : mieux vaut commencer frais et laisser un nouveau réseau se former sur la base des besoins de pensée actuels. Dans l’ensemble, le livre propose une vision profonde, méthodique et libératrice de l’écriture, conçue comme un processus continu où capturer, comprendre, relier et exprimer ses idées deviennent les fondations d’une pratique créative durable' }
 ];
 
-/* --- Génération des points --- */
 const map = document.getElementById("map");
 const canvas = document.getElementById("lines");
 const ctx = canvas.getContext("2d");
@@ -122,17 +123,15 @@ points.forEach(point => {
   coords.push({ el, left, top });
 
   el.onclick = () => {
-    /* --- Effet de fondu --- */
     map.style.opacity = "0";
 
     setTimeout(() => {
       map.style.display = "none";
-      const display = document.getElementById("textDisplay");
 
+      const display = document.getElementById("textDisplay");
       display.textContent = point.text.replace(/\\n/g, "\n");
       display.style.display = "block";
 
-      /* Fade in */
       setTimeout(() => {
         display.style.opacity = "1";
       }, 50);
@@ -143,11 +142,11 @@ points.forEach(point => {
   map.appendChild(el);
 });
 
-/* --- Dessin des traits verts entre les points --- */
+/* Traits verts */
 function drawLines() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.lineWidth = 2;
-  ctx.strokeStyle = "rgba(0,255,0,0.7)"; /* vert */
+  ctx.strokeStyle = "rgba(0,255,0,0.7)";
 
   coords.forEach((p1, i) => {
     const x1 = (p1.left / 100) * canvas.width;
