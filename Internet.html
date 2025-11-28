@@ -1,38 +1,53 @@
-
 <!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Grille éditable minimaliste</title>
+
+  <!-- Polices élégantes, rétro-minimalistes -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+
   <style>
-    /* -- Personnalisez ici -- */
+    /* -------------------- STYLE GLOBAL -------------------- */
     :root{
-      --bg: #ffffff; /* fond de la page */
-      --gap: 12px;    /* espace entre cases */
-      --box-size: 140px; /* taille par défaut des cases (width/height) */
-      --radius: 8px;
-      --border: 1px solid rgba(0,0,0,0.06);
-      --shadow: 0 2px 6px rgba(0,0,0,0.04);
-      --font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-      --text-color: #111111;
+      --bg: #faf9f6;                     /* blanc chaud vintage */
+      --gap: 12px;
+      --box-size: 140px;
+      --radius: 10px;
+      --border: 1px solid rgba(60, 50, 40, 0.15);
+      --shadow: 0 3px 10px rgba(0,0,0,0.04);
+      --shadow-hover: 0 5px 16px rgba(0,0,0,0.07);
+      --text-color: #222;
       --muted: rgba(0,0,0,0.45);
+      --font-body: "Inter", sans-serif;
+      --font-title: "Cormorant Garamond", serif;
     }
 
-    html,body{height:100%;}
-    body{
+    html,body{
+      height:100%;
       margin:0;
-      padding:24px;
+      padding:26px;
       background:var(--bg);
-      font-family:var(--font-family);
+      font-family:var(--font-body);
       color:var(--text-color);
       -webkit-font-smoothing:antialiased;
+      position:relative;
+    }
+
+    /* Grain discret pour effet papier vintage */
+    body::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:url("https://uploads-ssl.webflow.com/5fbd9e08b4374f52b8cf23a0/6032e8dce1e52e2b63d72692_noise.png");
+      opacity:0.08;
+      pointer-events:none;
     }
 
     .grid-wrap{
       display:flex;
       justify-content:center;
-      align-items:flex-start;
     }
 
     .grid{
@@ -42,8 +57,9 @@
       gap: var(--gap);
     }
 
+    /* -------------------- CASES -------------------- */
     .box{
-      background:transparent;
+      background:#fffdfb;
       border:var(--border);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
@@ -57,16 +73,24 @@
       user-select:none;
       overflow:hidden;
       position:relative;
+      transition:box-shadow 0.18s ease, transform 0.18s ease, background 0.2s;
     }
 
-    .box:active{transform:translateY(1px);}
+    .box:hover{
+      box-shadow:var(--shadow-hover);
+      transform:translateY(-2px);
+    }
+
+    .box:active{
+      transform:translateY(1px);
+    }
 
     .content{
       width:100%;
       height:100%;
       outline:none;
-      font-size:14px;
-      line-height:1.2;
+      font-size:15px;
+      line-height:1.25;
       text-align:center;
       display:flex;
       align-items:center;
@@ -74,94 +98,97 @@
       padding:6px;
       word-break:break-word;
       color:var(--text-color);
+      font-family:var(--font-title);
+      letter-spacing:0.2px;
     }
 
-    .placeholder{ color:var(--muted); }
+    .placeholder{
+      color:var(--muted);
+      font-style:italic;
+    }
 
-    /* Indicateur discret en bas-right quand la case a une URL */
+    /* Petit indicateur de lien */
     .hint{
       position:absolute;
       right:8px;
       bottom:8px;
       font-size:11px;
       color:var(--muted);
-      opacity:0.9;
+      opacity:0.85;
+      pointer-events:none;
     }
 
-    /* Mode édition visuel: aucune UI supplémentaire, juste une légère bordure accentuée */
-    .editing{ box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.14); }
+    /* Mode édition : ombre plus douce et fond clair */
+    .editing{
+      background:#fffefc;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+      border-color:rgba(0,0,0,0.25);
+    }
 
-    /* Responsive : réduire taille des cases sur petits écrans */
+    /* Responsive */
     @media (max-width:640px){
       :root{ --box-size: 100px; --cols: 3; }
+      .content{ font-size:13px; }
     }
-
   </style>
 </head>
+
 <body>
   <div class="grid-wrap">
     <div id="grid" class="grid" aria-label="Grille de cases éditables"></div>
   </div>
 
   <script>
-    /* -------------------- CONFIGURATION (MODIFIEZ ICI) -------------------- */
+    /* -------------------- CONFIGURATION -------------------- */
     const GRID_CONFIG = {
-      cols: 6,              // nombre de colonnes
-      rows: 4,              // nombre de lignes (utile pour générer un certain nombre de cases)
-      boxSizePx: 140,       // taille des cases (px) -> reflété dans CSS custom property
-      gapPx: 12,            // espacement (px)
+      cols: 6,
+      rows: 4,
+      boxSizePx: 140,
+      gapPx: 12,
     };
 
-    /* Définissez les cases ici. L'ordre correspond à l'ordre dans la grille.
-       id: identifiant unique, title: texte affiché par défaut, url: lien à ouvrir
-       placeholder: texte d'aide si vide. Vous pouvez ajouter d'autres propriétés.
-    */
     const BOXES = [
-      { id: 'b1', title: 'Calendrier', url: 'https://calendar.google.com', placeholder:'Double-clic pour éditer' },
-      { id: 'b2', title: 'Mail', url: 'https://mail.google.com', placeholder:'Double-clic pour éditer' },
-      { id: 'b3', title: 'Reddit', url: 'https://www.reddit.com', placeholder:'Double-clic pour éditer' },
-      { id: 'b4', title: 'Youtube', url: 'https://https://www.youtube.com/', placeholder:'Double-clic pour éditer' },
-      { id: 'b5', title: 'Framapad', url: 'https://framapad.org/abc/fr/', placeholder:'Double-clic pour éditer' },
-      { id: 'b6', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
-      { id: 'b7', title: 'Tool24', url: 'https://tools.pdf24.org/fr/ocr-pdf', placeholder:'Double-clic pour éditer' },
-      { id: 'b8', title: 'GitHub', url: 'https://github.com', placeholder:'Double-clic pour éditer' },
-      { id: 'b9', title: 'Lescan', url: 'https://lelscans.net/scan-one-piece/1084/2', placeholder:'Double-clic pour éditer' },
-      { id: 'b10', title: 'Chatgpt', url: 'https://chatgpt.com', placeholder:'Double-clic pour éditer' },
-      { id: 'b11', title: 'Fmtteam', url: 'https://fmteam.fr/comics/one-punch-man', placeholder:'Double-clic pour éditer' },
+      { id:'b1',  title:'Calendrier', url:'https://calendar.google.com' },
+      { id:'b2',  title:'Mail', url:'https://mail.google.com' },
+      { id:'b3',  title:'Reddit', url:'https://www.reddit.com' },
+      { id:'b4',  title:'Youtube', url:'https://www.youtube.com/' },
+      { id:'b5',  title:'Framapad', url:'https://framapad.org/abc/fr/' },
+      { id:'b6',  title:'GitHub', url:'https://github.com' },
+      { id:'b7',  title:'Tool24', url:'https://tools.pdf24.org/fr/ocr-pdf' },
+      { id:'b8',  title:'GitHub', url:'https://github.com' },
+      { id:'b9',  title:'Lescan', url:'https://lelscans.net/scan-one-piece/1084/2' },
+      { id:'b10', title:'Chatgpt', url:'https://chatgpt.com' },
+      { id:'b11', title:'Fmtteam', url:'https://fmteam.fr/comics/one-punch-man' },
     ];
-    /* ---------------------------------------------------------------------- */
 
-    // Apply CSS variables from config
+    /* -------------------- RESTE DU CODE (INCHANGÉ) -------------------- */
     const root = document.documentElement;
     root.style.setProperty('--cols', GRID_CONFIG.cols);
     root.style.setProperty('--box-size', GRID_CONFIG.boxSizePx + 'px');
     root.style.setProperty('--gap', GRID_CONFIG.gapPx + 'px');
 
-    const gridEl = document.getElementById('grid');
-
-    // Utility: load saved state
     const STORAGE_KEY = 'editable-link-grid:v1';
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-
-    // Build full list up to rows*cols
     const total = GRID_CONFIG.cols * GRID_CONFIG.rows;
     const fullBoxes = [];
+
     for(let i=0;i<total;i++){
-      const fromConfig = BOXES[i] || { id: 'auto_'+i, title: '', url: '', placeholder: 'Double-clic pour éditer' };
+      const fromConfig = BOXES[i] || { id:'auto_'+i, title:'', url:'' };
       const persisted = (saved[fromConfig.id] || {});
       fullBoxes.push({ ...fromConfig, ...persisted });
     }
 
-    // Render grid
+    const gridEl = document.getElementById('grid');
+
     fullBoxes.forEach(box => {
       const el = document.createElement('div');
       el.className = 'box';
       el.dataset.id = box.id;
-      el.dataset.url = box.url || '';
+      el.dataset.url = box.url||'';
 
       const content = document.createElement('div');
       content.className = 'content';
-      content.tabIndex = 0; // focusable
+      content.tabIndex = 0;
       content.innerText = box.title || '';
       if(!box.title) content.classList.add('placeholder');
 
@@ -172,45 +199,32 @@
       el.appendChild(hint);
       gridEl.appendChild(el);
 
-      // Click: ouvrir lien si défini
-      el.addEventListener('click', (ev)=>{
-        // If currently editing, do not open
+      el.addEventListener('click', ()=>{
         if(el.classList.contains('editing')) return;
         const url = el.dataset.url;
-        if(url) {
-          // target blank
-          window.open(url, '_blank');
-        }
+        if(url) window.open(url,'_blank');
       });
 
-      // Double-click: activer édition inline
-      el.addEventListener('dblclick', (ev)=>{
-        enterEditMode(el);
-      });
+      el.addEventListener('dblclick', ()=> enterEditMode(el));
 
-      // Keyboard: Enter to open, E to edit while focused
-      content.addEventListener('keydown', (e)=>{
+      content.addEventListener('keydown', e=>{
         if(e.key === 'Enter'){
           e.preventDefault();
-          // If editing, commit; else open
-          if(el.classList.contains('editing')){
-            exitEditMode(el);
-          } else {
+          if(el.classList.contains('editing')) exitEditMode(el);
+          else {
             const url = el.dataset.url;
-            if(url) window.open(url, '_blank');
+            if(url) window.open(url,'_blank');
           }
         }
-        if(e.key.toLowerCase() === 'e'){
+        if(e.key.toLowerCase()==='e'){
           e.preventDefault();
           enterEditMode(el);
         }
       });
 
-      // Focus out: commit edit if needed
       content.addEventListener('blur', ()=>{
         if(el.classList.contains('editing')) exitEditMode(el);
       });
-
     });
 
     function enterEditMode(el){
@@ -219,7 +233,6 @@
       content.contentEditable = 'true';
       content.classList.remove('placeholder');
       content.focus();
-      // place caret at end
       document.execCommand('selectAll', false, null);
       document.getSelection().collapseToEnd();
     }
@@ -230,58 +243,48 @@
       el.classList.remove('editing');
       content.contentEditable = 'false';
       const newText = content.innerText.trim();
-      if(!newText){
-        content.classList.add('placeholder');
-      }
+      if(!newText) content.classList.add('placeholder');
 
-      // Save title to localStorage under id
       const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
       state[id] = state[id] || {};
       state[id].title = newText;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
-    /* API helper dans window pour personnaliser dynamiquement via la console si besoin */
     window.EditableGrid = {
-      setUrl(id, url){
+      setUrl(id,url){
         const el = document.querySelector('.box[data-id="'+id+'"]');
         if(el) el.dataset.url = url;
-        // update hint
-        const hint = el.querySelector('.hint');
-        // persist url
-        const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
         state[id] = state[id] || {};
         state[id].url = url;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       },
-      setTitle(id, title){
+      setTitle(id,title){
         const el = document.querySelector('.box[data-id="'+id+'"]');
-        if(el){
-          const content = el.querySelector('.content');
-          content.innerText = title;
-          if(!title) content.classList.add('placeholder'); else content.classList.remove('placeholder');
-          const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-          state[id] = state[id] || {};
-          state[id].title = title;
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        }
+        if(!el) return;
+        const content = el.querySelector('.content');
+        content.innerText = title;
+        if(!title) content.classList.add('placeholder'); else content.classList.remove('placeholder');
+        const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+        state[id] = state[id] || {};
+        state[id].title = title;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       },
       clearStorage(){ localStorage.removeItem(STORAGE_KEY); location.reload(); }
     };
 
-    // Pré-remplir state depuis config BOXES (pour url initiales)
     (function persistInitial(){
-      const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
       let changed = false;
       BOXES.forEach(b=>{
         if(!state[b.id]){
-          state[b.id] = { title: b.title || '', url: b.url || '' };
+          state[b.id] = {title:b.title||'', url:b.url||''};
           changed = true;
         }
       });
       if(changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     })();
-
   </script>
 </body>
 </html>
