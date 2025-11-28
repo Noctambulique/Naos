@@ -1,62 +1,84 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Rectangles empilés</title>
-  <style>
-    body {
-      background: #fafafa;
-      color: #333;
-      font-family: Georgia, serif;
-      margin: 0;
-      padding: 40px 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map avec Points + Traits + Effet Fondu</title>
 
-    .stack {
-      width: 420px;
-    }
+<!-- Police élégante -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
 
-    .card {
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-top: -18px;
-      padding: 20px 18px 24px 18px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: #000;
+    color: black;
+  }
 
-    .card:hover {
-      background: #f2f2f2;
-    }
+  #map {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: #111 url("Map/noir.png") center/cover no-repeat;
+    opacity: 1;
+    transition: opacity 0.8s ease;
+  }
 
-    .title {
-      font-weight: bold;
-      font-size: 16px;
-      margin: 0;
-    }
+  /* Canvas pour les traits */
+  #lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
 
-    .content {
-      display: none;
-      font-size: 14px;
-      line-height: 1.5;
-      margin-top: 10px;
-    }
+  .point {
+    position: absolute;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 18px;
+    transform: translate(-50%, -50%);
+    border: 2px solid #0f0; /* bordure verte */
+    white-space: nowrap;
+    transition: 0.25s;
+    font-weight: 600;
+  }
 
-    .card.open .content {
-      display: block;
-    }
-  </style>
+  .point:hover {
+    background: #cfcfcf;
+    transform: translate(-50%, -50%) scale(1.07);
+  }
+
+  /* Zone de texte finale */
+  #textDisplay {
+    display: none;
+    opacity: 0;
+    transition: opacity 1s ease;
+    padding: 40px;
+    font-size: 22px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+
+</style>
 </head>
 <body>
-  <main class="stack" id="stack"></main>
-  <script>
-    const items = [
-      { title: 'Barthes', text: 'L’autre est en état de perpétuel départ, de voyage ; il est, par vocation, migrateur, fuyant ; je suis, moi qui aime, par vocation inverse, sédentaire, immobile, à disposition, en attente, tassé sur place, en souffrance, comme un paquet dans un coin perdu de gare. \n \n Je tiens sans fin à l’absent le discours de son absence ; situation en somme inouïe ; l’autre est absent comme référent, présent comme allocutaire. De cette distorsion singulière, naît une sorte de présent insoutenable ; je suis coincé entre deux temps, le temps de la référence et le temps de l’allocution : tu es parti (de quoi je me plains), tu es là (puisque je m’adresse à toi). Je sais alors ce qu’est le présent, ce temps difficile : un pur morceau d’angoisse\n \n Je m’installe seul, dans un café ; on vient m’y saluer ; je me sens entouré, demandé, flatté. Mais l’autre est absent ; je le convoque en moi même pour qu’il me retienne au bord de cette complaisance mondaine, qui me guette. J’en appelle à sa « vérité » (la vérité dont il me donne la sensation) contre l’hystérie de séduction où je me sens glisser. Je rends l’absence de l’autre responsable de ma mondanité : j’invoque sa protection, son retour : que l’autre apparaisse, qu’il me retire' },
+
+<div id="map">
+  <canvas id="lines"></canvas>
+</div>
+
+<div id="textDisplay"></div>
+
+<script>
+/* --- Déclare ici les points et textes --- */
+const points = [
+     { title: 'Barthes', text: 'L’autre est en état de perpétuel départ, de voyage ; il est, par vocation, migrateur, fuyant ; je suis, moi qui aime, par vocation inverse, sédentaire, immobile, à disposition, en attente, tassé sur place, en souffrance, comme un paquet dans un coin perdu de gare. \n \n Je tiens sans fin à l’absent le discours de son absence ; situation en somme inouïe ; l’autre est absent comme référent, présent comme allocutaire. De cette distorsion singulière, naît une sorte de présent insoutenable ; je suis coincé entre deux temps, le temps de la référence et le temps de l’allocution : tu es parti (de quoi je me plains), tu es là (puisque je m’adresse à toi). Je sais alors ce qu’est le présent, ce temps difficile : un pur morceau d’angoisse\n \n Je m’installe seul, dans un café ; on vient m’y saluer ; je me sens entouré, demandé, flatté. Mais l’autre est absent ; je le convoque en moi même pour qu’il me retienne au bord de cette complaisance mondaine, qui me guette. J’en appelle à sa « vérité » (la vérité dont il me donne la sensation) contre l’hystérie de séduction où je me sens glisser. Je rends l’absence de l’autre responsable de ma mondanité : j’invoque sa protection, son retour : que l’autre apparaisse, qu’il me retire' },
       { title: 'Loin de moi', text: 'René Girard signale un cas particulier de cette identité par procuration, qu’il classe comme variante de ce qu’il appelle la « médiation réciproque » et concerne la coquetterie. On peut résumer ainsi la formule de ce cas : A s’aime en imitant B qui l’aime ; et B à son tour aime A, en imitant A qui s’aime lui-même. \n \n La coquette est  entièrement tributaire de l’autre ; mais l’amant aussi. De tels cas sont  fréquents dans la vie et dans la littérature, par exemple chez Molière et  Marivaux. Le conflit propre à la coquetterie, où A se dérobe afin de perpétuer le sentiment illusoire qu’a B de l’identité autonome de A est ainsi moins un conflit de personnes qu’une trop grande entente, moins l’effet d’une incompatibilité d’humeur que celui d’une trop parfaite identité d’humeur, – contrairement à ce qu’en laisserait croire une observation superficielle. \n \n René Girard analyse très bien la source imitative, et non conflictuelle, de ce conflit : « Le “désespoir” de l’amant et la coquetterie de l’aimée grandissent de concert car les deux sentiments sont copiés l’un sur l’autre. C’est un même désir, toujours plus intense, qui circule entre les deux partenaires. \n \n Si les amants ne sont jamais d’accord, ce n’est pas parce qu’ils sont trop “différents” comme l’affirment le sens commun et les romans sentimentaux, c’est parce qu’ils sont trop semblables l’un à l’autre, c’est parce qu’ils sont tous des copies les uns des autres. » \n \n En bref, et contrairement à ce que prétend un proverbe bien connu, ce qui se ressemble ne s’assemble pas, ceux qui s’entendent sur toute chose n’ont pas vocation à s’entendre entre eux.' },
       { title: 'Ponérologie Politique', text: 'Lorsqu’un conflit survient, nous supposons automatiquement que dans tout conflit une des parties a raison au  moins en partie, que l’autre partie a elle aussi raison en partie, et qu’il est possible de reconnaître quelle partie a le plus raison ou le plus tort. Du fait de notre soumission à des facteurs d’arguments légaux, quand une dispute s’élève nous pensons automatiquement que la vérité se trouve quelque part entre les deux extrêmes.  L’hypothèse que la vérité se trouve entre les témoignages des deux parties fait toujours glisser l’avantage vers la partie qui ment, et non vers celle qui dit la vérité.\n \n Conférence donnée par un pseudo prof (propagande) . 6% transpersonification.\n \n Le livre met en avant l idée que certaines personnalités ayant des traits psychopathiques ou antisociaux accèdent souvent au pouvoir. Ces individus sont dépourvus d empathie, mais dotés d une capacité à manipuler les autres, ce qui leur permet de gravir les échelons politiques ou sociaux.\n \n Phase de stabilité : La société est dirigée par des individus normaux, empathiques et compétents, avec des institutions fonctionnelles.\n Phase d’infiltration : Les personnalités pathologiques (psychopathes, sociopathes) s’infiltrent dans les sphères de pouvoir en manipulant et exploitant les failles sociales ou les crises.\n Établissement de la pathocratie : Les individus pathologiques prennent le contrôle total des institutions. Ils imposent la répression, la propagande et des valeurs déshumanisantes.\n Effondrement : Sous l effet de la mauvaise gestion des pathocrates et des résistances (interne ou externe), le système s’effondre.\n Reconstruction : Les individus sains tentent de rétablir des institutions fonctionnelles et de réparer les traumatismes causés par le régime pathologique.\n \n Schizoïde - Simplifie la réalité quitte à la perdre\n Ces individus sont parfois les premiers à introduire des idées déconnectées des réalités humaines et sociales, mais qui semblent intellectuellement séduisantes.\n \n Paranoïdes - Vont l imposer\n Les paranoïaques jouent un rôle crucial dans l’étape d’infiltration et de consolidation d’un régime pathologique. Leur méfiance et leur agressivité les poussent à créer des climats de peur et de division.\n \n Psycho - Vont s en ressaisir\n Ils reprennent le pouvoir en chassant les paranoïdes.\n \n Que faire contre le mal ? Comprendre et attendre.' },
       { title: 'Ripley', text: 'Cet homme devait avoir une quarantaine d’années lors de notre rencontre. Il était arrivé depuis plus de six mois au Café social lorsque nous échangeâmes quelques mots pour la première fois, après qu’il m’ait spontanément interpellé par un : « Hé ! Paraît que c’est toi le nouveau ! » Il émanait de lui une forme d’entrain, une aisance relationnelle, que sa posture physique et sa musculature confortaient. L’impression générale qui se dégageait de ce premier échange était qu’une grande assurance l’habitait.\n \n Monsieur Ripley semblait animé par un besoin profond : de nature relationnelle. Mais le mode de lien qu’il engageait avec les gens avait un caractère remarquable. \n \n  Il se voulait par exemple expert en économie et commercial de talent et déclara un moment exercer un emploi de vendeur de téléphonie mobile (le téléphone portable faisait à cette époque son apparition) où il expliquait gagner des fortunes ; avant d’annoncer, quelque temps plus tard, avoir démissionné de ce poste pour pouvoir faire « de meilleures affaires ». \n \n Pour démontrer ses talents de financier, il m’avait, un jour, donné un cours sur la bourse, dont la complexité et la longueur n’eurent d’égal que mon scepticisme à l’égard de la logique de ses théories. \n \n Ainsi, Monsieur Ripley, se mesurant constamment à ses compagnons dont il faisait des êtres faibles en comparaison de lui, apparaissait-il avide d’un certain rapport de force, comme s’il fallait qu’il soit le « grand » et les autres des « petits ». Or, cette posture dans laquelle il tentait de placer tout un chacun suscitait beaucoup de méfiance. \n \n En fait, Monsieur Ripley, adulé à son arrivée dans le lieu six mois plus tôt, avait, depuis que les gens s’étaient habitués à lui, perdu leur confiance. Tout le monde, des professionnels aux usagers, s’accordait à dire qu’il était « mythomane ». Ce qualificatif révélait le degré d’agressivité qu’avait suscité cette façon particulière de chercher à « être aimé ». Son attitude lui était devenue nuisible au point d’en faire le repoussoir du groupe.\n \n À présent, les gens semblaient devenus phobiques à l’égard de Monsieur Ripley, sa tendance au mensonge lui ayant valu de devenir l’objet d’un rejet manifeste. Elle révélait à la fois l’existence de sa soif narcissique et celle d’un lien psychiquement coûteux pour les gens qui l’entouraient. Ces derniers ressentaient le sentiment d’être utilisés pour étancher son besoin de reconnaissance. À travers ses mensonges, c’est en effet une étrange manière d’assouvir son avidité relationnelle qui semblait transparaître. \n \n Le mensonge qui va être décrit commence lorsque Monsieur Ripley vint me solliciter pour une demande spéciale : il lui fallait des feuilles à petits carreaux grand format. Sa manière surprenante et directe de m’interpeller laissait à penser qu’il nourrissait un dessein de la plus grande importance. Il fallait, dit-il avec empressement, qu’il dessine des plans. Ces paroles une fois prononcées, il me fixa intensément, comme s’il attendait une question de ma part. L’œil scrutateur avec lequel il observait ma réaction signait son attente que je le questionne sur le motif de sa requête. Posté face à cette énigmatique demande, je l’interrogeais sur ce fameux plan à propos duquel il était venu me solliciter. « Tu dois dessiner des plans ? » demandais-je, sans doute un peu interloqué. « Oui, répondit-il spontanément, car je dois faire le plan d’une éolienne à géométrie variable…  Tu dois savoir ce que c’est qu’une éolienne ? » Là-dessus, il enchaîna des explications, nourries par une quantité impressionnante de détails techniques concernant les divers usages d’une éolienne. \n \n Durant ce « cours », prononcé d’un air magistral, son regard restait cramponné au mien, guettant avidement la moindre de mes réactions. Et ce jusqu’à la conclusion : « L’éolienne que je vais mettre au point est différente… » Le silence qui suivit paraissait être savouré par Monsieur Ripley, qui semblait désireux de m’intriguer avec le caractère exceptionnel de cet appareil. Il poursuivit son descriptif technique : « Une éolienne normale produit 40 % d’électricité… », puis laissa s’amorcer un moment de suspense avant d’enchaîner : « …40 % par rapport à une centrale nucléaire ». Puis, il augmenta le débit des informations délivrées, me faisant définitivement perdre le fil de son discours. Assis en face de lui, je ne recevais plus ses paroles, qui semblaient à présent glisser sur mon écoute et ne résonnaient plus autrement que comme une sorte de flot d’onomatopées vide de tout sens. \n \n Ne saisissant plus le débit continu d’explications dont il semblait m’assaillir, j’avais effectivement la sensation d’être réduit à néant. Aussi, comme pour lutter contre le sentiment d’être noyé par cette logorrhée, je m’accrochais à une phrase, perdue dans un amas de bruits : « Tu sais, un champ d’éoliennes entier produit 40 % d’électricité de moins qu’une centrale nucléaire. Alors que l’éolienne à géométrie variable que j’ai conçue en produit autant. » « Mais c’est quoi le principe de géométrie variable ? » lui demandais-je. \n \n « Tu sais, je ne veux pas commercialiser mon invention, je veux juste faire les plans pour qu’elle puisse être construite. J’ai des amis qui ont monté une association en Afrique. Tu sais, là-bas, produire de l’électricité et extraire de l’eau sera bien utile. D’autant plus qu’avec mon système, extraire de l’eau à dix mètres ne coûtera que cinquante francs… Tu sais que j’étais plombier avant (il avait évoqué beaucoup de professions différentes), eh bien je me sers simplement d’un siphon comme celui-ci (il indiqua d’un geste le lavabo en face de lui) ».  \n \n Quelque chose s’était produit qui, au début, nous avait liés et semblait à présent nous séparer.\n \n Les membres de l’équipe avaient également signalé assez tôt la suspicion que provoquait cet homme. Il était conseillé de s’en « méfier », et ne « pas trop l’écouter ». Les membres de l’équipe se plaignaient du fait qu’ils ne supportaient plus « l’impression d’être pris pour des imbéciles ».\n \n  L’ostracisme impalpable que Monsieur Ripley pouvait ressentir autour de lui devait probablement être la source d’un grand malaise. \n \n Cette rupture signe à la fois l’échec de ces personnes à faire entendre leur souffrance et celui de notre capacité à les contenir, comme si leur parcours ne pouvait être qu’un continuel recommencement, comme si le problème intérieur qui les poussait à mentir les obligeait continuellement à prendre le chemin de l’errance pour rencontrer de nouvelles personnes dans de nouveaux lieux, jusqu’à ce que leur crédibilité soit à nouveau mise à mal. \n \n On peut considérer que « le projet d’éolienne » dont fit part Monsieur Ripley contenait des éléments significatifs de sa solitude et de son besoin d’être réparé. En parlant d’aider l’Afrique (un continent qui souffre) avec son éolienne, Monsieur Ripley pourrait avoir inconsciemment exprimé son attente que quelqu’un vienne le secourir. Dans cette optique, sa souffrance et ses espoirs se seraient dévoilés dans les linéaments fantasmatiques de sa parole. \n \n Par-delà le dire, le sujet ferait partager ses affects avec ceux qu’il trompe. Les éprouvés dérangeants que ferait naître la situation dite de méprise auraient un caractère significatif. En trompant ses interlocuteurs, le sujet se « raconterait » à l’endroit où sa parole échoue à remplir cet office. Autrement dit, la manière dont l’individu manipule l’environnement signifierait la présence du problème qu’il tente de résoudre. \n \n Sans doute notre sentiment d’impuissance consécutif à la situation de méprise que Monsieur Ripley s’efforçait de créer était-il similaire à celui qu’il ressentait au fond de lui. Cette défense qui consiste à tromper l’autre indique en cela la vulnérabilité que le sujet cache. \n \n L’agressivité dont nous faisions état à l’égard de Monsieur Ripley aurait fait écho à sa souffrance.' },
@@ -68,37 +90,84 @@
       { title: 'Précis de décomposition', text: 'Toute expérience capitale est néfaste : les couches de l’existence manquent d’épaisseur ; celui qui les fouille, archéologue du cœur et de l’être, se trouve, au bout de ses recherches, devant des profondeurs vides. Il regrettera en vain la parure des apparences. C’est ainsi que les Mystères antiques, révélations prétendues des secrets ultimes, ne nous ont rien légué en fait de connaissance. Les initiés sans doute étaient tenus de n’en rien transmettre ; il est cependant inconcevable que dans le nombre il ne se soit trouvé un seul bavard ; quoi de plus contraire à la nature humaine qu’une telle obstination dans le secret ? C’est que des secrets, il n’y en avait point ; il y avait des rites et des frissons. Les voiles écartés, que pouvaient-ils découvrir sinon des abîmes sans conséquence ? Il n’y a d’initiation qu’au néant – et au ridicule d’être vivant.\n \n -\n \n C’est l’impossibilité de pleurer qui entretient en nous le goût des choses, et les fait exister encore : elle nous empêche d’en épuiser la saveur et de nous en détourner. Quand, sur tant de routes et de rivages, nos yeux refusaient de se noyer en eux-mêmes, ils préservaient par leur sécheresse l’objet qui les émerveillait. Nos larmes gaspillent la nature, comme nos transes, Dieu… Mais à la fin, elles nous gaspillent nous-mêmes. Car nous ne sommes que par le refus de donner libre cours à nos désirs suprêmes : les choses qui entrent dans la sphère de notre admiration ou de notre tristessen’y demeurent que parce que nous ne les avons ni sacrifiées ni bénies de nos adieux liquides. … Et c’est ainsi qu’après chaque nuit, nous retrouvant en face d’un jour nouveau, l’irréalisable nécessité de le combler nous transporte d’effroi ; et, dépaysés dans la lumière, comme si le monde venait de s’ébranler, d’inventer son Astre, nous fuyons les larmes – dont une seule suffirait à nous évincer du temps.\n \n -\n \n Dans tout homme sommeille un prophète, et quand il s’éveille il y a un peu plus de mal dans le monde… La folie de prêcher est si ancrée en nous qu’elle émerge de profondeurs inconnues à l’instinct de conservation. Chacun attend son moment pour proposer quelque chose : n’importe quoi. Il a une voix : cela suffit. Nous payons cher de n’être ni sourds ni muets… Des boueux aux snobs, tous dépensent leur générosité criminelle, tous distribuent des recettes de bonheur, tous veulent diriger les pas de tous : la vie en commun en devient intolérable, et la vie avec soi-même plus intolérable encore : lorsqu’on n’intervient point dans les affaires des autres, on est si inquiet des siennes que l’on convertit son « moi » en religion, ou, apôtre à rebours, on le nie : nous sommes victimes du jeu universel…' },
       { title: 'Quantified Self', text: ' En 1664, Charles 2 d Angleterre se pesait plusieurs fois par jour pour observer les variations de son corps selon les activités : avant et après avoir dormi, joué au tennis, dîné, ou monté à cheval. Il constatait par exemple qu’il perdait environ deux livres après une partie de tennis, avant de regagner ce poids en buvant deux verres de liquide.\n \n Dans un petit carnet, Benjamin Franklin notait chaque jour ses écarts de conduite morale selon un tableau des vertus (tempérance, sincérité, etc.), marquant d’un point noir chaque faute commise.\n \n Parmi les figures marquantes de l’autodocumentation extrême, on peut citer Anaïs Nin (20 ème siecle), qui a tenu un journal quotidien pendant soixante-trois ans, façonnant une œuvre immense et introspective à travers laquelle elle a exploré son monde intérieur et ses relations.\n \n    À un autre niveau d’obsession, Robert William Shields a rédigé, entre 1972 et 1997, un journal intime estimé à 37,5 millions de mots. Pendant cinq ans, il y enregistrait minutieusement, toutes les cinq minutes, des données personnelles : température corporelle, tension artérielle, prise de médicaments, détails physiologiques, rêves – au point de ne jamais dormir plus de quatre heures d’affilée. Une vie entièrement mise en écriture, presque en temps réel.\n \n  Quantified Self » (QS) est un mouvement né en Californie à la fin des années 2000 autour de l’automesure des individus à l’aide de technologies numériques. Ce mouvement prône la « connaissance de soi par les chiffres ».\n \n    Sur un registre plus visuel et analytique, Nicholas Felton a créé une série de « Feltron Annual Reports », où il quantifie et visualise chaque aspect de son année (déplacements, lectures, chansons écoutées, relations sociales). Ces rapports, sous forme d infographies et de cartes élégantes, transforment la vie personnelle en un objet esthétique et compréhensible. Un modèle pionnier du quantified self devenu culte.\n \n    Enfin, plus collaboratif et émotionnel, l’expérience We Feel Fine recueille automatiquement des phrases contenant l’expression "I feel" postées sur Internet, et les organise en visualisations interactives. Ce "sismographe émotionnel" collectif cartographie les états d’âme du monde en temps réel, permettant d’explorer les sentiments par thèmes, lieux ou couleurs.' },
       { title: 'Ecriture des pensées', text: 'System for Writing: How an Unconventional Approach to Note-Making Can Help You Capture Ideas & Think de Bob Doto présente une vision très large et cohérente de l’écriture en montrant que celle-ci n’est pas simplement un acte de produire du texte, mais un système complet de pensée. Écrire commence par capter des idées, se poursuit en les transformant en notes, puis en les reliant pour créer un réseau dynamique qui nourrit ensuite la rédaction. L’auteur insiste sur le fait que lire, penser, noter et écrire forment une boucle continue, où chaque étape enrichit les autres. Le zettelkasten se trouve au cœur de ce processus : présenté non comme un outil de rangement, mais comme un dispositif vivant destiné à faire émerger des idées, à faire mûrir la pensée, et à aider l’auteur à développer des projets d’écriture de manière organique.\n \n Au centre de ce système se trouvent trois types de notes. Les notes fugitives sont des captures rapides qui évitent de perdre une idée ou une intuition. Les notes de référence extraient des éléments de lectures ou de contenus, mais sans chercher à tout résumer : l’important est de retenir ce qui résonne, même de manière surprenante. Les notes principales, elles, constituent le véritable moteur intellectuel : chacune contient une seule idée formulée avec clarté, reliée à au moins une autre note, et intentionnellement reformulée dans les mots de l’auteur. L’objectif n’est pas de stocker des informations, mais d’engager sa propre pensée et de bâtir un réseau de concepts interconnectés. Ce réseau n’a rien de hiérarchique : les identifiants ne servent qu’à localiser les notes, et non à structurer une classification. Les liens entre notes contribuent à faire émerger des séquences, des grappes d’idées et des zones révélant l’évolution d’un thème.\n \n Le livre met en garde contre une mauvaise utilisation du zettelkasten : croire qu’il peut écrire à la place de l’auteur conduit à des textes incohérents ou désincarnés. Le rôle de la boîte n’est pas de générer automatiquement du contenu, mais de fournir un matériau intellectuel riche qui doit ensuite être réinterprété et reconstruit dans le cadre d’un projet d’écriture. C’est pour cela que l’auteur propose une méthode claire pour transformer le réseau de notes en un texte structuré. Il décrit un processus en plusieurs étapes : vider spontanément ses idées dans un premier plan, développer ces blocs en approfondissant chaque section, découper ce plan en chapitres ou parties cohérentes, puis naviguer constamment entre notes, plan et rédaction. L’écriture devient un aller-retour permanent, où le texte se clarifie au fur et à mesure, porté par la densité croissante des idées.\n \n L’organisation du travail d’écriture occupe également une place importante. L’auteur propose des stratégies pour avancer régulièrement : définir des projets avec des étapes claires, attribuer des dates d’action précises, consigner quotidiennement l’avancement, et maintenir un journal qui documente le processus créatif. Ce suivi renforce la continuité du travail et évite la dispersion. L’ensemble du système vise à inscrire l’auteur dans un cycle créatif plus vaste : lire nourrit l’esprit, les notes transforment la lecture en pensée personnelle, l’écriture matérialise cette pensée, et être lu relance à son tour la dynamique. L’objectif n’est donc pas seulement de produire plus de texte, mais d’entrer dans une relation vivante avec les idées et avec l’expression de soi.\n \n L’ouvrage propose enfin une série de clarifications essentielles : un zettelkasten n’est pas un second cerveau et ne doit pas contenir toute sa vie, mais seulement ce qui soutient la pensée. Il n’est pas nécessaire d’accumuler des milliers de notes : la qualité du travail est déterminée par la manière dont on interagit avec elles, pas par leur nombre. Il n’est pas utile non plus de faire preuve d’originalité à chaque note : c’est la structure globale, les liens et les résonances qui créent une véritable nouveauté intellectuelle. De même, il ne sert à rien de convertir massivement de vieilles notes : mieux vaut commencer frais et laisser un nouveau réseau se former sur la base des besoins de pensée actuels. Dans l’ensemble, le livre propose une vision profonde, méthodique et libératrice de l’écriture, conçue comme un processus continu où capturer, comprendre, relier et exprimer ses idées deviennent les fondations d’une pratique créative durable' }
-        ];
+];
 
-    function formatText(raw){
-      raw = String(raw || '');
-      const pars = raw.split('\n\n').map(p => p.replace(/\n/g, '<br>'));
-      return pars.map(p => `<p>${p}</p>`).join('');
+/* --- Génération des points --- */
+const map = document.getElementById("map");
+const canvas = document.getElementById("lines");
+const ctx = canvas.getContext("2d");
+let coords = [];
+
+function resizeCanvas() {
+  canvas.width = map.clientWidth;
+  canvas.height = map.clientHeight;
+}
+resizeCanvas();
+window.onresize = () => {
+  resizeCanvas();
+  drawLines();
+};
+
+points.forEach(point => {
+  const el = document.createElement("div");
+  el.className = "point";
+  el.textContent = point.title;
+
+  const left = 10 + Math.random() * 80;
+  const top = 10 + Math.random() * 80;
+
+  el.style.left = left + "%";
+  el.style.top = top + "%";
+
+  coords.push({ el, left, top });
+
+  el.onclick = () => {
+    /* --- Effet de fondu --- */
+    map.style.opacity = "0";
+
+    setTimeout(() => {
+      map.style.display = "none";
+      const display = document.getElementById("textDisplay");
+
+      display.textContent = point.text.replace(/\\n/g, "\n");
+      display.style.display = "block";
+
+      /* Fade in */
+      setTimeout(() => {
+        display.style.opacity = "1";
+      }, 50);
+
+    }, 800);
+  };
+
+  map.appendChild(el);
+});
+
+/* --- Dessin des traits verts entre les points --- */
+function drawLines() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "rgba(0,255,0,0.7)"; /* vert */
+
+  coords.forEach((p1, i) => {
+    const x1 = (p1.left / 100) * canvas.width;
+    const y1 = (p1.top / 100) * canvas.height;
+
+    for (let j = i + 1; j < coords.length; j++) {
+      const p2 = coords[j];
+      const x2 = (p2.left / 100) * canvas.width;
+      const y2 = (p2.top / 100) * canvas.height;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
     }
+  });
+}
 
-    const stack = document.getElementById('stack');
+drawLines();
+</script>
 
-    items.forEach((it, idx) => {
-      const card = document.createElement('article');
-      card.className = 'card';
-
-      const title = document.createElement('div');
-      title.className = 'title';
-      title.textContent = it.title || `Carte ${idx+1}`;
-
-      const content = document.createElement('div');
-      content.className = 'content';
-      content.innerHTML = formatText(it.text);
-
-      card.appendChild(title);
-      card.appendChild(content);
-
-      card.addEventListener('click', () => {
-        card.classList.toggle('open');
-      });
-
-      stack.appendChild(card);
-    });
-  </script>
 </body>
 </html>
