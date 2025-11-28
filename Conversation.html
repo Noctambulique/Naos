@@ -4,22 +4,105 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Colonnes minimalistes</title>
+
+  <!-- Police poétique -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet">
+
   <style>
-    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-    body{padding:24px;color:#111;background:#fff}
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      font-family:'Cormorant Garamond', serif;
+    }
 
-    .columns{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-    .col{padding:8px}
-    .title{font-weight:600;font-size:18px;margin-bottom:12px}
-    .line{margin-bottom:8px;cursor:pointer;display:block}
+    body{
+      padding:30px;
+      background:#faf7f2;
+      color:#111;
+      font-size:20px;
+    }
 
-    /* Vue du texte complet */
-    .reader{position:fixed;inset:0;background:#fff;display:none;align-items:center;justify-content:center;padding:40px;z-index:9999}
-    .reader.open{display:flex}
-    .reader .card{max-width:900px;max-height:90vh;overflow:auto;font-size:20px;line-height:1.5}
-    .close{position:absolute;top:16px;right:16px;font-size:28px;border:0;background:transparent;cursor:pointer}
+    .columns{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:32px;
+    }
 
-    @media(max-width:700px){.columns{grid-template-columns:1fr}}
+    .col{
+      padding:8px;
+    }
+
+    .title{
+      font-size:24px;
+      font-weight:500;
+      margin-bottom:14px;
+      letter-spacing:0.5px;
+      text-transform:uppercase;
+    }
+
+    .line{
+      margin-bottom:10px;
+      cursor:pointer;
+      display:block;
+      font-size:20px;
+      opacity:0.9;
+      transition:0.2s ease;
+    }
+
+    .line:hover{
+      opacity:1;
+      padding-left:6px;
+    }
+
+    /* Lecteur */
+    .reader{
+      position:fixed;
+      inset:0;
+      background:rgba(250,247,242,0.95);
+      backdrop-filter:blur(4px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:40px;
+      z-index:9999;
+      opacity:0;
+      transition:opacity .35s ease;
+    }
+
+    .reader.open{
+      display:flex;
+      opacity:1;
+    }
+
+    .reader .card{
+      max-width:850px;
+      max-height:85vh;
+      overflow:auto;
+      font-size:26px;
+      line-height:1.55;
+      padding:20px;
+      border-radius:6px;
+    }
+
+    .close{
+      position:absolute;
+      top:18px;
+      right:22px;
+      font-size:34px;
+      border:0;
+      background:transparent;
+      cursor:pointer;
+      opacity:0.7;
+      transition:0.2s;
+    }
+    .close:hover{opacity:1;}
+
+    @media(max-width:700px){
+      .columns{grid-template-columns:1fr}
+      .title{font-size:22px}
+      .line{font-size:20px}
+    }
   </style>
 </head>
 <body>
@@ -31,12 +114,12 @@
       <span class="line" data-full="Texte explicatif 1.">De soi</span>
     </section>
 
-            <section class="col">
+    <section class="col">
       <div class="title">Conscience</div>
       <span class="line" data-full="Information liée à l’élément X.">Chercher les ambiguités</span>
       <span class="line" data-full="Etudier la solid.">Parler des rêves</span>
       <span class="line" data-full="Etudier la solid.">Comprendre pourquoi on fait ce qu'on fait</span>
-        </section>
+    </section>
 
     <section class="col">
       <div class="title">Pro-Conscience</div>
@@ -49,7 +132,7 @@
       <span class="line" data-full="Texte explicatif 1.">????</span>
     </section>
 
-        <section class="col">
+    <section class="col">
       <div class="title">Force</div>
       <span class="line" data-full="Information liée à l’élément X.">Contre-Intuitif</span>
     </section>
@@ -60,7 +143,6 @@
       <span class="line" data-full="Etudier la solidité des connaissances, le bien et le mal, les questions existentielles.">Vibes paradox</span>
     </section>
 
-    
   </div>
 
   <div class="reader" id="reader">
@@ -73,8 +155,15 @@
   const readerCard = document.getElementById('readerCard');
   const closeReader = document.getElementById('closeReader');
 
-  function openReader(html){ readerCard.innerHTML = html; reader.classList.add('open'); }
-  function closeReaderFn(){ reader.classList.remove('open'); }
+  function openReader(html){
+    readerCard.innerHTML = html;
+    reader.classList.add('open');
+  }
+
+  function closeReaderFn(){
+    reader.classList.remove('open');
+  }
+
   closeReader.onclick = closeReaderFn;
 
   document.querySelectorAll('.line').forEach(el=>{
@@ -84,7 +173,9 @@
     };
   });
 
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeReaderFn(); });
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape') closeReaderFn();
+  });
 </script>
 
 </body>
