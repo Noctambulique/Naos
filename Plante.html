@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Jardin de Basile</title>
 
+  <!-- Polices raffinées -->
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Merriweather:wght@300;400&display=swap" rel="stylesheet">
 
   <style>
@@ -24,6 +25,9 @@
       letter-spacing:0.4px;
     }
 
+    body.fade{opacity:0}
+
+    /* --- IMAGE EN HAUT --- */
     #banniere{
       width:100%;
       max-height:25vh;
@@ -34,41 +38,49 @@
 
     main{
       width:100%;
-      padding:4vh 2vw; /* RAPPROCHE LES COLONNES */
+      padding:4vh 6vw;
+      transition:opacity .5s ease;
       text-align:center;
     }
 
     .grid{
       display:grid;
       grid-template-columns:repeat(var(--cols),1fr);
-      gap:2px; /* COLONNES TRÈS RAPPROCHÉES */
+      gap:24px;
     }
 
     .word{
       background:transparent;
       border:0;
-      padding:4px; /* TEXTE PLUS PROCHE */
+      padding:24px;
       cursor:pointer;
-      font-size:1.45rem;
+      outline:none;
+      font-size:1.55rem;
       font-family:"EB Garamond",serif;
       transition:opacity .3s,transform .25s;
       letter-spacing:0.6px;
     }
+    .word:active{transform:scale(.97)}
+    .word.fade{opacity:.45}
 
     #detail{
       display:none;
       flex-direction:column;
       align-items:center;
+      justify-content:flex-start;
       padding:5vh 8vw;
+      animation:fadeIn .6s ease;
+      width:100%;
+      height:100%;
       text-align:center;
     }
 
     #detail img{
       max-width:100%;
-      max-height:50vh; /* IMAGE PLUS PETITE */
+      max-height:60vh;
       object-fit:contain;
       border-radius:6px;
-      margin:20px 0 35px 0;
+      margin:25px 0;
     }
 
     #detail p{
@@ -78,6 +90,7 @@
       letter-spacing:0.4px;
     }
 
+    /* Flèche retour */
     #retour{
       position:absolute;
       top:20px;
@@ -86,20 +99,30 @@
       border:none;
       font-size:1.3rem;
       cursor:pointer;
+      font-family:inherit;
       color:#111;
       display:flex;
       align-items:center;
       gap:6px;
+      transition:opacity .3s;
     }
+    #retour:hover{opacity:0.7}
     #retour::before{
       content:"←";
+      font-size:1.3rem;
     }
+
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
   </style>
 </head>
-
 <body>
+
   <main id="main">
-    <img id="banniere" src="D hiver/Jardin de Basile.png" alt="bannière" />
+
+    <!-- AJOUT : image personnalisable en haut -->
+    <img id="banniere" src="images/mon_image.jpg" alt="bannière" />
+
     <div id="grid" class="grid" style="--cols:2"></div>
   </main>
 
@@ -122,9 +145,7 @@
       { mot: 'Ciboulette', texte: 'Ciboulette', image: 'plante/Ciboulette.JPG' },
       { mot: 'Salvina', texte: 'Salvina', image: 'plante/Salvina.JPG' },
       { mot: 'Trèfle Pourpre', texte: 'Trèfle Pourpre', image: 'plante/Trèfle Pourpre.JPG' },
-      { mot: 'Poireau', texte: 'Poireau', image: 'plante/Poireau.JPG' },
-      { mot: 'Avocat', texte: 'Avocat', image: 'D hiver/Screenshot_20240909_015144_Photos.jpg' },
-      { mot: 'Oignon', texte: 'Oignon', image: 'D hiver/Screenshot_20240909_015011_Photos.jpg' }
+      { mot: 'Poireau', texte: 'Poireau', image: 'plante/Poireau.JPG' }
     ];
 
     function genererMots() {
@@ -144,12 +165,22 @@
       const btn = e.target.closest('.word');
       if (!btn) return;
 
+      btn.classList.add('fade');
+      setTimeout(() => btn.classList.remove('fade'), 350);
+
       main.style.opacity = 0;
 
       setTimeout(() => {
         main.style.display = 'none';
         texteDetail.textContent = btn.dataset.text;
-        imgDetail.src = btn.dataset.image;
+
+        if (btn.dataset.image) {
+          imgDetail.src = btn.dataset.image;
+          imgDetail.style.display = 'block';
+        } else {
+          imgDetail.style.display = 'none';
+        }
+
         detail.style.display = 'flex';
       }, 380);
     });
