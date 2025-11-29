@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Carrés minimalistes</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#000000;
+      --square-bg:#ffffff;
+      --square-border:#000;
+      --square-size:130px;
+      --gap:14px;
+      --radius:6px;
+      --font:system-ui, sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      background:var(--bg);
+      color:var(--text);
+      font-family:var(--font);
+      padding:40px;
+      display:flex;justify-content:center;align-items:center;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(var(--square-size),1fr));
+      gap:var(--gap);
+      width:100%;max-width:900px;
+      transition:opacity .35s ease;
+    }
+    .square{
+      border:1px solid var(--square-border);
+      height:var(--square-size);
+      display:flex;align-items:center;justify-content:center;
+      border-radius:var(--radius);
+      cursor:pointer;
+      padding:10px;
+      user-select:none;
+    }
+    .title{font-size:14px;text-align:center}
+    .viewer{
+      position:fixed;inset:0;
+      background:#fff;
+      display:flex;align-items:center;justify-content:center;
+      padding:40px;
+      opacity:0;pointer-events:none;
+      transition:opacity .3s ease;
+    }
+    .viewer.open{opacity:1;pointer-events:auto}
+    .card{max-width:700px;width:100%}
+    .card h1{font-size:24px;margin-bottom:10px}
+    .card p{white-space:pre-wrap;line-height:1.5;font-size:15px}
+    .btn{border:1px solid #000;background:none;padding:6px 12px;cursor:pointer;margin-top:20px}
+  </style>
+</head>
+<body>
+  <div id="grid" class="grid"></div>
+
+  <div id="viewer" class="viewer">
+    <div class="card">
+      <h1 id="viewerTitle"></h1>
+      <p id="viewerText"></p>
+      <button class="btn" id="closeViewer">Fermer</button>
+    </div>
+  </div>
+
+<script>
+  let data=[
+    {title:'Scrapper sur reddit',text:'import os\n import requests\n import time\n \n SUBREDDIT = "ObsidianMD"\n BASE_URL = f"https://www.reddit.com/r/{SUBREDDIT}.json"\n \n BASE_DIR = r"C:\Users\hydre\Pictures"\n SAVE_DIR = os.path.join(BASE_DIR, "images_reddit")\n os.makedirs(SAVE_DIR, exist_ok=True)\n \n headers = {"User-Agent": "Mozilla/5.0"}\n \n all_image_urls = set()  # empêche les doublons\n after = None  # pointeur pour pages suivantes\n page_count = 0\n \n print("Scraping du subreddit… (scroll infini via API)\n")\n \n while True:\n     page_count += 1\n     \n     # Construire l’URL\n     url = BASE_URL if not after else f"{BASE_URL}?after={after}"\n \n     print(f"→ Page {page_count} : {url}")\n \n     # Charger la page JSON\n     try:\n         data = requests.get(url, headers=headers).json()\n     except:\n         print("Erreur JSON, arrêt.")\n         break\n \n     children = data["data"]["children"]\n     if not children:\n         print("Plus rien à charger, fin.")\n         break\n \n     # Extraire images\n     for child in children:\n         post = child["data"]\n \n         # 1. Image du post (simple)\n         if "url_overridden_by_dest" in post:\n             url = post["url_overridden_by_dest"]\n             if any(url.endswith(ext) for ext in [".jpg",".jpeg",".png",".gif",".webp"]):\n                 all_image_urls.add(url)\n \n         # 2. Preview haute résolution\n         if "preview" in post:\n             for img in post["preview"]["images"]:\n                 all_image_urls.add(img["source"]["url"].replace("&amp;", "&"))\n                 for res in img["resolutions"]:\n                     all_image_urls.add(res["url"].replace("&amp;", "&"))\n \n         # 3. Galeries multi-images\n         if "gallery_data" in post:\n             items = post["gallery_data"]["items"]\n             meta = post["media_metadata"]\n             for item in items:\n                 media_id = item["media_id"]\n                 info = meta[media_id]\n                 if "s" in info and "u" in info["s"]:\n                     all_image_urls.add(info["s"]["u"].replace("&amp;", "&"))\n \n     # Page suivante\n     after = data["data"]["after"]\n     if not after:\n         print("Fin du subreddit, plus de pages.")\n         break\n \n     time.sleep(1)  # petite pause pour éviter rate limit\n \n print(f"\nTotal IMAGES trouvées : {len(all_image_urls)}")\n print("Téléchargement…\n")\n \n # Télécharger toutes les images\n count = 0\n for url in all_image_urls:\n     try:\n         ext = url.split("?")[0].split(".")[-1]\n         if len(ext) > 4: \n             ext = "jpg"  # sécurité\n         \n         filename = os.path.join(SAVE_DIR, f"image_{count}.{ext}")\n         content = requests.get(url, headers=headers).content\n         with open(filename, "wb") as f:\n             f.write(content)\n         print(f"✔ {filename}")\n         count += 1\n     except Exception as e:\n         print(f"Erreur : {url} -> {e}")\n \n print(f"\nTerminé ! {count} images enregistrées dans : {SAVE_DIR}")'},
+  ];
+
+  const grid=document.getElementById('grid');
+  const viewer=document.getElementById('viewer');
+  const viewerTitle=document.getElementById('viewerTitle');
+  const viewerText=document.getElementById('viewerText');
+  const closeViewer=document.getElementById('closeViewer');
+
+  function render(){
+    grid.innerHTML='';
+    data.forEach((item,i)=>{
+      const s=document.createElement('div');
+      s.className='square';
+      s.innerHTML=`<div class="title">${item.title}</div>`;
+      s.onclick=()=>openViewer(i);
+      s.ondblclick=()=>edit(i,s);
+      grid.appendChild(s);
+    });
+  }
+
+  function edit(i,el){
+    el.contentEditable=true;
+    el.focus();
+    el.onblur=()=>{
+      el.contentEditable=false;
+      data[i].title=el.innerText.trim()||data[i].title;
+      render();
+    };
+  }
+
+  function openViewer(i){
+    viewerTitle.innerText=data[i].title;
+    viewerText.innerText=data[i].text;
+    grid.style.opacity=0;
+    viewer.classList.add('open');
+  }
+
+  function close(){
+    viewer.classList.remove('open');
+    grid.style.opacity=1;
+  }
+
+  closeViewer.onclick=close;
+  document.onkeydown=e=>{if(e.key==='Escape') close();};
+
+  render();
+</script>
+</body>
+</html>
