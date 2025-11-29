@@ -3,360 +3,120 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Grille de carrés interactive — Minimaliste</title>
+  <title>Carrés minimalistes</title>
   <style>
-    /* --- VARIABLES DE STYLE (personnalisables) --- */
     :root{
-      --bg: #0b0b0c;            /* fond de la page */
-      --square-bg: #0f1720;     /* fond des carrés */
-      --square-border: rgba(255,255,255,0.06);
-      --accent: #7bd389;        /* couleur accent (traits / survol) */
-      --text: #e6eef8;          /* couleur du texte */
-      --muted: rgba(230,238,248,0.6);
-      --gap: 16px;              /* espacement entre carrés */
-      --square-size: 140px;     /* taille par défaut des carrés */
-      --radius: 8px;            /* arrondis */
-      --font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      --bg:#ffffff;
+      --text:#000000;
+      --square-bg:#ffffff;
+      --square-border:#000;
+      --square-size:130px;
+      --gap:14px;
+      --radius:6px;
+      --font:system-ui, sans-serif;
     }
-
-    /* --- Reset minimaliste --- */
-    *{box-sizing:border-box}
-    html,body{height:100%;}
+    *{box-sizing:border-box;margin:0;padding:0}
     body{
-      margin:0;
-      font-family:var(--font-family);
       background:var(--bg);
       color:var(--text);
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      font-family:var(--font);
       padding:40px;
+      display:flex;justify-content:center;align-items:center;
     }
-
-    /* Conteneur principal */
-    .wrap{
-      width:100%;
-      max-width:1100px;
-    }
-
-    /* Grille de carrés */
     .grid{
       display:grid;
       grid-template-columns:repeat(auto-fill,minmax(var(--square-size),1fr));
       gap:var(--gap);
-      align-items:stretch;
-      transition:opacity .45s ease, transform .45s ease;
-    }
-
-    .square{
-      background:var(--square-bg);
-      border:1px solid var(--square-border);
-      height:var(--square-size);
-      border-radius:var(--radius);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:12px;
-      text-align:center;
-      cursor:pointer;
-      user-select:none;
-      position:relative;
-      overflow:hidden;
-      transition:transform .18s ease, box-shadow .18s ease;
-      color:var(--text);
-      min-height:var(--square-size);
-    }
-
-    .square:active{transform:scale(.995)}
-    .square:hover{box-shadow:0 6px 18px rgba(0,0,0,0.45)}
-
-    .title{
-      font-weight:600;
-      font-size:1rem;
-      line-height:1.1;
-      word-break:break-word;
-      width:100%;
-    }
-
-    /* Indicateur pour éditer (double-clic) */
-    .hint{
-      position:absolute;
-      top:8px;
-      right:8px;
-      font-size:11px;
-      color:var(--muted);
-      opacity:.9;
-      pointer-events:none;
-    }
-
-    /* Zone d'affichage du texte complet (après clic) */
-    .viewer{
-      position:fixed;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:40px;
-      background:linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0.75));
-      z-index:1000;
-      opacity:0;
-      pointer-events:none;
+      width:100%;max-width:900px;
       transition:opacity .35s ease;
     }
-
-    .viewer.open{opacity:1; pointer-events:auto}
-
-    .card{
-      max-width:880px;
-      width:100%;
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:12px;
-      padding:28px;
-      border:1px solid rgba(255,255,255,0.04);
-      box-shadow:0 20px 60px rgba(2,6,23,0.6);
+    .square{
+      border:1px solid var(--square-border);
+      height:var(--square-size);
+      display:flex;align-items:center;justify-content:center;
+      border-radius:var(--radius);
+      cursor:pointer;
+      padding:10px;
+      user-select:none;
     }
-
-    .card h1{margin:0 0 12px 0; font-size:clamp(20px,2.6vw,32px);}
-    .card p{margin:0; white-space:pre-wrap; color:var(--muted); line-height:1.6}
-
-    /* Boutons utilitaires */
-    .controls{
-      margin:18px 0 10px 0;
-      display:flex;gap:8px;justify-content:flex-end;
+    .title{font-size:14px;text-align:center}
+    .viewer{
+      position:fixed;inset:0;
+      background:#fff;
+      display:flex;align-items:center;justify-content:center;
+      padding:40px;
+      opacity:0;pointer-events:none;
+      transition:opacity .3s ease;
     }
-    .btn{
-      background:transparent;border:1px solid var(--square-border);color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px
-    }
-    .btn:hover{border-color:var(--accent);color:var(--text)}
-
-    /* Mode édition — style du contenu éditable */
-    .square[contenteditable="true"]{
-      outline:2px dashed rgba(123,211,137,0.08);
-      cursor:text;
-    }
-
-    /* Petit message d'aide en bas */
-    .help{color:var(--muted);font-size:13px;margin-top:10px;text-align:center}
-
-    /* Effet de disparition fluide (lorsqu'on ouvre le viewer) */
-    .grid.hidden{opacity:0; transform:scale(.99);}
-
-    @media (max-width:520px){:root{--square-size:110px}}
+    .viewer.open{opacity:1;pointer-events:auto}
+    .card{max-width:700px;width:100%}
+    .card h1{font-size:24px;margin-bottom:10px}
+    .card p{white-space:pre-wrap;line-height:1.5;font-size:15px}
+    .btn{border:1px solid #000;background:none;padding:6px 12px;cursor:pointer;margin-top:20px}
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div id="grid" class="grid"></div>
 
-    <div class="controls">
-      <button class="btn" id="addSquare">➕ Ajouter</button>
-      <button class="btn" id="export">⬇︎ Export JSON</button>
-      <button class="btn" id="reset">↺ Réinitialiser</button>
-    </div>
-
-    <div id="grid" class="grid" aria-live="polite"></div>
-
-    <div class="help">Double-cliquez sur un carré pour l'éditer — Cliquez une fois pour afficher le texte. Appuyez sur Échap pour revenir.</div>
-  </div>
-
-  <!-- viewer plein écran -->
-  <div id="viewer" class="viewer" role="dialog" aria-hidden="true">
-    <div class="card" role="document">
+  <div id="viewer" class="viewer">
+    <div class="card">
       <h1 id="viewerTitle"></h1>
       <p id="viewerText"></p>
-      <div style="display:flex;justify-content:flex-end;margin-top:16px">
-        <button class="btn" id="closeViewer">Fermer (Esc)</button>
-      </div>
+      <button class="btn" id="closeViewer">Fermer</button>
     </div>
   </div>
 
-  <script>
-    /*******************************
-     *  SECTION PERSONNALISABLE
-     *  Modifiez ces valeurs dans le code.
-     *******************************/
+<script>
+  let data=[
+    {title:'A',text:'Texte A'},
+    {title:'B',text:'Texte B'},
+    {title:'C',text:'Texte C'}
+  ];
 
-    const CONFIG = {
-      squareSize: 140, // correspond à --square-size (px)
-      gap: 16,          // correspond à --gap (px)
-      // Contenu initial — personnalisez librement
-      squaresData: [
-        { title: 'Carte 1', text: 'Texte complet pour la carte 1.\n\nIci une deuxième ligne.' },
-        { title: 'Carte 2', text: 'Une autre carte — double-clique pour modifier.' },
-        { title: 'Note',   text: "Ceci est une note\nAvec un saut de ligne." },
-        { title: 'Idée',   text: 'Idée : prototyper un mini jeu visuel.' }
-      ]
+  const grid=document.getElementById('grid');
+  const viewer=document.getElementById('viewer');
+  const viewerTitle=document.getElementById('viewerTitle');
+  const viewerText=document.getElementById('viewerText');
+  const closeViewer=document.getElementById('closeViewer');
+
+  function render(){
+    grid.innerHTML='';
+    data.forEach((item,i)=>{
+      const s=document.createElement('div');
+      s.className='square';
+      s.innerHTML=`<div class="title">${item.title}</div>`;
+      s.onclick=()=>openViewer(i);
+      s.ondblclick=()=>edit(i,s);
+      grid.appendChild(s);
+    });
+  }
+
+  function edit(i,el){
+    el.contentEditable=true;
+    el.focus();
+    el.onblur=()=>{
+      el.contentEditable=false;
+      data[i].title=el.innerText.trim()||data[i].title;
+      render();
     };
+  }
 
-    /*******************************
-     *  Fin de la zone personnalisable
-     *******************************/
+  function openViewer(i){
+    viewerTitle.innerText=data[i].title;
+    viewerText.innerText=data[i].text;
+    grid.style.opacity=0;
+    viewer.classList.add('open');
+  }
 
-    // Application
-    const root = document.documentElement;
-    root.style.setProperty('--square-size', CONFIG.squareSize + 'px');
-    root.style.setProperty('--gap', CONFIG.gap + 'px');
+  function close(){
+    viewer.classList.remove('open');
+    grid.style.opacity=1;
+  }
 
-    const grid = document.getElementById('grid');
-    const viewer = document.getElementById('viewer');
-    const viewerTitle = document.getElementById('viewerTitle');
-    const viewerText = document.getElementById('viewerText');
-    const closeViewer = document.getElementById('closeViewer');
-    const addSquare = document.getElementById('addSquare');
-    const exportBtn = document.getElementById('export');
-    const resetBtn = document.getElementById('reset');
+  closeViewer.onclick=close;
+  document.onkeydown=e=>{if(e.key==='Escape') close();};
 
-    // Copie de travail des données (sera modifiée si l'utilisateur édite)
-    let data = JSON.parse(JSON.stringify(CONFIG.squaresData));
-
-    function renderGrid(){
-      grid.innerHTML = '';
-      data.forEach((item, i) => {
-        const s = document.createElement('div');
-        s.className = 'square';
-        s.setAttribute('tabindex', '0');
-        s.dataset.index = i;
-        s.dataset.text = item.text || '';
-
-        const title = document.createElement('div');
-        title.className = 'title';
-        title.innerText = item.title || ('Carte ' + (i+1));
-        title.title = 'Double-cliquez pour éditer';
-
-        const hint = document.createElement('div');
-        hint.className = 'hint';
-        hint.innerText = 'dbl • edit';
-
-        s.appendChild(title);
-        s.appendChild(hint);
-
-        // Single click : afficher le viewer complet
-        s.addEventListener('click', (e) => {
-          // Si on est en train d'éditer (contentEditable), ignore le clic
-          if (s.isContentEditable) return;
-          openViewer(i);
-        });
-
-        // Support clavier (Entrée pour ouvrir, F2 pour éditer)
-        s.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') { e.preventDefault(); openViewer(i); }
-          if (e.key === 'F2') { e.preventDefault(); enableEdit(s, i); }
-        });
-
-        // Double-clic pour éditer le titre OU le contenu
-        s.addEventListener('dblclick', (e) => {
-          // Rendre la zone éditable pour permettre écriture libre
-          enableEdit(s, i);
-        });
-
-        grid.appendChild(s);
-      });
-    }
-
-    function enableEdit(squareEl, index){
-      // Permet d'éditer le titre et le texte source. On va transformer
-      // le carré en zone editable, mais on n'autorise que du texte simple.
-
-      squareEl.setAttribute('contentEditable', 'true');
-      squareEl.focus();
-
-      // lorsque l'utilisateur termine l'édition (blur ou Enter), on sauve
-      const stopEdit = (evt) => {
-        // Restaurer l'état non editable
-        squareEl.removeAttribute('contentEditable');
-
-        // Récupérer le titre (première ligne) et stocker dans data
-        const textContent = squareEl.innerText.trim();
-        const parts = textContent.split('\n');
-        const newTitle = parts[0] || 'Carte ' + (index + 1);
-
-        // Si l'utilisateur a mis d'autres lignes, on les conserve dans text
-        const remaining = parts.slice(1).join('\n').trim();
-
-        data[index].title = newTitle;
-        // si remaining vide et data[index].text existait, on garde l'ancien
-        data[index].text = remaining || data[index].text || '';
-
-        renderGrid();
-
-        // retirer listeners
-        squareEl.removeEventListener('blur', stopEdit);
-        squareEl.removeEventListener('keydown', onKeyDownWhileEdit);
-      };
-
-      const onKeyDownWhileEdit = (e) => {
-        // Enter en combinaison avec Ctrl (ou Cmd) insère un saut, sinon Enter termine
-        if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
-          e.preventDefault();
-          // Terminer édition
-          squareEl.blur();
-        }
-      };
-
-      squareEl.addEventListener('blur', stopEdit);
-      squareEl.addEventListener('keydown', onKeyDownWhileEdit);
-    }
-
-    function openViewer(index){
-      const item = data[index] || {};
-      // Transformer les retours \n en sauts HTML
-      viewerTitle.innerText = item.title || '';
-      viewerText.innerHTML = (item.text || '').replace(/\n/g, '<br>');
-
-      // masquer la grille en douceur
-      grid.classList.add('hidden');
-      // ouvrir le viewer
-      viewer.classList.add('open');
-      viewer.setAttribute('aria-hidden', 'false');
-
-      // focus sur bouton fermer pour accessibilité
-      closeViewer.focus();
-    }
-
-    function closeViewerFn(){
-      viewer.classList.remove('open');
-      viewer.setAttribute('aria-hidden', 'true');
-      grid.classList.remove('hidden');
-    }
-
-    // Ajouter un nouveau carré (ex: bouton +)
-    addSquare.addEventListener('click', () => {
-      data.push({ title: 'Nouvelle carte', text: 'Texte...' });
-      renderGrid();
-      // focus dernier
-      const last = grid.querySelector('.square[data-index="' + (data.length-1) + '"]');
-      if (last) last.focus();
-    });
-
-    // Exporter le JSON pour réutiliser
-    exportBtn.addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'squares.json';
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-
-    // Réinitialiser aux valeurs par défaut du CONFIG
-    resetBtn.addEventListener('click', () => {
-      if (!confirm('Réinitialiser les carrés aux valeurs par défaut ?')) return;
-      data = JSON.parse(JSON.stringify(CONFIG.squaresData));
-      renderGrid();
-    });
-
-    // Fermer viewer
-    closeViewer.addEventListener('click', closeViewerFn);
-    viewer.addEventListener('click', (e) => {
-      // si click en dehors de la card, fermer
-      if (e.target === viewer) closeViewerFn();
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeViewerFn();
-    });
-
-    // Initial render
-    renderGrid();
-  </script>
+  render();
+</script>
 </body>
 </html>
