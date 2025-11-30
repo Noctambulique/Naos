@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Arbre généalogique interactif (single-file)</title>
+<style>
+  :root{--bg:#0f1724;--card:#0b1220;--accent:#22c55e;--muted:#9ba6b2}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:linear-gradient(180deg,#081124 0%, #071826 100%);color:#e6eef6}
+  .toolbar{display:flex;gap:.5rem;padding:.6rem;background:rgba(255,255,255,0.03);align-items:center}
+  .toolbar button, .toolbar input, .toolbar textarea{background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit;padding:.4rem .6rem;border-radius:.4rem}
+  .toolbar input[type=file]{display:none}
+  .stage{position:relative;overflow:auto;height:calc(100vh - 48px)}
+  .canvas{position:relative;min-width:1200px;min-height:800px;padding:60px}
+  svg.connectors{position:absolute;inset:0;pointer-events:none}
+  .node{position:absolute;min-width:140px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;padding:10px;border:1px solid rgba(255,255,255,0.06);box-shadow:0 6px 18px rgba(0,0,0,0.5);cursor:grab;user-select:none}
+  .node:active{cursor:grabbing}
+  .node .name{font-weight:700;line-height:1.1}
+  .node small{display:block;color:var(--muted);margin-top:4px}
+  .node .controls{display:flex;gap:6px;margin-top:8px}
+  .node .controls button{font-size:12px;padding:5px;border-radius:6px}
+  .hud{position:fixed;right:12px;bottom:12px;background:rgba(2,6,23,0.6);padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04)}
+  .hint{font-size:12px;color:var(--muted)}
+  .hidden{display:none}
+  /* small screens */
+  @media (max-width:700px){.canvas{min-width:900px}}
+</style>
+</head>
+<body>
+  
+    <span class="hint">Double‑clic sur un nom pour éditer — Glisser pour déplacer</span>
+  </div>
+
+  <div class="stage">
+    <div id="canvas" class="canvas"></div>
+    <svg id="svg" class="connectors"></svg>
+  </div>
+
+  
+  </div>
+
+<script>
+// ------------------------------
+// CONFIGURATION SIMPLE DE L'ARBRE
+// Édite seulement cet objet pour créer ton arbre.
+// Exemple : chaque node = { id, name, parentId }
+// L'arbre se génère automatiquement.
+// ------------------------------
+const TREE_DATA = {
+  persons: [
+    // Génération 1
+    { id: "1", parentId: null, name: "Grand-parent 1" },
+    { id: "2", parentId: null, name: "Grand-parent 2" },
+    { id: "3", parentId: null, name: "Grand-parent 3" },
+    { id: "4", parentId: null, name: "Grand-parent 4" },
+
+    // Génération 2
+    { id: "5", parentId: "1", name: "Parent A1" },
+    { id: "6", parentId: "1", name: "Parent A2" },
+    { id: "7", parentId: "2", name: "Parent B1" },
+    { id: "8", parentId: "2", name: "Parent B2" },
+    { id: "9", parentId: "3", name: "Parent C1" },
+    { id: "10", parentId: "4", name: "Parent D1" },
+
+    // Génération 3 – enfants de la branche A
+    { id: "11", parentId: "5", name: "Enfant A1-1" },
+    { id: "12", parentId: "5", name: "Enfant A1-2" },
+    { id: "13", parentId: "6", name: "Enfant A2-1" },
+    { id: "14", parentId: "6", name: "Enfant A2-2" },
+    { id: "15", parentId: "6", name: "Enfant A2-3" },
+
+    // Génération 3 – enfants de la branche B
+    { id: "16", parentId: "7", name: "Enfant B1-1" },
+    { id: "17", parentId: "7", name: "Enfant B1-2" },
+    { id: "18", parentId: "8", name: "Enfant B2-1" },
+
+    // Génération 3 – enfants de la branche C
+    { id: "19", parentId: "9", name: "Enfant C1-1" },
+    { id: "20", parentId: "9", name: "Enfant C1-2" },
+
+    // Génération 3 – enfants de la branche D
+    { id: "21", parentId: "10", name: "Enfant D1-1" },
+    { id: "22", parentId: "10", name: "Enfant D1-2" },
+    { id: "23", parentId: "10", name: "Enfant D1-3" },
+
+    // Génération 4 – petits-enfants (exemple détaillé)
+    { id: "24", parentId: "11", name: "Petit-enfant A1-1a" },
+    { id: "25", parentId: "11", name: "Petit-enfant A1-1b" },
+    { id: "26", parentId: "12", name: "Petit-enfant A1-2a" },
+    { id: "27", parentId: "12", name: "Petit-enfant A1-2b" },
+    { id: "28", parentId: "16", name: "Petit-enfant B1-1a" },
+    { id: "29", parentId: "19", name: "Petit-enfant C1-1a" },
+    { id: "30", parentId: "19", name: "Petit-enfant C1-1b" }
+  ],
+  // Réglages de style simples à modifier directement ici
+  style: {
+    nodeWidth: 140,
+    nodeHeight: 50,
+    gapX: 60,      // distance horizontale
+    gapY: 80,      // distance verticale
+    fontSize: "16px",
+    bgColor: "#fff",
+    borderColor: "#000",
+    lineColor: "#333"
+  }
+};
+
+// ------------------------------
+// MOTEUR DE RENDU AUTOMATIQUE
+// ------------------------------
+let nodes = {};
+
+function buildTree(data) {
+  nodes = {};
+  data.forEach(n => {
+    nodes[n.id] = {
+      id: n.id,
+      name: n.name,
+      parentId: n.parentId,
+      children: []
+    };
+  });
+  Object.values(nodes).forEach(n => {
+    if (n.parentId && nodes[n.parentId]) nodes[n.parentId].children.push(n);
+  });
+}
+
+function layoutTree(node, depth = 0, offset = 0) {
+  node.x = depth * 200;
+  node.y = offset * 100;
+  let currentOffset = offset;
+  node.children.forEach((c, i) => {
+    currentOffset = layoutTree(c, depth + 1, currentOffset);
+    currentOffset++;
+  });
+  return currentOffset;
+}
+
+function render() {
+  const container = document.getElementById("tree");
+  container.innerHTML = "";
+
+  Object.values(nodes).forEach(n => {
+    const el = document.createElement("div");
+    el.className = "node";
+    el.style.left = n.x + "px";
+    el.style.top = n.y + "px";
+    el.textContent = n.name;
+    container.appendChild(el);
+  });
+
+  const svg = document.getElementById("links");
+  svg.innerHTML = "";
+  Object.values(nodes).forEach(n => {
+    if (n.parentId && nodes[n.parentId]) {
+      const p = nodes[n.parentId];
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", p.x + 80);
+      line.setAttribute("y1", p.y + 20);
+      line.setAttribute("x2", n.x + 80);
+      line.setAttribute("y2", n.y + 20);
+      line.setAttribute("stroke", "#555");
+      svg.appendChild(line);
+    }
+  });
+}
+
+// LANCEMENT
+buildTree(TREE_DATA);
+layoutTree(Object.values(nodes).find(n => !n.parentId));
+render();
+</script>
+</body>
+</html>
