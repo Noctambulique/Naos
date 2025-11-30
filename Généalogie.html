@@ -200,13 +200,29 @@
 
     function addParent(){
       if(!selected){ alert('Sélectionnez une personne.'); return; }
+
       const current = selected;
       const parentUL = current.parentElement;
-      const newParent = createNode('Nouveaux parents');
-      // Insert newParent at the same level as current
-      parentUL.insertBefore(newParent, current);
-      // Move current inside newParent
-      newParent.querySelector(':scope > ul.tree').appendChild(current);
+
+      // Créer un container parent unique SI le parent direct n'est pas déjà un "vrai" parent ajouté
+      let wrapperParent = parentUL.closest('li.node');
+
+      // Cas 1 : le nœud sélectionné n'a PAS encore de parent créé par l'utilisateur
+      if(!wrapperParent){
+        const newParent = createNode('Parents');
+        parentUL.insertBefore(newParent, current);
+        newParent.querySelector(':scope > ul.tree').appendChild(current);
+        selectNode(newParent);
+        return;
+      }
+
+      // Cas 2 : déjà un parent -> créer un autre parent sur le même niveau
+      const upperUL = wrapperParent.parentElement;
+      const newParent = createNode('Parents');
+
+      upperUL.insertBefore(newParent, wrapperParent);
+      newParent.querySelector(':scope > ul.tree').appendChild(wrapperParent);
+
       selectNode(newParent);
     }
 
