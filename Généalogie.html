@@ -4,20 +4,90 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-html,body{margin:0;height:100%;background:#000;overflow:hidden}
-img{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:none;cursor:grab;user-select:none}
+html,body{
+    margin:0;
+    height:100%;
+    background:#000;
+    overflow:hidden;
+}
+#img{
+    position:absolute;
+    top:0;
+    left:0;
+    transform-origin: top left;
+    cursor:grab;
+    user-select:none;
+}
 </style>
 </head>
 <body>
+
 <img id="img" src="D hiver/Généalogie.png">
+
 <script>
-const img=document.getElementById('img');
-let s=1,tx=0,ty=0,d=false,px=0,py=0;
-function apply(){img.style.transform=`translate(calc(-50%+${tx}px),calc(-50%+${ty}px)) scale(${s})`}
-window.addEventListener('wheel',e=>{e.preventDefault();s*=e.deltaY<0?1.1:0.9;apply()});
-img.addEventListener('mousedown',e=>{d=true;px=e.clientX-tx;py=e.clientY-ty});
-window.addEventListener('mousemove',e=>{if(!d)return;tx=e.clientX-px;ty=e.clientY-py;apply()});
-window.addEventListener('mouseup',()=>d=false);
+const img = document.getElementById("img");
+
+let s = 1;      // scale
+let tx = 0;     // translation X
+let ty = 0;     // translation Y
+let dragging = false;
+let startX = 0;
+let startY = 0;
+
+// position initiale centrée
+window.onload = () => {
+    tx = window.innerWidth/2  - img.width/2;
+    ty = window.innerHeight/2 - img.height/2;
+    apply();
+};
+
+function apply() {
+    img.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+}
+
+/* --- ZOOM SOURIS --- */
+window.addEventListener("wheel", e => {
+    e.preventDefault();
+    s *= e.deltaY < 0 ? 1.1 : 0.9;
+    apply();
+}, {passive:false});
+
+/* --- SOURIS : drag --- */
+img.addEventListener("mousedown", e => {
+    dragging = true;
+    startX = e.clientX - tx;
+    startY = e.clientY - ty;
+});
+
+window.addEventListener("mousemove", e => {
+    if (!dragging) return;
+    tx = e.clientX - startX;
+    ty = e.clientY - startY;
+    apply();
+});
+
+window.addEventListener("mouseup", () => dragging = false);
+
+/* --- ÉCRAN TACTILE --- */
+img.addEventListener("touchstart", e => {
+    if (e.touches.length !== 1) return;
+    dragging = true;
+    const t = e.touches[0];
+    startX = t.clientX - tx;
+    startY = t.clientY - ty;
+});
+
+img.addEventListener("touchmove", e => {
+    if (!dragging || e.touches.length !== 1) return;
+    e.preventDefault();  // sinon le téléphone défile la page
+    const t = e.touches[0];
+    tx = t.clientX - startX;
+    ty = t.clientY - startY;
+    apply();
+}, {passive:false});
+
+img.addEventListener("touchend", () => dragging = false);
 </script>
+
 </body>
 </html>
