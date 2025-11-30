@@ -1,176 +1,135 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Arbre généalogique interactif (single-file)</title>
-<style>
-  :root{--bg:#ffffff;--card:#c7dffc;--muted:#334155}
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:#fff;color:#111}
-  .stage{position:relative;overflow:auto;height:100vh}
-  .canvas{position:relative;min-width:1200px;min-height:1400px;padding:60px}
-  svg.connectors{position:absolute;inset:0;pointer-events:none}
-  .node{position:absolute;width:var(--node-width);height:var(--node-height);display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;border-radius:6px;background:var(--card);border:2px solid var(--border-color);font-size:var(--font-size);box-shadow:0 6px 18px rgba(0,0,0,0.07);}
-  .hint{position:fixed;left:12px;bottom:12px;font-size:13px;color:var(--muted)}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Arbre généalogique</title>
+  <style>
+    :root{--card-bg:#9fc5e8;--muted-bg:#cfcfcf;--text:#08304b}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial; background:#fbfbfb; color:var(--text); padding:28px}
+    h1{font-size:20px;margin:0 0 18px}
+    .tree{max-width:900px;margin:0 auto;background:white;padding:18px;border-radius:8px;box-shadow:0 6px 18px rgba(10,20,30,0.06)}
+    /* simple vertical tree using nested lists */
+    .tree ul{padding-left:28px;position:relative}
+    .tree ul::before{content:'';position:absolute;left:10px;top:0;width:2px;height:100%;background:linear-gradient(#ddd,#ddd)}
+    .tree li{list-style:none;margin:12px 0;position:relative;padding-left:22px}
+    .node{display:inline-block;padding:10px 14px;border-radius:6px;background:var(--card-bg);box-shadow:inset 0 -2px 0 rgba(0,0,0,0.06);font-weight:600}
+    .node.gray{background:var(--muted-bg);font-weight:700}
+    .node small{display:block;font-weight:400;margin-top:6px;font-size:12px}
+    /* connectors */
+    .tree li::before{content:'';position:absolute;left:0;top:18px;width:14px;height:2px;background:#ddd}
+    /* responsive */
+    @media (max-width:700px){.tree{padding:12px}}
+    /* extra: make spouse pairs on same line */
+    .pair{display:flex;gap:12px;align-items:center}
+    .pair .node{font-weight:700}
+    .muted{font-weight:500;opacity:0.9}
+  </style>
 </head>
 <body>
-  <div class="stage">
-    <div id="tree" class="canvas"></div>
-    <svg id="links" class="connectors"></svg>
+  <div class="tree">
+    <h1>Arbre généalogique (reprise)</h1>
+    <p class="muted">J'ai transcrit les informations visibles sur l'image. Les traits montrent les liens parents-enfants ou conjoints quand c'était clair.</p>
+
+    <ul>
+      <li>
+        <div class="pair">
+          <div class="node">Françoise Primault</div>
+          <div class="node">Joseph La Batte</div>
+        </div>
+        <ul>
+          <li>
+            <div class="node">Marie La Batte <small>1789 - 1819</small></div>
+            <ul>
+              <li>
+                <div class="node">René-Pierre Lemercier-Dumineray</div>
+                <ul>
+                  <li><div class="node">Henri-Pierre Lemercier-Dumineray</div></li>
+                  <li><div class="node">Marie Duport</div></li>
+                  <li>
+                    <div class="node">Henri François Dumineray</div>
+                    <ul>
+                      <li>
+                        <div class="node">Anne-Antoinette Dumineray</div>
+                        <ul>
+                          <li>
+                            <div class="node gray">Antoine Durelle</div>
+                            <ul>
+                              <li><div class="node">Claude Durelle</div></li>
+                              <li><div class="node">Jeanne Travard</div></li>
+                            </ul>
+                          </li>
+                          <li>
+                            <div class="node">Fleury-Jules Durelle</div>
+                            <small>Catherine Mottin (liée)</small>
+                            <ul>
+                              <li>
+                                <div class="pair">
+                                  <div class="node">René Durelle <small>1872 - 1954</small></div>
+                                  <div class="node">Lucie Giroux <small>1876 - 1960</small></div>
+                                </div>
+                                <ul>
+                                  <li>
+                                    <div class="node">Robert Durelle</div>
+                                    <ul>
+                                      <li>
+                                        <div class="node">Jean Claude Durelle</div>
+                                        <ul>
+                                          <li>
+                                            <div class="pair">
+                                              <div class="node">Camille Durelle</div>
+                                              <div class="node">Catherine Hedal</div>
+                                            </div>
+                                            <ul>
+                                              <li><div class="node">Dejumne Nathan</div>
+                                                <ul>
+                                                  <li>
+                                                    <div class="node">François Dejumne</div>
+                                                    <ul>
+                                                      <li><div class="node">Michelle</div></li>
+                                                      <li><div class="node">(autre enfant non nommé)</div></li>
+                                                    </ul>
+                                                  </li>
+                                                </ul>
+                                              </li>
+                                            </ul>
+                                          </li>
+                                        </ul>
+                                      </li>
+                                    </ul>
+                                  </li>
+                                </ul>
+                              </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+
+      <!-- branche latérale inconnue Tourey -->
+      <li>
+        <div class="node gray">? Tourey</div>
+        <ul>
+          <li><div class="node">Didier Tourey</div></li>
+          <li><div class="node">Symphorienne Moreau <small>1867</small></div></li>
+        </ul>
+      </li>
+
+      <!-- autres personnes isolées présentes sur l'image -->
+      <li>
+        <div class="node">Jeanne Lesigne</div>
+      </li>
+
+    </ul>
+
+    <p style="margin-top:18px;font-size:13px;color:#555">Remarques : j'ai regroupé et simplifié la mise en page pour tenir sur une page. Si tu veux une version imprimable, une organisation horizontale ou des flèches SVG, dis-moi et je l'adapte.</p>
   </div>
-
-<script>
-// ------------------------------
-// CONFIGURATION (éditer uniquement)
-// ------------------------------
-const TREE_DATA = {
-  persons: [
-    { id: "1", parentId: null, name: "Françoise Primault" },
-    { id: "2", parentId: null, name: "Joseph La Batte" },
-    { id: "3", parentId: null, name: "Claude Durelle" },
-    { id: "4", parentId: null, name: "Jeanne Travard" },
-
-    { id: "5", parentId: "1", name: "Henri-Pierre Lemercier-Dumineray" },
-    { id: "6", parentId: "2", name: "Marie La Batte 1789 – 1819" },
-
-    { id: "7", parentId: "3", name: "Antoine Durelle" },
-    { id: "8", parentId: "4", name: "Catherine Mottin" },
-
-    { id: "9", parentId: null, name: "Marie Duport" },
-
-    { id: "10", parentId: "5", name: "René-Pierre Lemercier-Dumineray" },
-    { id: "11", parentId: "6", name: "Henri François Dumineray" },
-
-    { id: "12", parentId: "7", name: "Fleury-Jules Durelle" },
-
-    { id: "13", parentId: null, name: "? Tourey" },
-    { id: "14", parentId: "13", name: "Didier Tourey" },
-    { id: "15", parentId: "13", name: "Symphoriennne Moreau 1867" },
-
-    { id: "16", parentId: "11", name: "Anne-Antoinette Dumineray" },
-
-    { id: "17", parentId: "12", name: "Lucie Giroux 1876 – 1960" },
-    { id: "18", parentId: "12", name: "René Durelle 1872 – 1954" },
-
-    { id: "19", parentId: "18", name: "Robert Durelle" },
-    { id: "20", parentId: null, name: "Jeanne Lesigne" },
-
-    { id: "21", parentId: "19", name: "Jean Claude Durelle" },
-    { id: "22", parentId: null, name: "Catherine Hedal" },
-
-    { id: "23", parentId: "21", name: "Camille Durelle" },
-    { id: "24", parentId: "23", name: "Dejumne Nathan" },
-    { id: "25", parentId: "24", name: "François Dejumne" },
-    { id: "26", parentId: "25", name: "Michelle" },
-    { id: "27", parentId: "25", name: "Enfant inconnu" }
-  ],
-
-  style: {
-    nodeWidth: 200,
-    nodeHeight: 64,
-    gapX: 220,
-    gapY: 110,
-    fontSize: "15px",
-    bgColor: "#c7dffc",
-    borderColor: "#123",
-    lineColor: "#444"
-  }
-};
-
-// ------------------------------
-// MOTEUR DE RENDU AUTOMATIQUE
-// ------------------------------
-const CSS = document.documentElement.style;
-CSS.setProperty('--node-width', TREE_DATA.style.nodeWidth + 'px');
-CSS.setProperty('--node-height', TREE_DATA.style.nodeHeight + 'px');
-CSS.setProperty('--font-size', TREE_DATA.style.fontSize);
-CSS.setProperty('--card', TREE_DATA.style.bgColor);
-CSS.setProperty('--border-color', TREE_DATA.style.borderColor);
-
-let nodes = {}; // id -> node
-
-function buildTree(persons) {
-  nodes = {};
-  persons.forEach(p => {
-    nodes[p.id] = { ...p, children: [], x: 0, y: 0 };
-  });
-  Object.values(nodes).forEach(n => {
-    if (n.parentId && nodes[n.parentId]) nodes[n.parentId].children.push(n);
-  });
-}
-
-function layoutRoots() {
-  const roots = Object.values(nodes).filter(n => !n.parentId || !nodes[n.parentId]);
-  let offset = 0;
-  roots.forEach(r => {
-    offset = layoutNode(r, 0, offset);
-    offset += 1; // gap between root subtrees
-  });
-}
-
-function layoutNode(node, depth, offset) {
-  node.x = depth * TREE_DATA.style.gapX;
-  node.y = offset * TREE_DATA.style.gapY;
-  let cur = offset;
-  if (node.children.length === 0) return cur;
-  node.children.forEach((c, i) => {
-    cur = layoutNode(c, depth + 1, cur);
-    cur += 1;
-  });
-  // center parent vertically above children
-  const first = node.children[0];
-  const last = node.children[node.children.length - 1];
-  if (first && last) {
-    node.y = (first.y + last.y) / 2;
-  }
-  return cur;
-}
-
-function render() {
-  const container = document.getElementById('tree');
-  const svg = document.getElementById('links');
-  container.innerHTML = '';
-  svg.innerHTML = '';
-
-  // make svg cover canvas
-  const rect = container.getBoundingClientRect();
-  svg.setAttribute('width', container.scrollWidth);
-  svg.setAttribute('height', container.scrollHeight);
-
-  Object.values(nodes).forEach(n => {
-    const el = document.createElement('div');
-    el.className = 'node';
-    el.style.left = (n.x) + 'px';
-    el.style.top = (n.y) + 'px';
-    el.textContent = n.name;
-    container.appendChild(el);
-
-    if (n.parentId && nodes[n.parentId]) {
-      const p = nodes[n.parentId];
-      const x1 = p.x + TREE_DATA.style.nodeWidth / 2;
-      const y1 = p.y + TREE_DATA.style.nodeHeight;
-      const x2 = n.x + TREE_DATA.style.nodeWidth / 2;
-      const y2 = n.y;
-      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1', x1);
-      line.setAttribute('y1', y1);
-      line.setAttribute('x2', x2);
-      line.setAttribute('y2', y2);
-      line.setAttribute('stroke', TREE_DATA.style.lineColor);
-      line.setAttribute('stroke-width', 2);
-      svg.appendChild(line);
-    }
-  });
-}
-
-// build + layout + render
-buildTree(TREE_DATA.persons);
-layoutRoots();
-render();
-
-// expose for console debugging
-window.TREE = { data: TREE_DATA, nodes, buildTree, layoutRoots, render };
-</script>
 </body>
 </html>
