@@ -14,17 +14,66 @@
     button.ghost{background:transparent;color:#111;border:1px solid #ddd}
     main{display:flex;gap:16px}
     .canvas{flex:1;padding:12px;border-radius:10px;background:#fff;min-height:320px;box-shadow:0 1px 0 rgba(0,0,0,0.04);overflow:auto;border:2px solid #e5e5e5}
-    ul.tree{list-style:none;margin:8px 0 0 20px;padding-left:20px;border-left:2px solid #ddd}
-    li.node{margin:6px 0;padding-left:12px;position:relative}
-    li.node > .label{display:inline-block;padding:6px 10px;border-radius:8px;background:#f0f0f2;cursor:pointer}
-    li.node.selected > .label{outline:2px solid #3b82f6;background:#eff6ff}
+    ul.tree{
+  list-style:none;
+  margin:12px 0 0 0;
+  padding-left:0;
+  display:flex;
+  flex-direction:row;
+  gap:32px;
+  border-left:0;
+}
+    li.node{
+  margin:6px 0;
+  padding:0;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+    li.node > .label{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:8px;
+  background:#f0f0f2;
+  cursor:pointer;
+  border:1px solid #ccc;
+}{display:inline-block;padding:6px 10px;border-radius:8px;background:#f0f0f2;cursor:pointer}
+    li.node.selected > .label{
+  outline:2px solid #3b82f6;
+  background:#eff6ff;
+  border-color:#3b82f6;
+}{outline:2px solid #3b82f6;background:#eff6ff}
     .label[contenteditable]{min-width:64px}
     .export-area{width:420px;max-width:45%;display:flex;flex-direction:column;gap:8px}
     textarea{width:100%;height:320px;padding:8px;border-radius:8px;border:1px solid #ddd;font-family:monospace}
     .muted{color:#666;font-size:13px}
     footer{margin-top:10px}
     small.note{color:#666}
-  </style>
+    /* Connecteurs horizontaux */
+  li.node::before{
+    content:"";
+    position:absolute;
+    top:18px;
+    left:-32px;
+    width:32px;
+    height:1px;
+    background:#999;
+  }
+  /* Pas de connecteur pour les racines */
+  ul.root > li.node::before{display:none;}
+
+  /* Ligne verticale vers enfants */
+  li.node > ul.tree::before{
+    content:"";
+    position:absolute;
+    top:32px;
+    left:50%;
+    width:1px;
+    height:20px;
+    background:#999;
+  }
+</style>
 </head>
 <body>
   <header>
