@@ -48,50 +48,77 @@
 // ------------------------------
 const TREE_DATA = {
   persons: [
-    // Génération 1
-    { id: "1", parentId: null, name: "Grand-parent 1" },
-    { id: "2", parentId: null, name: "Grand-parent 2" },
-    { id: "3", parentId: null, name: "Grand-parent 3" },
-    { id: "4", parentId: null, name: "Grand-parent 4" },
+const TREE_DATA = {
+  persons: [
+    // ----- Génération 1 (tout en haut) -----
+    { id: "1", parentId: null, name: "Françoise Primault" },
+    { id: "2", parentId: null, name: "Joseph La Batte" },
+    { id: "3", parentId: null, name: "Claude Durelle" },
+    { id: "4", parentId: null, name: "Jeanne Travard" },
 
-    // Génération 2
-    { id: "5", parentId: "1", name: "Parent A1" },
-    { id: "6", parentId: "1", name: "Parent A2" },
-    { id: "7", parentId: "2", name: "Parent B1" },
-    { id: "8", parentId: "2", name: "Parent B2" },
-    { id: "9", parentId: "3", name: "Parent C1" },
-    { id: "10", parentId: "4", name: "Parent D1" },
+    // ----- Génération 2 -----
+    { id: "5", parentId: "1", name: "Henri-Pierre Lemercier-Dumineray" },
+    { id: "6", parentId: "2", name: "Marie La Batte\n1789 – 1819" },
 
-    // Génération 3 – enfants de la branche A
-    { id: "11", parentId: "5", name: "Enfant A1-1" },
-    { id: "12", parentId: "5", name: "Enfant A1-2" },
-    { id: "13", parentId: "6", name: "Enfant A2-1" },
-    { id: "14", parentId: "6", name: "Enfant A2-2" },
-    { id: "15", parentId: "6", name: "Enfant A2-3" },
+    { id: "7", parentId: "3", name: "Antoine Durelle" },
+    { id: "8", parentId: "4", name: "Catherine Mottin" },
 
-    // Génération 3 – enfants de la branche B
-    { id: "16", parentId: "7", name: "Enfant B1-1" },
-    { id: "17", parentId: "7", name: "Enfant B1-2" },
-    { id: "18", parentId: "8", name: "Enfant B2-1" },
+    // Conjoint(e) non connecté = conservé comme indépendant
+    { id: "9", parentId: null, name: "Marie Duport" },
 
-    // Génération 3 – enfants de la branche C
-    { id: "19", parentId: "9", name: "Enfant C1-1" },
-    { id: "20", parentId: "9", name: "Enfant C1-2" },
+    // ----- Génération 3 -----
+    { id: "10", parentId: "5", name: "René-Pierre Lemercier-Dumineray" },
+    { id: "11", parentId: "6", name: "Henri François Dumineray" },
 
-    // Génération 3 – enfants de la branche D
-    { id: "21", parentId: "10", name: "Enfant D1-1" },
-    { id: "22", parentId: "10", name: "Enfant D1-2" },
-    { id: "23", parentId: "10", name: "Enfant D1-3" },
+    { id: "12", parentId: "7", name: "Fleury-Jules Durelle" },
 
-    // Génération 4 – petits-enfants (exemple détaillé)
-    { id: "24", parentId: "11", name: "Petit-enfant A1-1a" },
-    { id: "25", parentId: "11", name: "Petit-enfant A1-1b" },
-    { id: "26", parentId: "12", name: "Petit-enfant A1-2a" },
-    { id: "27", parentId: "12", name: "Petit-enfant A1-2b" },
-    { id: "28", parentId: "16", name: "Petit-enfant B1-1a" },
-    { id: "29", parentId: "19", name: "Petit-enfant C1-1a" },
-    { id: "30", parentId: "19", name: "Petit-enfant C1-1b" }
+    // côté Tourey
+    { id: "13", parentId: null, name: "? Tourey" },
+    { id: "14", parentId: "13", name: "Didier Tourey" },
+    { id: "15", parentId: "13", name: "Symphoriennne Moreau\n1867" },
+
+    // ----- Génération 4 -----
+    { id: "16", parentId: "11", name: "Anne-Antoinette Dumineray" },
+
+    { id: "17", parentId: "12", name: "Lucie Giroux\n1876 – 1960" },
+    { id: "18", parentId: "12", name: "René Durelle\n1872 – 1954" },
+
+    // ----- Génération 5 -----
+    { id: "19", parentId: "18", name: "Robert Durelle" },
+
+    // Conjoint de Robert (indiqué séparé)
+    { id: "20", parentId: null, name: "Jeanne Lesigne" },
+
+    // ----- Génération 6 -----
+    { id: "21", parentId: "19", name: "Jean Claude Durelle" },
+    { id: "22", parentId: null, name: "Catherine Hedal" },
+
+    // ----- Génération 7 -----
+    { id: "23", parentId: "21", name: "Camille Durelle" },
+
+    // ----- Génération 8 -----
+    { id: "24", parentId: "23", name: "Dejumne Nathan" },
+
+    // ----- Génération 9 -----
+    { id: "25", parentId: "24", name: "François Dejumne" },
+
+    // ----- Génération 10 -----
+    { id: "26", parentId: "25", name: "Michelle" },
+    { id: "27", parentId: "25", name: "Enfant inconnu" }
   ],
+
+  style: {
+    nodeWidth: 140,
+    nodeHeight: 60,
+    gapX: 80,
+    gapY: 90,
+    fontSize: "15px",
+    bgColor: "#c7dffc",
+    borderColor: "#000",
+    lineColor: "#666"
+  }
+};
+
   // Réglages de style simples à modifier directement ici
   style: {
     nodeWidth: 140,
