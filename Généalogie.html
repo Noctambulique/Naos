@@ -3,134 +3,224 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Arbre généalogique</title>
+  <title>Arbre généalogique — Éditeur interactif</title>
   <style>
-    :root{--card-bg:#9fc5e8;--muted-bg:#cfcfcf;--text:#08304b}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial; background:#fbfbfb; color:var(--text); padding:28px}
-    h1{font-size:20px;margin:0 0 18px}
-    .tree{max-width:900px;margin:0 auto;background:white;padding:18px;border-radius:8px;box-shadow:0 6px 18px rgba(10,20,30,0.06)}
-    /* simple vertical tree using nested lists */
-    .tree ul{padding-left:28px;position:relative}
-    .tree ul::before{content:'';position:absolute;left:10px;top:0;width:2px;height:100%;background:linear-gradient(#ddd,#ddd)}
-    .tree li{list-style:none;margin:12px 0;position:relative;padding-left:22px}
-    .node{display:inline-block;padding:10px 14px;border-radius:6px;background:var(--card-bg);box-shadow:inset 0 -2px 0 rgba(0,0,0,0.06);font-weight:600}
-    .node.gray{background:var(--muted-bg);font-weight:700}
-    .node small{display:block;font-weight:400;margin-top:6px;font-size:12px}
-    /* connectors */
-    .tree li::before{content:'';position:absolute;left:0;top:18px;width:14px;height:2px;background:#ddd}
-    /* responsive */
-    @media (max-width:700px){.tree{padding:12px}}
-    /* extra: make spouse pairs on same line */
-    .pair{display:flex;gap:12px;align-items:center}
-    .pair .node{font-weight:700}
-    .muted{font-weight:500;opacity:0.9}
+    :root{--bg:#0f172a;--card:#0b1220;--accent:#7c3aed;--muted:#94a3b8;--text:#e6eef6}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,#071024 0%, #081226 60%);color:var(--text)}
+    .app{display:grid;grid-template-columns:300px 1fr;gap:16px;height:100vh;padding:16px;box-sizing:border-box}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px;box-shadow:0 8px 24px rgba(2,6,23,0.6);overflow:auto}
+    h1{font-size:18px;margin:0 0 8px}
+    label{display:block;font-size:13px;color:var(--muted);margin-top:8px}
+    input,select,textarea,button{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text);box-sizing:border-box}
+    .controls{display:flex;gap:8px;margin-top:8px}
+    button.primary{background:var(--accent);border:none;color:white;font-weight:600}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    #graph-wrap{background:linear-gradient(180deg,#021126 0%, #05162b 100%);border-radius:12px;padding:8px;position:relative}
+    #svg-root{width:100%;height:calc(100vh - 64px);border-radius:8px}
+    .node-rect{fill:rgba(255,255,255,0.04);stroke:rgba(255,255,255,0.06);rx:6;cursor:pointer}
+    .node-text{font-size:12px;pointer-events:none}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+    .small{font-size:12px;padding:6px}
+    .footer-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .search{display:flex;gap:8px}
+    .badge{display:inline-block;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.03);font-size:12px}
+    /* tooltip */
+    .hint{position:absolute;right:12px;bottom:12px;background:rgba(0,0,0,0.4);padding:8px;border-radius:8px;color:var(--muted);font-size:12px}
   </style>
 </head>
 <body>
-  <div class="tree">
-    <h1>Arbre généalogique (reprise)</h1>
-    <p class="muted">J'ai transcrit les informations visibles sur l'image. Les traits montrent les liens parents-enfants ou conjoints quand c'était clair.</p>
+  <div class="app">
+    <aside class="panel">
+      <h1>Éditeur d'arbre généalogique</h1>
+      <div class="toolbar">
+        <button id="btn-new" class="small primary">Nouvel arbre</button>
+        <button id="btn-export" class="small ghost">Exporter JSON</button>
+        <button id="btn-import" class="small ghost">Importer JSON</button>
+        <button id="btn-save" class="small ghost">Enregistrer local</button>
+      </div>
 
-    <ul>
-      <li>
-        <div class="pair">
-          <div class="node">Françoise Primault</div>
-          <div class="node">Joseph La Batte</div>
+      <label>Recherche rapide</label>
+      <div class="search"><input id="search" placeholder="Nom ou année..."><button id="btn-find" class="small">Chercher</button></div>
+
+      <hr style="margin:12px 0;border:0;border-top:1px solid rgba(255,255,255,0.03)">
+
+      <div id="node-form">
+        <label>Personne sélectionnée</label>
+        <input id="sel-id" readonly placeholder="Aucun" />
+        <label>Nom</label>
+        <input id="inp-name" placeholder="Prénom Nom" />
+        <label>Date de naissance (optionnelle)</label>
+        <input id="inp-birth" placeholder="YYYY" />
+        <label>Notes</label>
+        <textarea id="inp-notes" rows="3" placeholder="Petites notes"></textarea>
+
+        <div class="controls">
+          <button id="btn-update" class="primary small">Mettre à jour</button>
+          <button id="btn-add-child" class="small ghost">Ajouter enfant</button>
+          <button id="btn-add-sib" class="small ghost">Ajouter frère/soeur</button>
         </div>
-        <ul>
-          <li>
-            <div class="node">Marie La Batte <small>1789 - 1819</small></div>
-            <ul>
-              <li>
-                <div class="node">René-Pierre Lemercier-Dumineray</div>
-                <ul>
-                  <li><div class="node">Henri-Pierre Lemercier-Dumineray</div></li>
-                  <li><div class="node">Marie Duport</div></li>
-                  <li>
-                    <div class="node">Henri François Dumineray</div>
-                    <ul>
-                      <li>
-                        <div class="node">Anne-Antoinette Dumineray</div>
-                        <ul>
-                          
-                              <li><div class="node">Jeanne Travard</div></li>
-                            </ul>
-                          </li>
-                          <li>
-                            <div class="node">Fleury-Jules Durelle</div>
-                            <small>Catherine Mottin (liée)</small>
-                            <ul>
-                              <li>
-                                <div class="pair">
-                                  <div class="node">René Durelle <small>1872 - 1954</small></div>
-                                  <div class="node">Lucie Giroux <small>1876 - 1960</small></div>
-                                </div>
-                                <ul>
-                                  <li>
-                                    <div class="node">Robert Durelle</div>
-                                    <ul>
-                                      <li>
-                                        <div class="node">Jean Claude Durelle</div>
-                                        <ul>
-                                          <li>
-                                            <div class="pair">
-                                              <div class="node">Camille Durelle</div>
-                                              <div class="node">Catherine Hedal</div>
-                                            </div>
-                                            <ul>
-                                              <li><div class="node">Dejumne Nathan</div>
-                                                <ul>
-                                                  <li>
-                                                    <div class="node">François Dejumne</div>
-                                                    <ul>
-                                                      <li><div class="node">Michelle</div></li>
-                                                      <li><div class="node">(autre enfant non nommé)</div></li>
-                                                    </ul>
-                                                  </li>
-                                                </ul>
-                                              </li>
-                                            </ul>
-                                          </li>
-                                        </ul>
-                                      </li>
-                                    </ul>
-                                  </li>
-                                </ul>
-                              </li>
-                            </ul>
-                          </li>
-                        </ul>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </li>
+        <div style="margin-top:8px" class="controls">
+          <button id="btn-delete" class="small">Supprimer</button>
+          <button id="btn-collapse" class="small">Réduire/Étendre</button>
+        </div>
+      </div>
 
-      <!-- branche latérale inconnue Tourey -->
-      <li>
-        <div class="node gray">? Tourey</div>
-        <ul>
-          <li><div class="node">Didier Tourey</div></li>
-          <li><div class="node">Symphorienne Moreau <small>1867</small></div></li>
-        </ul>
-      </li>
+      <div class="footer-note">
+        Astuce: cliquez sur un nœud pour éditer. Glissez pour réorganiser. Utilisez exporter/importer pour partager.
+      </div>
+    </aside>
 
-      <li>
-        <div class="node gray">Antoine Durelle</div>
-      </li>
+    <main class="panel" id="graph-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div>
+          <span class="badge">Zoom: molette</span>
+          <span class="badge">Pan: cliquer+glisser fond</span>
+        </div>
+        <div>
+          <button id="btn-fit" class="small ghost">Ajuster</button>
+          <button id="btn-zoom-in" class="small">+</button>
+          <button id="btn-zoom-out" class="small">-</button>
+        </div>
+      </div>
 
-      <!-- autres personnes isolées présentes sur l'image -->
-      <li>
-        <div class="node">Jeanne Lesigne</div></div>
-      </li>
-
-    </ul>
-
-    <p style="margin-top:18px;font-size:13px;color:#555">Remarques : j'ai regroupé et simplifié la mise en page pour tenir sur une page. Si tu veux une version imprimable, une organisation horizontale ou des flèches SVG, dis-moi et je l'adapte.</p>
+      <svg id="svg-root"></svg>
+      <div class="hint">Sélection: <span id="hint-name">aucune</span></div>
+    </main>
   </div>
+
+  <!-- D3.js (utilisé pour des arbres larges et performants) -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    // ----- données d'exemple -----
+    const sample = {
+      id: 'root', name: 'Vous', birth: '', notes: '', children: [
+        {id: 'p1', name: 'Parent 1', birth: '1958', notes: '', children:[{id:'g1',name:'Enfant A',birth:'1985',notes:'',children:[]}]},
+        {id: 'p2', name: 'Parent 2', birth: '1960', notes: '', children:[]}
+      ]
+    };
+
+    // ----- configuration et état -----
+    let rootData = loadFromLocal() || sample;
+    let selected = null;
+
+    // svg setup
+    const svg = d3.select('#svg-root');
+    const width = document.getElementById('svg-root').clientWidth;
+    const height = document.getElementById('svg-root').clientHeight;
+    svg.attr('viewBox', [0,0,width,height]).attr('preserveAspectRatio','xMidYMid meet');
+
+    const g = svg.append('g'); // groupe général (pour zoom/pan)
+
+    const treeLayout = d3.tree().nodeSize([160, 120]); // ajustez pour espacement
+
+    const zoom = d3.zoom().scaleExtent([0.1, 2.5]).on('zoom', (event)=> g.attr('transform', event.transform));
+    svg.call(zoom).call(zoom.transform, d3.zoomIdentity.translate(width/2,50).scale(1));
+
+    // rendre l'arbre
+    function update() {
+      const root = d3.hierarchy(rootData, d => d.children);
+      treeLayout(root);
+
+      // liens
+      const links = g.selectAll('.link').data(root.links(), d => d.target.data.id);
+      links.enter().append('path').attr('class','link').merge(links)
+        .attr('fill','none').attr('stroke','rgba(255,255,255,0.06)').attr('stroke-width',1.2)
+        .attr('d', d => { return `M${d.source.x},${d.source.y+20} C${d.source.x},${(d.source.y+d.target.y)/2} ${d.target.x},${(d.source.y+d.target.y)/2} ${d.target.x},${d.target.y-12}`; });
+      links.exit().remove();
+
+      // nodes
+      const nodes = g.selectAll('.node').data(root.descendants(), d => d.data.id);
+      const nodeEnter = nodes.enter().append('g').attr('class','node').attr('transform', d => `translate(${d.x},${d.y})`).call(d3.drag()
+        .on('start', (event,d)=>{event.sourceEvent.stopPropagation();})
+        .on('drag', (event,d)=>{d.x += event.dx; d.y += event.dy; d3.select(event.sourceEvent.target.parentNode).attr('transform', `translate(${d.x},${d.y})`);})
+        .on('end', ()=>{ /* drag only moves visual pos for now */ })
+      );
+
+      nodeEnter.append('rect').attr('class','node-rect').attr('width',140).attr('height',44).attr('x',-70).attr('y',-22).attr('rx',8);
+      nodeEnter.append('text').attr('class','node-text name').attr('y',-2).attr('text-anchor','middle').text(d => d.data.name);
+      nodeEnter.append('text').attr('class','node-text birth').attr('y',14).attr('text-anchor','middle').text(d => d.data.birth ? d.data.birth : '');
+
+      nodes.merge(nodeEnter).on('click', (event,d)=>{ event.stopPropagation(); selectNode(d.data); })
+        .attr('transform', d => `translate(${d.x},${d.y})`);
+
+      nodes.exit().remove();
+
+      updateHint();
+    }
+
+    // sélection
+    function selectNode(node){ selected = node; document.getElementById('sel-id').value = node.id || ''; document.getElementById('inp-name').value = node.name || ''; document.getElementById('inp-birth').value = node.birth || ''; document.getElementById('inp-notes').value = node.notes || ''; updateHint(); }
+    function updateHint(){ document.getElementById('hint-name').textContent = selected ? (selected.name || selected.id) : 'aucune'; }
+
+    // opérations sur l'arbre
+    function findById(node, id){ if(node.id === id) return node; if(!node.children) return null; for(const c of node.children){ const found = findById(c,id); if(found) return found; } return null; }
+    function findParent(node, id){ if(!node.children) return null; for(const c of node.children){ if(c.id === id) return node; const p = findParent(c,id); if(p) return p; } return null; }
+
+    function addChildTo(selectedId){ const parent = findById(rootData, selectedId); if(!parent) return; const newid = genId(); const child = {id:newid, name:'Nouvel·le', birth:'', notes:'', children:[]}; parent.children = parent.children || []; parent.children.push(child); selectNode(child); saveToLocal(); update(); }
+    function addSiblingTo(selectedId){ if(!selectedId) return; const parent = findParent(rootData, selectedId); if(!parent){ alert('Pas de parent trouvé — ajoutez un enfant au lieu d'un frère/soeur.'); return; } const newid = genId(); const sib = {id:newid,name:'Nouvel·le',birth:'',notes:'',children:[]}; parent.children.push(sib); selectNode(sib); saveToLocal(); update(); }
+    function updateSelected(){ if(!selected) return; selected.name = document.getElementById('inp-name').value; selected.birth = document.getElementById('inp-birth').value; selected.notes = document.getElementById('inp-notes').value; saveToLocal(); update(); }
+    function deleteSelected(){ if(!selected) return; if(selected.id === rootData.id){ if(confirm('Supprimer la racine effacera tout l\'arbre. Continuer?')){ rootData = {id:genId(),name:'Racine',birth:'',notes:'',children:[]}; selected = null; saveToLocal(); update(); } return; }
+      const parent = findParent(rootData, selected.id); if(!parent) return; parent.children = parent.children.filter(c=>c.id!==selected.id); selected = null; saveToLocal(); update(); }
+
+    function toggleCollapse(){ if(!selected) return; if(selected._collapsed){ selected._collapsed = false; } else { selected._collapsed = true; }
+      // appliquer au modèle: si _collapsed true, cache children tempor., d3.hierarchy callback uses children accessor
+      pruneCollapsed(rootData);
+      saveToLocal(); update(); }
+
+    function pruneCollapsed(node){ if(!node) return; if(node._collapsed){ node._oldChildren = node.children; node.children = []; } else { if(node._oldChildren && (!node.children || node.children.length===0)) node.children = node._oldChildren; }
+      if(node.children) for(const c of node.children) pruneCollapsed(c);
+    }
+
+    function genId(){ return 'n'+Math.random().toString(36).slice(2,9); }
+
+    // import / export
+    function exportJSON(){ const s = JSON.stringify(rootData, null, 2); const blob = new Blob([s], {type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'arbre.json'; a.click(); URL.revokeObjectURL(url); }
+    function importJSON(){ const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json'; inp.onchange = e => { const f = e.target.files[0]; if(!f) return; const reader = new FileReader(); reader.onload = ev => { try{ rootData = JSON.parse(ev.target.result); selected = null; saveToLocal(); update(); }catch(err){ alert('Fichier JSON invalide'); } }; reader.readAsText(f); }; inp.click(); }
+
+    // localStorage
+    function saveToLocal(){ localStorage.setItem('arbre-data', JSON.stringify(rootData)); }
+    function loadFromLocal(){ try{ const s = localStorage.getItem('arbre-data'); return s ? JSON.parse(s) : null; }catch(e){ return null; } }
+
+    // recherche simple
+    function search(term){ if(!term) return null; const matches = []; (function recurse(n){ if((n.name||'').toLowerCase().includes(term) || (n.birth||'').includes(term)) matches.push(n); if(n.children) n.children.forEach(recurse); })(rootData); return matches; }
+
+    // UI binding
+    document.getElementById('btn-add-child').onclick = ()=>{ if(!selected) { alert('Sélectionnez un nœud puis cliquez sur "Ajouter enfant"'); return; } addChildTo(selected.id); };
+    document.getElementById('btn-add-sib').onclick = ()=>{ if(!selected) { alert('Sélectionnez un nœud puis cliquez sur "Ajouter frère/soeur"'); return; } addSiblingTo(selected.id); };
+    document.getElementById('btn-update').onclick = ()=>{ updateSelected(); };
+    document.getElementById('btn-delete').onclick = ()=>{ if(confirm('Supprimer la personne sélectionnée ?')) deleteSelected(); };
+    document.getElementById('btn-export').onclick = exportJSON;
+    document.getElementById('btn-import').onclick = importJSON;
+    document.getElementById('btn-save').onclick = ()=>{ saveToLocal(); alert('Enregistré dans le stockage local du navigateur.'); };
+    document.getElementById('btn-new').onclick = ()=>{ if(confirm('Créer un nouvel arbre vide (perd les données locales) ?')){ rootData = {id:genId(),name:'Racine',birth:'',notes:'',children:[]}; selected = null; saveToLocal(); update(); } };
+    document.getElementById('btn-collapse').onclick = ()=>{ toggleCollapse(); };
+    document.getElementById('btn-find').onclick = ()=>{ const term = document.getElementById('search').value.trim().toLowerCase(); const matches = search(term); if(!matches || matches.length===0) return alert('Aucun résultat'); selectNode(matches[0]); // sélectionne le premier
+      // recentrer
+      centerOn(matches[0]); };
+    document.getElementById('btn-fit').onclick = ()=>{ fitToScreen(); };
+    document.getElementById('btn-zoom-in').onclick = ()=>{ svg.transition().call(zoom.scaleBy, 1.2); };
+    document.getElementById('btn-zoom-out').onclick = ()=>{ svg.transition().call(zoom.scaleBy, 0.8); };
+
+    // centrer sur un noeud (approx.)
+    function centerOn(node){ // calcule position via d3.hierarchy
+      const root = d3.hierarchy(rootData, d=>d.children);
+      treeLayout(root);
+      let target = null; root.each(d=>{ if(d.data.id===node.id) target=d; }); if(!target) return; const tx = width/2 - target.x; const ty = 60 - target.y; svg.transition().duration(600).call(zoom.transform, d3.zoomIdentity.translate(tx,ty).scale(1)); }
+
+    function fitToScreen(){ // simple fit: recentre sur racine
+      svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(width/2,50).scale(1)); }
+
+    // fermer la sélection au clic sur fond
+    svg.on('click', ()=>{ selected = null; document.getElementById('sel-id').value=''; document.getElementById('inp-name').value=''; document.getElementById('inp-birth').value=''; document.getElementById('inp-notes').value=''; updateHint(); update(); });
+
+    // initial render
+    update();
+
+    // responsive resize
+    window.addEventListener('resize', ()=>{ const w = document.getElementById('svg-root').clientWidth; const h = document.getElementById('svg-root').clientHeight; svg.attr('viewBox', [0,0,w,h]); update(); });
+
+    // ----- quelques utilitaires supplémentaires possibles -----
+    // TODO: attacher relations conjugales, couleurs par branche, impression PDF adaptée, export PNG/SVG, import GEDCOM (à ajouter si besoin)
+  </script>
 </body>
 </html>
