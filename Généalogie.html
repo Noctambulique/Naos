@@ -31,6 +31,12 @@
     <h1>Arbre généalogique — Minimal</h1>
     <div class="controls" style="margin-left:12px">
       <button id="addRoot">Ajouter personne racine</button>
+      <button id="addParent" class="ghost">Ajouter parents</button>
+      <button id="addChild" class="ghost">Ajouter enfant</button>
+      <button id="delete" class="ghost">Supprimer</button>
+      <button id="export">Exporter HTML</button>
+      <button id="download" class="ghost">Télécharger page</button>
+      <button id="addRoot">Ajouter personne racine</button>
       <button id="addChild" class="ghost">Ajouter enfant</button>
       <button id="delete" class="ghost">Supprimer</button>
       <button id="export">Exporter HTML</button>
@@ -61,6 +67,7 @@
     // Minimal tree editor: nested UL/LI. No frameworks. All in one file.
     const treeContainer = document.getElementById('treeContainer');
     const exportArea = document.getElementById('exportArea');
+    const btnAddParent = document.getElementById('addParent');
     let selected = null;
 
     function createNode(name = 'Nouvelle personne'){
@@ -142,6 +149,18 @@
       selectNode(child);
     }
 
+    function addParent(){
+      if(!selected){ alert('Sélectionnez une personne.'); return; }
+      const current = selected;
+      const parentUL = current.parentElement;
+      const newParent = createNode('Nouveaux parents');
+      // Insert newParent at the same level as current
+      parentUL.insertBefore(newParent, current);
+      // Move current inside newParent
+      newParent.querySelector(':scope > ul.tree').appendChild(current);
+      selectNode(newParent);
+    }
+
     function deleteNode(){
       if(!selected){
         alert('Sélectionnez une personne à supprimer.');
@@ -218,6 +237,8 @@
 
     // wire buttons
     document.getElementById('addRoot').addEventListener('click', addRoot);
+    btnAddParent.addEventListener('click', addParent);
+    document.getElementById('addChild').addEventListener('click', addChild);('click', addRoot);
     document.getElementById('addChild').addEventListener('click', addChild);
     document.getElementById('delete').addEventListener('click', deleteNode);
     document.getElementById('export').addEventListener('click', exportHTML);
