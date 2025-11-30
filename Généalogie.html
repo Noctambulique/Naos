@@ -13,8 +13,8 @@
     button{background:#111;color:#fff;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
     button.ghost{background:transparent;color:#111;border:1px solid #ddd}
     main{display:flex;gap:16px}
-    .canvas{flex:1;padding:12px;border-radius:10px;background:#fff;min-height:320px;box-shadow:0 1px 0 rgba(0,0,0,0.04)}
-    ul.tree{list-style:none;margin:8px 0 0 12px;padding-left:12px;border-left:1px dashed rgba(0,0,0,0.06)}
+    .canvas{flex:1;padding:12px;border-radius:10px;background:#fff;min-height:320px;box-shadow:0 1px 0 rgba(0,0,0,0.04);overflow:auto;border:2px solid #e5e5e5}
+    ul.tree{list-style:none;margin:8px 0 0 20px;padding-left:20px;border-left:2px solid #ddd}
     li.node{margin:6px 0;padding-left:12px;position:relative}
     li.node > .label{display:inline-block;padding:6px 10px;border-radius:8px;background:#f0f0f2;cursor:pointer}
     li.node.selected > .label{outline:2px solid #3b82f6;background:#eff6ff}
@@ -256,11 +256,8 @@
       }
     });
 
-    // Initialize
-    initSample();
-    // Select first node by default
-    const first = treeContainer.querySelector('li.node');
-    if(first) selectNode(first);
+    // Initialize — start with an empty tree
+    getRootUL();(first);
   </script>
 </body>
 </html>
