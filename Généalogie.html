@@ -5,197 +5,176 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Arbre généalogique interactif (single-file)</title>
 <style>
-  :root{--bg:#0f1724;--card:#0b1220;--accent:#22c55e;--muted:#9ba6b2}
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:linear-gradient(180deg,#081124 0%, #071826 100%);color:#e6eef6}
-  .toolbar{display:flex;gap:.5rem;padding:.6rem;background:rgba(255,255,255,0.03);align-items:center}
-  .toolbar button, .toolbar input, .toolbar textarea{background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit;padding:.4rem .6rem;border-radius:.4rem}
-  .toolbar input[type=file]{display:none}
-  .stage{position:relative;overflow:auto;height:calc(100vh - 48px)}
-  .canvas{position:relative;min-width:1200px;min-height:800px;padding:60px}
+  :root{--bg:#ffffff;--card:#c7dffc;--muted:#334155}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:#fff;color:#111}
+  .stage{position:relative;overflow:auto;height:100vh}
+  .canvas{position:relative;min-width:1200px;min-height:1400px;padding:60px}
   svg.connectors{position:absolute;inset:0;pointer-events:none}
-  .node{position:absolute;min-width:140px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;padding:10px;border:1px solid rgba(255,255,255,0.06);box-shadow:0 6px 18px rgba(0,0,0,0.5);cursor:grab;user-select:none}
-  .node:active{cursor:grabbing}
-  .node .name{font-weight:700;line-height:1.1}
-  .node small{display:block;color:var(--muted);margin-top:4px}
-  .node .controls{display:flex;gap:6px;margin-top:8px}
-  .node .controls button{font-size:12px;padding:5px;border-radius:6px}
-  .hud{position:fixed;right:12px;bottom:12px;background:rgba(2,6,23,0.6);padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04)}
-  .hint{font-size:12px;color:var(--muted)}
-  .hidden{display:none}
-  /* small screens */
-  @media (max-width:700px){.canvas{min-width:900px}}
+  .node{position:absolute;width:var(--node-width);height:var(--node-height);display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;border-radius:6px;background:var(--card);border:2px solid var(--border-color);font-size:var(--font-size);box-shadow:0 6px 18px rgba(0,0,0,0.07);}
+  .hint{position:fixed;left:12px;bottom:12px;font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
-  
-    <span class="hint">Double‑clic sur un nom pour éditer — Glisser pour déplacer</span>
-  </div>
-
   <div class="stage">
-    <div id="canvas" class="canvas"></div>
-    <svg id="svg" class="connectors"></svg>
-  </div>
-
-  
+    <div id="tree" class="canvas"></div>
+    <svg id="links" class="connectors"></svg>
   </div>
 
 <script>
 // ------------------------------
-// CONFIGURATION SIMPLE DE L'ARBRE
-// Édite seulement cet objet pour créer ton arbre.
-// Exemple : chaque node = { id, name, parentId }
-// L'arbre se génère automatiquement.
+// CONFIGURATION (éditer uniquement)
 // ------------------------------
 const TREE_DATA = {
   persons: [
-const TREE_DATA = {
-  persons: [
-    // ----- Génération 1 (tout en haut) -----
     { id: "1", parentId: null, name: "Françoise Primault" },
     { id: "2", parentId: null, name: "Joseph La Batte" },
     { id: "3", parentId: null, name: "Claude Durelle" },
     { id: "4", parentId: null, name: "Jeanne Travard" },
 
-    // ----- Génération 2 -----
     { id: "5", parentId: "1", name: "Henri-Pierre Lemercier-Dumineray" },
-    { id: "6", parentId: "2", name: "Marie La Batte\n1789 – 1819" },
+    { id: "6", parentId: "2", name: "Marie La Batte
+1789 – 1819" },
 
     { id: "7", parentId: "3", name: "Antoine Durelle" },
     { id: "8", parentId: "4", name: "Catherine Mottin" },
 
-    // Conjoint(e) non connecté = conservé comme indépendant
     { id: "9", parentId: null, name: "Marie Duport" },
 
-    // ----- Génération 3 -----
     { id: "10", parentId: "5", name: "René-Pierre Lemercier-Dumineray" },
     { id: "11", parentId: "6", name: "Henri François Dumineray" },
 
     { id: "12", parentId: "7", name: "Fleury-Jules Durelle" },
 
-    // côté Tourey
     { id: "13", parentId: null, name: "? Tourey" },
     { id: "14", parentId: "13", name: "Didier Tourey" },
-    { id: "15", parentId: "13", name: "Symphoriennne Moreau\n1867" },
+    { id: "15", parentId: "13", name: "Symphoriennne Moreau
+1867" },
 
-    // ----- Génération 4 -----
     { id: "16", parentId: "11", name: "Anne-Antoinette Dumineray" },
 
-    { id: "17", parentId: "12", name: "Lucie Giroux\n1876 – 1960" },
-    { id: "18", parentId: "12", name: "René Durelle\n1872 – 1954" },
+    { id: "17", parentId: "12", name: "Lucie Giroux
+1876 – 1960" },
+    { id: "18", parentId: "12", name: "René Durelle
+1872 – 1954" },
 
-    // ----- Génération 5 -----
     { id: "19", parentId: "18", name: "Robert Durelle" },
-
-    // Conjoint de Robert (indiqué séparé)
     { id: "20", parentId: null, name: "Jeanne Lesigne" },
 
-    // ----- Génération 6 -----
     { id: "21", parentId: "19", name: "Jean Claude Durelle" },
     { id: "22", parentId: null, name: "Catherine Hedal" },
 
-    // ----- Génération 7 -----
     { id: "23", parentId: "21", name: "Camille Durelle" },
-
-    // ----- Génération 8 -----
     { id: "24", parentId: "23", name: "Dejumne Nathan" },
-
-    // ----- Génération 9 -----
     { id: "25", parentId: "24", name: "François Dejumne" },
-
-    // ----- Génération 10 -----
     { id: "26", parentId: "25", name: "Michelle" },
     { id: "27", parentId: "25", name: "Enfant inconnu" }
   ],
 
   style: {
-    nodeWidth: 140,
-    nodeHeight: 60,
-    gapX: 80,
-    gapY: 90,
+    nodeWidth: 200,
+    nodeHeight: 64,
+    gapX: 220,
+    gapY: 110,
     fontSize: "15px",
     bgColor: "#c7dffc",
-    borderColor: "#000",
-    lineColor: "#666"
-  }
-};
-
-  // Réglages de style simples à modifier directement ici
-  style: {
-    nodeWidth: 140,
-    nodeHeight: 50,
-    gapX: 60,      // distance horizontale
-    gapY: 80,      // distance verticale
-    fontSize: "16px",
-    bgColor: "#fff",
-    borderColor: "#000",
-    lineColor: "#333"
+    borderColor: "#123",
+    lineColor: "#444"
   }
 };
 
 // ------------------------------
 // MOTEUR DE RENDU AUTOMATIQUE
 // ------------------------------
-let nodes = {};
+const CSS = document.documentElement.style;
+CSS.setProperty('--node-width', TREE_DATA.style.nodeWidth + 'px');
+CSS.setProperty('--node-height', TREE_DATA.style.nodeHeight + 'px');
+CSS.setProperty('--font-size', TREE_DATA.style.fontSize);
+CSS.setProperty('--card', TREE_DATA.style.bgColor);
+CSS.setProperty('--border-color', TREE_DATA.style.borderColor);
 
-function buildTree(data) {
+let nodes = {}; // id -> node
+
+function buildTree(persons) {
   nodes = {};
-  data.forEach(n => {
-    nodes[n.id] = {
-      id: n.id,
-      name: n.name,
-      parentId: n.parentId,
-      children: []
-    };
+  persons.forEach(p => {
+    nodes[p.id] = { ...p, children: [], x: 0, y: 0 };
   });
   Object.values(nodes).forEach(n => {
     if (n.parentId && nodes[n.parentId]) nodes[n.parentId].children.push(n);
   });
 }
 
-function layoutTree(node, depth = 0, offset = 0) {
-  node.x = depth * 200;
-  node.y = offset * 100;
-  let currentOffset = offset;
-  node.children.forEach((c, i) => {
-    currentOffset = layoutTree(c, depth + 1, currentOffset);
-    currentOffset++;
+function layoutRoots() {
+  const roots = Object.values(nodes).filter(n => !n.parentId || !nodes[n.parentId]);
+  let offset = 0;
+  roots.forEach(r => {
+    offset = layoutNode(r, 0, offset);
+    offset += 1; // gap between root subtrees
   });
-  return currentOffset;
+}
+
+function layoutNode(node, depth, offset) {
+  node.x = depth * TREE_DATA.style.gapX;
+  node.y = offset * TREE_DATA.style.gapY;
+  let cur = offset;
+  if (node.children.length === 0) return cur;
+  node.children.forEach((c, i) => {
+    cur = layoutNode(c, depth + 1, cur);
+    cur += 1;
+  });
+  // center parent vertically above children
+  const first = node.children[0];
+  const last = node.children[node.children.length - 1];
+  if (first && last) {
+    node.y = (first.y + last.y) / 2;
+  }
+  return cur;
 }
 
 function render() {
-  const container = document.getElementById("tree");
-  container.innerHTML = "";
+  const container = document.getElementById('tree');
+  const svg = document.getElementById('links');
+  container.innerHTML = '';
+  svg.innerHTML = '';
+
+  // make svg cover canvas
+  const rect = container.getBoundingClientRect();
+  svg.setAttribute('width', container.scrollWidth);
+  svg.setAttribute('height', container.scrollHeight);
 
   Object.values(nodes).forEach(n => {
-    const el = document.createElement("div");
-    el.className = "node";
-    el.style.left = n.x + "px";
-    el.style.top = n.y + "px";
+    const el = document.createElement('div');
+    el.className = 'node';
+    el.style.left = (n.x) + 'px';
+    el.style.top = (n.y) + 'px';
     el.textContent = n.name;
     container.appendChild(el);
-  });
 
-  const svg = document.getElementById("links");
-  svg.innerHTML = "";
-  Object.values(nodes).forEach(n => {
     if (n.parentId && nodes[n.parentId]) {
       const p = nodes[n.parentId];
-      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line.setAttribute("x1", p.x + 80);
-      line.setAttribute("y1", p.y + 20);
-      line.setAttribute("x2", n.x + 80);
-      line.setAttribute("y2", n.y + 20);
-      line.setAttribute("stroke", "#555");
+      const x1 = p.x + TREE_DATA.style.nodeWidth / 2;
+      const y1 = p.y + TREE_DATA.style.nodeHeight;
+      const x2 = n.x + TREE_DATA.style.nodeWidth / 2;
+      const y2 = n.y;
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', x1);
+      line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y2);
+      line.setAttribute('stroke', TREE_DATA.style.lineColor);
+      line.setAttribute('stroke-width', 2);
       svg.appendChild(line);
     }
   });
 }
 
-// LANCEMENT
-buildTree(TREE_DATA);
-layoutTree(Object.values(nodes).find(n => !n.parentId));
+// build + layout + render
+buildTree(TREE_DATA.persons);
+layoutRoots();
 render();
+
+// expose for console debugging
+window.TREE = { data: TREE_DATA, nodes, buildTree, layoutRoots, render };
 </script>
 </body>
 </html>
