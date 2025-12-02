@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Convertisseur Excel → HTML</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Librairie SheetJS pour lire les fichiers Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f5f5f5;
+    }
+
+    h1 { font-size: 24px; }
+
+    #result {
+        margin-top: 20px;
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    textarea {
+        width: 100%;
+        height: 300px;
+        margin-top: 20px;
+        font-family: monospace;
+        font-size: 14px;
+    }
+</style>
+</head>
+
+<body>
+<h1>Convertisseur Excel → Code HTML</h1>
+
+<input type="file" id="fileInput" accept=".xlsx, .xls" />
+<div id="result"></div>
+
+<script>
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    let file = e.target.files[0];
+    let reader = new FileReader();
+
+    reader.onload = function(e) {
+        let data = new Uint8Array(e.target.result);
+        let workbook = XLSX.read(data, {type: 'array'});
+
+        // Première feuille
+        let sheet = workbook.Sheets[workbook.SheetNames[0]];
+        let rows = XLSX.utils.sheet_to_json(sheet, {header: 1});
+
+        let htmlRows = "";
+
+        rows.forEach(row => {
+            let text = row[0] || "";
+            let imgUrl = row[1] || "";
+
+            htmlRows += 
+`<tr>
+    <td>${text}</td>
+    <td><img src="${imgUrl}" alt="${text}"></td>
+</tr>
+`;
+        });
+
+        let finalHTML = 
+`<table>
+${htmlRows}
+</table>`;
+
+        document.getElementById("result").innerHTML = `
+            <h2>📄 Code HTML généré :</h2>
+            <textarea>${finalHTML}</textarea>
+        `;
+    };
+
+    reader.readAsArrayBuffer(file);
+});
+</script>
+
+</body>
+</html>
