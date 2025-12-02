@@ -15,7 +15,10 @@
         background: #8000ff; /* Fond violet */
     }
 
-    h1 { font-size: 24px; color: white; }
+    h1 { 
+        font-size: 24px; 
+        color: white;
+    }
 
     #result {
         margin-top: 20px;
@@ -31,6 +34,12 @@
         margin-top: 20px;
         font-family: monospace;
         font-size: 14px;
+    }
+
+    img {
+        max-width: 200px;
+        max-height: 150px;
+        object-fit: contain;
     }
 </style>
 </head>
@@ -60,10 +69,15 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
             let text = row[0] || "";
             let imgUrl = row[1] || "";
 
+            // Si pas d'URL : texte gris
+            let imgHtml = imgUrl
+                ? `<img src="${imgUrl}" alt="${text}">`
+                : `<span style="color:#999;">(aucune image)</span>`;
+
             htmlRows += 
 `<tr>
     <td>${text}</td>
-    <td><img src="${imgUrl}" alt="${text}"></td>
+    <td>${imgHtml}</td>
 </tr>
 `;
         });
