@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+  body { font-family: Arial; background:#fff; padding:40px; }
+  .container { max-width:480px; margin:auto; }
+  .question-box { display:none; }
+  .question { font-size:18px; margin-bottom:20px; }
+  .choice {
+    display:block; padding:12px; border:1px solid #ccc;
+    border-radius:8px; margin-bottom:10px; cursor:pointer;
+    background:#fafafa;
+  }
+  .choice.selected {
+  background:#c7f7c2;
+  border-color:#2e8b57;
+}
+  .choice:hover { border-color:#000; }
+  #nextBtn {
+    padding:10px 16px; background:#000; color:#fff;
+    border:0; border-radius:8px; cursor:pointer;
+    display:none; margin-top:20px;
+  }
+  #result {
+    font-family:monospace; font-size:20px; margin-top:30px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div id="questions"></div>
+
+  <button id="nextBtn">Continuer</button>
+  <div id="result"></div>
+
+</div>
+
+<script>
+// Valeurs de scoring
+const values = {A:7, B:16.5, C:26, D:35.5, E:45.5};
+
+// Questions & réponses personnalisables
+const quizData = [
+  {
+    // Conscience
+    q: " J'ai envie de lancer un projet",
+    answers: {
+      A: "Je me lance sans réfléchir, on apprend sur le terrain !",
+      B: "Je définis les objectifs et je me lance",
+      C: "Je cherche à avoir une base théoriques",
+      D: "Je note un max d'informations ",
+      E: "Je prépare un plan précis qui contient toutes les éventualités",
+    }
+  },
+{
+      // Conscience
+  q: "Quelqu’un mentionne un hobby que je ne connais mal",
+  answers: {
+    A: "Je lui parle aussi de mes hobbys du moment",
+    B: "J'attends de voir s'il veut développer",
+    C: "Je lui poser des questions pour voir si ça peut me plaire",
+    D: "Je pose une question pour comprendre mieux ce dont il s'agit",
+    E: "Je relie ça à sa personnalité pour saisir le sens"
+  }
+  },
+  {
+        // AC
+    q: "Quelqu'un vous pose une question indiscrète :",
+    answers: {
+      A: "Je réponds pour ne pas le gêner",
+      B: "J'essaie de donner quelques éléments quand même",
+      C: "Je change de sujet",
+      D: "Je dis que je ne peux pas répondre",
+      E: "Je lui dis de ne plus me poser ce genre de question"
+    }
+  },
+  {
+            // AC
+    q: "Laquelle de ces phrases te semble la plus juste ?",
+    answers: {
+      A: "Toute information sur soi est bonne à connaitre",
+      B: "Il y a peu de choses sur soi qu'il vaut mieux ignorer",
+      C: "Certaines choses sont bonnes à connaitre et d'autres non",
+      D: "Il y a beaucoup de choses sur soi qu'il vaut mieux ignorer",
+      E: "Mieux vaut ne pas trop se connaitre"
+    }
+  },
+  {
+            // AF
+    q: "Quelqu’un veut faire quelque chose de risqué :",
+    answers: {
+      A: "Je ne dis rien et je change de sujet",
+      B: "Je lui dis qu'il fait ce qu'il veut",
+      C: "Je donne mon avis mais je le laisse faire",
+      D: "Je lui dis d’être très prudent",
+      E: "J’essaie de le décourager"
+    }
+  },
+  {
+                // AF
+    q: "Quelle phrase te décrit le mieux ?",
+    answers: {
+      A: "La procrastination ? C'est quoi ?",
+      B: "Sur une journée j'arrive à être productif au moins 60% du temps",
+      C: "Sur une journée j'arrive à être productif au moins 30% du temps",
+      D: "Je repousse très souvent ce que je devrais faire",
+      E: "Je procrastine beaucoup"
+    }
+  },
+  {
+                // F
+    q: "Laquelle de ces phrases décrit le mieux votre pensée ?",
+    answers: {
+      A: "Une bonne vie est une vie de repos et de plaisir",
+      B: "Chaque jour il faut avoir fait une petite chose",
+      C: "Dans une vie il faut équiliber activité et repos",
+      D: "Il faut avoir accompli au moins une chose importante une chose dans sa vie",
+      E: "Une bonne vie se mesure au nombre de choses qu'on a fait"
+    }
+    },
+  {
+                    // F
+    q: "J’ai une tâche importante mais qui ne m’emballe pas :",
+    answers: {
+      A: "J’oublie / je laisse tomber",
+      B: "Je repousse au maximum",
+      C: "Je fais le minimum quand il le faut",
+      D: "Je finis mais j’ai besoin qu’on me pousse",
+      E: "Je me force à la faire correctement"
+    }
+  },
+  {
+                    // PF
+    q: "Il faut préparer un travail de groupe :?",
+    answers: {
+      A: "Je laisse les autres s’en occuper",
+      B: "Je fais ma part si on me dit quoi faire",
+      C: "Je prends une partie du travail",
+      D: "Je m’organise avec les autres pour répartir les tâches",
+      E: "Je prends la tête du projet et j’avance vite"
+    }
+  },
+    {
+                      // PF
+    q: "Mes talents de motivation :",
+    answers: {
+    A: "J’ai du mal à motiver les autres ou je ne m’en sens pas capable",
+    B: "Je peux encourager un peu, mais ce n’est pas vraiment mon point fort",
+    C: "Je réfléchis à la meilleure façon de motiver et j’y arrive parfois",
+    D: "Je motive efficacement quand je m’implique vraiment",
+    E: "Je suis très doué pour motiver les autres, même dans les situations difficiles"
+    }
+  },
+    {
+                      // PC
+    q: "Les gens se confient à moi :",
+    answers: {
+      A: "Quasiment jamais",
+      B: "Rarement, et seulement pour des petites choses",
+      C: "Parfois, quand ils ont besoin",
+      D: "Souvent, même pour des sujets importants",
+      E: "Très souvent, ils me racontent tout naturellement"
+    }
+  },
+    {
+                            // PC
+    q: "Un ami me semble dans un état inhabituel :",
+    answers: {
+      A: " S'il veut m'en parler, il le fera de lui-même",
+      B: " Je lui lance une perche discrète et n'insiste pas",
+      C: "Je lui dis que s'il veut me parler il peut",
+      D: "Je lui demande frontalement si tout va bien",
+      E: "Je lui pose des tas de questions"
+    }
+  }
+];
+
+let current = 0;
+let answers = [];
+
+const container = document.getElementById("questions");
+
+// Génération dynamique
+quizData.forEach((item, i)=>{
+  let html = `<div class="question-box" id="q${i}">
+    <div class="question">${i+1}️⃣ ${item.q}</div>
+  `;
+  for(let letter in item.answers){
+    html += `<div class="choice" data-value="${letter}">${letter} — ${item.answers[letter]}</div>`;
+  }
+  html += `</div>`;
+  container.innerHTML += html;
+});
+
+function show(n){
+  document.querySelectorAll('.question-box').forEach(q=>q.style.display="none");
+  document.getElementById("q"+n).style.display="block";
+}
+show(current);
+
+document.addEventListener('click', (e)=>{
+  if(e.target.classList.contains("choice")){
+    // retire le vert sur les autres réponses de la même question
+    const parent = e.target.parentElement;
+    parent.querySelectorAll('.choice').forEach(c=>c.classList.remove('selected'));
+
+    // ajoute le surlignage vert
+    e.target.classList.add("selected");
+
+    let letter = e.target.dataset.value;
+    answers[current] = values[letter];
+    document.getElementById("nextBtn").style.display="inline-block";
+  }
+});
+
+
+document.getElementById("nextBtn").addEventListener("click", ()=>{
+  current++;
+  document.getElementById("nextBtn").style.display="none";
+  if(current < quizData.length){
+    show(current);
+  } else {
+    document.querySelectorAll('.question-box').forEach(q=>q.style.display="none");
+
+    // Calcul final par paire
+    let result = [];
+    for(let i=0;i<12;i+=2){
+      result.push(answers[i] + answers[i+1]);
+    }
+
+    document.getElementById("result").textContent = "[" + result.join(", ") + "]";
+  }
+});
+</script>
+
+</body>
+</html>
