@@ -7,17 +7,17 @@
 
 <style>
 :root{
-  --bg:#f7f7f9;
-  --card-radius:12px;
-  --gap:14px;
+  --bg:#e7e7eb;
+  --card-radius:16px;
+  --gap:18px;
   --max-width:1100px;
 }
 *{box-sizing:border-box}
 
 body{
   margin:0;
-  padding:24px;
-  font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  padding:28px;
+  font-family:Inter, Arial, sans-serif;
   background:var(--bg);
   color:#111;
 }
@@ -27,26 +27,25 @@ body{
 .grid{
   display:grid;
   gap:var(--gap);
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
 .card{
-  background:#fff;
   border-radius:var(--card-radius);
-  padding:14px;
-  box-shadow:0 6px 18px rgba(8,12,20,0.06);
+  padding:18px;
   display:flex;
-  gap:12px;
+  gap:18px;
   align-items:flex-start;
-  transition:transform .12s ease;
+  transition:transform .12s ease, box-shadow .2s;
+  box-shadow:0 6px 20px rgba(20,20,20,0.12);
 }
-.card:hover{transform:translateY(-6px)}
+.card:hover{transform:translateY(-5px);}
 
 .left{
-  width:140px;
+  width:120px;
   display:flex;
   flex-direction:column;
-  gap:6px;
+  gap:10px;
   align-items:center;
 }
 
@@ -56,15 +55,15 @@ body{
   justify-content:center;
 }
 canvas.radar{
-  width:86px;
-  height:86px;
+  width:88px;
+  height:88px;
 }
 
 .content{
   flex:1;
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:12px;
 }
 
 .title-row{
@@ -73,29 +72,36 @@ canvas.radar{
   align-items:center;
 }
 
-.name{font-weight:600}
-
-.rects{display:flex; gap:8px}
-.rect{
-  flex:1;
-  min-height:56px;
-  border-radius:10px;
-  padding:8px;
-  background:rgba(0,0,0,0.03);
-  outline:none;
+.name{
+  font-weight:600;
+  font-size:16px;
+  color:#fff;
 }
 
-.meta{
+.rects{
   display:flex;
-  gap:8px;
-  align-items:center;
-  margin-top:6px;
+  flex-direction:column;
+  gap:10px;
+}
+
+.rect{
+  width:100%;
+  min-height:52px;
+  border-radius:12px;
+  padding:10px;
+  background:rgba(255,255,255,0.25);
+  backdrop-filter:blur(3px);
+  font-size:13px;
+  font-weight:500;
+  line-height:1.25;
+  color:#fff;
+  box-shadow:inset 0 0 6px rgba(0,0,0,0.12);
+  border:1px solid rgba(255,255,255,0.35);
 }
 
 @media (max-width:520px){
-  .rects{flex-direction:column}
-  .left{width:86px}
-  .card{padding:10px}
+  .grid{grid-template-columns:1fr}
+  .left{width:100px}
 }
 </style>
 </head>
@@ -133,7 +139,6 @@ function createCard(contact){
   radarWrap.appendChild(cvs);
   left.appendChild(radarWrap);
 
-  // 2e radar
   const radarWrap2 = document.createElement('div');
   radarWrap2.className='radar-wrap';
   const cvs2 = document.createElement('canvas');
@@ -170,29 +175,13 @@ function createCard(contact){
   drawRadar(cvs, contact.radar);
   drawRadar(cvs2, contact.radar2 || [0,0,0,0,0,0]);
 
-  // édition clic 1er radar
   cvs.style.cursor='pointer';
-  cvs.title='Modifier radar 1 : 6 valeurs (0-100)';
-  cvs.addEventListener('click', ()=>{
-    const input = prompt("Entrez 6 valeurs séparées par des virgules (0-100) :", contact.radar.join(', '));
-    if(!input) return;
-    const arr = input.split(',').map(s=>parseFloat(s.trim())).slice(0,6);
-    if(arr.length!==6 || arr.some(v=>Number.isNaN(v))) return alert('Format incorrect');
-    contact.radar = arr.map(v=>Math.max(0,Math.min(100,v)));
-    drawRadar(cvs, contact.radar);
-  });
+  cvs.title='Modifier radar 1';
+  cvs.addEventListener('click', ()=> editRadar(cvs, contact, 'radar'));
 
-  // édition clic 2e radar
   cvs2.style.cursor='pointer';
-  cvs2.title='Modifier radar 2 : 6 valeurs (0-100)';
-  cvs2.addEventListener('click', ()=>{
-    const input = prompt("Entrez 6 valeurs séparées par des virgules (0-100) :", (contact.radar2 || []).join(', '));
-    if(!input) return;
-    const arr = input.split(',').map(s=>parseFloat(s.trim())).slice(0,6);
-    if(arr.length!==6 || arr.some(v=>Number.isNaN(v))) return alert('Format incorrect');
-    contact.radar2 = arr.map(v=>Math.max(0,Math.min(100,v)));
-    drawRadar(cvs2, contact.radar2);
-  });
+  cvs2.title='Modifier radar 2';
+  cvs2.addEventListener('click', ()=> editRadar(cvs2, contact, 'radar2'));
 
   return card;
 }
@@ -206,11 +195,12 @@ function drawRadar(canvas, values){
   const radius=Math.min(w,h)*0.36;
   const N=6;
 
-  const fillViolet='rgba(150,80,200,0.18)';
-  const strokeViolet='rgba(150,80,200,0.95)';
+  const fill='rgba(255,255,255,0.2)';
+  const stroke='#fff';
 
-  ctx.strokeStyle='rgba(0,0,0,0.1)';
-  ctx.lineWidth=1.1;
+  ctx.strokeStyle='rgba(255,255,255,0.35)';
+  ctx.lineWidth=1;
+
   for(let r=4;r>=1;r--){
     ctx.beginPath();
     const rr=radius*(r/4);
@@ -224,7 +214,6 @@ function drawRadar(canvas, values){
     ctx.stroke();
   }
 
-  ctx.strokeStyle='rgba(0,0,0,0.1)';
   for(let i=0;i<N;i++){
     const a=Math.PI/2 + i*(Math.PI*2/N);
     const x=cx+Math.cos(a)*radius;
@@ -237,38 +226,33 @@ function drawRadar(canvas, values){
 
   ctx.beginPath();
   for(let i=0;i<N;i++){
-    const v=Math.max(0,Math.min(100, Number(values[i]||0)))/100;
+    const v=(values[i]||0)/100;
     const a=Math.PI/2 + i*(Math.PI*2/N);
     const x=cx+Math.cos(a)*radius*v;
     const y=cy-Math.sin(a)*radius*v;
     if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
   }
   ctx.closePath();
-  ctx.fillStyle=fillViolet;
-  ctx.fill();
-  ctx.strokeStyle=strokeViolet;
-  ctx.lineWidth=2;
-  ctx.stroke();
+  ctx.fillStyle=fill; ctx.fill();
+  ctx.strokeStyle=stroke; ctx.lineWidth=2; ctx.stroke();
+}
 
-  for(let i=0;i<N;i++){
-    const v=Math.max(0,Math.min(100, Number(values[i]||0)))/100;
-    const a=Math.PI/2 + i*(Math.PI*2/N);
-    const x=cx+Math.cos(a)*radius*v;
-    const y=cy-Math.sin(a)*radius*v;
-    ctx.beginPath();
-    ctx.arc(x,y,4,0,Math.PI*2);
-    ctx.fillStyle=strokeViolet;
-    ctx.fill();
-  }
+function editRadar(canvas, contact, key){
+  const input = prompt("Entrez 6 valeurs (0-100) :", (contact[key] || []).join(', '));
+  if(!input) return;
+  const arr = input.split(',').map(s=>parseFloat(s.trim())).slice(0,6);
+  if(arr.length!==6 || arr.some(v=>Number.isNaN(v))) return alert("Format incorrect");
+  contact[key] = arr.map(v=>Math.max(0,Math.min(100,v)));
+  drawRadar(canvas, contact[key]);
 }
 
 function renderAll(){
   cardsRoot.innerHTML='';
   contacts.forEach(c=> cardsRoot.appendChild(createCard(c)));
 }
-
 renderAll();
 window.CARNET_CONTACTS = contacts;
 </script>
+
 </body>
 </html>
