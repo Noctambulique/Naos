@@ -42,7 +42,7 @@ body{
 .card:hover{transform:translateY(-5px);}
 
 .left{
-  width:120px;
+  width:180px;
   display:flex;
   flex-direction:column;
   gap:10px;
@@ -55,8 +55,8 @@ body{
   justify-content:center;
 }
 canvas.radar{
-  width:88px;
-  height:88px;
+  width:180px;
+  height:180px;
 }
 
 .content{
@@ -95,13 +95,13 @@ canvas.radar{
   font-weight:500;
   line-height:1.25;
   color:#fff;
-  box-shadow:inset 0 0 6px rgba(0,0,0,0.12);
   border:1px solid rgba(255,255,255,0.35);
 }
 
 @media (max-width:520px){
   .grid{grid-template-columns:1fr}
-  .left{width:100px}
+  .left{width:140px}
+  canvas.radar{width:150px;height:150px}
 }
 </style>
 </head>
@@ -113,11 +113,38 @@ canvas.radar{
 <script>
 /* ======================== CONTACTS ==========================*/
 const contacts = [
-  { id:'aldrin_n', name:'Aldrin N', rect1:'V', rect2:'N', rect3:'', radar:[15,30,40,55,70,90], radar2:[15,30,40,55,70,90], color:'#3F917F' },
-  { id:'amandine_cp', name:'Amandine CP', rect1:'S', rect2:'MT', rect3:'', radar:[50,50,30,20,20,80], radar2:[50,50,50,50,50,50], color:'#3F917F' },
-  { id:'chara_f', name:'Chara F', rect1:'?', rect2:'MT', rect3:'', radar:[40,60,80,50,20,50], radar2:[50,50,50,50,50,50], color:'#4F9359' },
-  { id:'simon-n', name:'Simon N', rect1:'?', rect2:'?', rect3:'', radar:[20,30,50,65,80,95], radar2:[10,80,40,40,70,80], color:'#3F917F' }
+{ id: 'aldrin_n', name: 'Aldrin N', rect1: 'V', rect2: 'N', radar: [30,20,50,70,70,40], color:'#3F917F' },
+{ id: 'amandine_cp', name: 'Amandine CP', rect1: 'S', rect2: 'MT', radar: [50,50,30,20,20,80], color:'#3F917F' },
+{ id: 'chara_f', name: 'Chara F', rect1: '?', rect2: 'MT', radar: [40,60,80,50,20,50], color:'#4F9359' },
+{ id: 'david_cp', name: 'David CP', rect1: '?', rect2: '?', radar: [10,10,10,10,10], color:'#4F9359' },
+{ id: 'dimitri_f', name: 'Dimitri F', rect1: '?', rect2: '?', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'dounia', name: 'Dounia', rect1: '?', rect2: 'F', radar: [60,60,20,60,60,60], color:'#4F9359' },
+{ id: 'esperance_cp', name: 'Esperance CP', rect1: 'S', rect2: '?', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'gauthier_f', name: 'Gauthier F', rect1: 'O', rect2: 'F', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'jeanne', name: 'Jeanne', rect1: '?', rect2: 'NS', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'juliette_f', name: 'Juliette F', rect1: 'O', rect2: 'O', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'kalanie_f', name: 'Kalanie F', rect1: 'CS', rect2: '?', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'laurene', name: 'Laurène', rect1: '?', rect2: '?', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'leny_f', name: 'Leny F', rect1: 'N', rect2: 'CS', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'lili_f', name: 'Lili F', rect1: '?', rect2: '?', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'lisa', name: 'Lisa', rect1: 'N', rect2: 'MT', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'lucas_p', name: 'Lucas', rect1: 'V', rect2: 'R', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'ludovic_p', name: 'Ludovic F', rect1: '?', rect2: 'R', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'mael_p', name: 'Mael F', rect1: '?', rect2: 'R', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'martha_k', name: 'Martha CP', rect1: '?', rect2: '?', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'nathalie_v', name: 'Nathalie CP', rect1: '?', rect2: '?', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'octavie', name: 'Octavie', rect1: '?', rect2: 'R', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'poly_l', name: 'Poly CP', rect1: 'O', rect2: 'MT / O', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'saoussen_b', name: 'Saoussen', rect1: '?', rect2: 'R', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'solene_f', name: 'Solène CP', rect1: '?', rect2: '?', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'yasmine_m', name: 'Yasmine', rect1: '?', rect2: '?', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'milena_l', name: 'Miléna L', rect1: '?', rect2: '?', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'chloe_F', name: 'Chloé F', rect1: '?', rect2: '?', radar: [50,50,50,50,50,50], color:'#4F9359' },
+{ id: 'vincent_cp', name: 'Vincent CP', rect1: '?', rect2: '?', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'marie_noel_cp', name: 'Marie-Noel CP', rect1: '?', rect2: '?', radar: [50,50,50,50,50,50], color:'#3F917F' },
+{ id: 'simon-n', name: 'Simon N', rect1: '?', rect2: '?', radar: [20,30,50,65,80,95], color:'#3F917F' }
 ];
+
 
 /* =================== RENDER ====================*/
 const cardsRoot = document.getElementById('cards');
@@ -135,17 +162,9 @@ function createCard(contact){
   radarWrap.className='radar-wrap';
   const cvs = document.createElement('canvas');
   cvs.className='radar';
-  cvs.width = 200; cvs.height = 200;
+  cvs.width = 350; cvs.height = 350;
   radarWrap.appendChild(cvs);
   left.appendChild(radarWrap);
-
-  const radarWrap2 = document.createElement('div');
-  radarWrap2.className='radar-wrap';
-  const cvs2 = document.createElement('canvas');
-  cvs2.className='radar';
-  cvs2.width = 200; cvs2.height = 200;
-  radarWrap2.appendChild(cvs2);
-  left.appendChild(radarWrap2);
 
   const content = document.createElement('div');
   content.className='content';
@@ -172,47 +191,52 @@ function createCard(contact){
   card.appendChild(left);
   card.appendChild(content);
 
-  drawRadar(cvs, contact.radar);
-  drawRadar(cvs2, contact.radar2 || [0,0,0,0,0,0]);
+  drawRadar(cvs, contact.radar, contact.color);
 
   cvs.style.cursor='pointer';
-  cvs.title='Modifier radar 1';
-  cvs.addEventListener('click', ()=> editRadar(cvs, contact, 'radar'));
-
-  cvs2.style.cursor='pointer';
-  cvs2.title='Modifier radar 2';
-  cvs2.addEventListener('click', ()=> editRadar(cvs2, contact, 'radar2'));
+  cvs.title='Modifier radar';
+  cvs.addEventListener('click', ()=> editRadar(cvs, contact));
 
   return card;
 }
 
 /* =================== RADAR ====================*/
-function drawRadar(canvas, values){
+const LABELS = ["A", "B", "C", "D", "E", "F"];
+
+function drawRadar(canvas, values, baseColor){
   const ctx = canvas.getContext('2d');
   const w=canvas.width, h=canvas.height;
   ctx.clearRect(0,0,w,h);
+
   const cx=w/2, cy=h/2;
-  const radius=Math.min(w,h)*0.36;
+  const radius=Math.min(w,h)*0.38;
   const N=6;
 
-  const fill='rgba(255,255,255,0.2)';
+  const fill= "rgba(255,255,255,0.22)";
   const stroke='#fff';
 
   ctx.strokeStyle='rgba(255,255,255,0.35)';
   ctx.lineWidth=1;
 
+  // Grille polygonale
   for(let r=4;r>=1;r--){
-    ctx.beginPath();
     const rr=radius*(r/4);
+    ctx.beginPath();
     for(let i=0;i<N;i++){
       const a=Math.PI/2 + i*(Math.PI*2/N);
       const x=cx+Math.cos(a)*rr;
       const y=cy-Math.sin(a)*rr;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
     }
     ctx.closePath();
     ctx.stroke();
   }
+
+  // Axes + labels
+  ctx.font="14px Arial";
+  ctx.fillStyle="#fff";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
 
   for(let i=0;i<N;i++){
     const a=Math.PI/2 + i*(Math.PI*2/N);
@@ -222,28 +246,31 @@ function drawRadar(canvas, values){
     ctx.moveTo(cx,cy);
     ctx.lineTo(x,y);
     ctx.stroke();
+
+    ctx.fillText(LABELS[i], x*1.05 - cx*0.05, y*1.05 - cy*0.05);
   }
 
+  // Forme radar
   ctx.beginPath();
   for(let i=0;i<N;i++){
     const v=(values[i]||0)/100;
     const a=Math.PI/2 + i*(Math.PI*2/N);
     const x=cx+Math.cos(a)*radius*v;
     const y=cy-Math.sin(a)*radius*v;
-    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    i?ctx.lineTo(x,y):ctx.moveTo(x,y);
   }
   ctx.closePath();
   ctx.fillStyle=fill; ctx.fill();
   ctx.strokeStyle=stroke; ctx.lineWidth=2; ctx.stroke();
 }
 
-function editRadar(canvas, contact, key){
-  const input = prompt("Entrez 6 valeurs (0-100) :", (contact[key] || []).join(', '));
+function editRadar(canvas, contact){
+  const input = prompt("Entrez 6 valeurs (0-100) :", (contact.radar || []).join(', '));
   if(!input) return;
   const arr = input.split(',').map(s=>parseFloat(s.trim())).slice(0,6);
   if(arr.length!==6 || arr.some(v=>Number.isNaN(v))) return alert("Format incorrect");
-  contact[key] = arr.map(v=>Math.max(0,Math.min(100,v)));
-  drawRadar(canvas, contact[key]);
+  contact.radar = arr.map(v=>Math.max(0,Math.min(100,v)));
+  drawRadar(canvas, contact.radar, contact.color);
 }
 
 function renderAll(){
