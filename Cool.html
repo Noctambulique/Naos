@@ -7,156 +7,145 @@
 :root {
   --gap: 22px;
   --radius: 14px;
-
-  --aero-blue-top: #54c7ff;
-  --aero-blue-bottom: #0073d9;
-
-  --aero-green: #8bf25b;
-  --aero-white: #e8faff;
-  --aero-glass: rgba(255, 255, 255, 0.55);
-
-  --shadow-dark: 0 8px 22px rgba(0, 0, 0, 0.45);
+  --aero-blue1: #73e0ff;
+  --aero-blue2: #0094ff;
+  --aero-green: #9cf75e;
+  --aero-shadow: 0 10px 32px rgba(0,0,0,.55);
 }
 
-/* FOND FRUTIGER AERO */
-html, body {
+/* FOND : ciel, bulles, feuilles */
+body {
   margin: 0;
-  height: 100%;
   font-family: "Segoe UI", Tahoma, sans-serif;
   background:
-    radial-gradient(circle at 70% 20%, #bafffc 0%, #5dc8ff 35%, #0074d9 100%);
-  background-attachment: fixed;
-  color: #002242;
+    linear-gradient(145deg, #7be6ff 0%, #0094ff 60%, #0058b9 100%);
+  color: #002d55;
   overflow-x: hidden;
 }
 
-/* Ajout nuageux + bulles flottantes */
-html::before {
+/* Nuages glossy */
+body::before {
   content:"";
   position: fixed;
-  top:0; left:0;
-  width:100vw; height:100vh;
+  inset:0;
+  background:url('https://frutiger-aero.org/img/frutiger-aero-6.webp') center/cover no-repeat;
+  opacity:.22;
+  filter:blur(1.4px);
   pointer-events:none;
-  background:
-    url('https://frutiger-aero.org/img/frutiger-aero-6.webp') center/cover no-repeat;
-  opacity: .22;
-  filter: blur(2px);
 }
 
-/* Mise en page */
+/* Bubbles */
+@keyframes bubbles {
+  from { transform: translateY(100vh) scale(.4); opacity:.2; }
+  to { transform: translateY(-10vh) scale(1); opacity:.8; }
+}
+.bubble {
+  position: fixed; bottom:-60px;
+  width:50px; height:50px;
+  background: radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 70%);
+  border-radius:50%;
+  animation: bubbles 12s linear infinite;
+  pointer-events:none;
+  filter:blur(.4px);
+}
+.bubble:nth-child(odd) { animation-duration:15s; opacity:.4; }
+
+/* FEUILLES */
+.leaf {
+  position:fixed;
+  top:-80px;
+  width:60px; height:60px;
+  background:url("https://i.imgur.com/0A9AzXU.png") center/contain no-repeat;
+  animation: leafFall 9s linear infinite;
+  pointer-events:none;
+  opacity:.55;
+}
+@keyframes leafFall {
+  0% { transform: translateX(0) translateY(-80px) rotate(0deg); }
+  50% { transform: translateX(-80px) translateY(50vh) rotate(120deg); }
+  100% { transform: translateX(60px) translateY(100vh) rotate(260deg); }
+}
+
+/* WRAP */
 .wrap {
-  max-width: 1150px;
-  margin: 0 auto;
-  padding: 38px;
-  box-sizing: border-box;
+  max-width:1100px;
+  margin:0 auto;
+  padding:50px 36px;
 }
 
-/* Titres façon Vista */
-.title {
-  font-weight: 600;
-  margin: 0 0 14px;
-  color: #003e73;
-  text-shadow: 0 2px 0 rgba(255,255,255,.7);
+/* HEADER OVER-THE-TOP LIVE STYLE */
+.header {
+  height:68px;
+  border-radius:18px;
+  margin-bottom:32px;
+  background:linear-gradient(to bottom,#ffffffba,#d6f1ffb2);
+  border:2px solid #9fe3ff;
+  box-shadow:0 6px 22px rgba(0,0,0,.4);
+  display:flex;
+  align-items:center;
+  padding:0 26px;
+  font-size:22px;
+  color:#00508c;
+  text-shadow:0 2px 0 rgba(255,255,255,.8);
 }
 
-/* Grille */
+/* GRID */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--gap);
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:var(--gap);
 }
 
-/* VRAIES CARTES FRUTIGER AERO */
+/* CARDS */
 .card {
-  position: relative;
-  border-radius: var(--radius);
+  position:relative;
+  border:2px solid #fff;
+  border-radius:var(--radius);
   overflow:hidden;
-  min-height: 180px;
-  border: 1px solid rgba(255,255,255,0.8);
-
-  background: linear-gradient(
-    135deg,
-    var(--aero-white) 0%,
-    rgba(255,255,255,.75) 40%,
-    var(--aero-glass) 100%
-  );
-  box-shadow:
-    var(--shadow-dark),
-    inset 0 0 20px rgba(255,255,255,0.7);
-
-  cursor: pointer;
-  transition: .18s ease-out;
-  backdrop-filter: blur(4px);
+  cursor:pointer;
+  min-height:180px;
+  background:linear-gradient(135deg,#fff,#c8f7ff 60%,#73e0ff);
+  box-shadow:var(--aero-shadow), inset 0 0 24px rgba(255,255,255,.75);
+  transition:.2s;
 }
-
-/* Reflet glossy typique Web 2.0 */
 .card::before {
   content:"";
   position:absolute;
-  top:0; left:0;
-  width:100%; height:45%;
-  background:linear-gradient(
-    rgba(255,255,255,.85),
-    rgba(255,255,255,.1)
-  );
-  pointer-events:none;
+  top:0;left:0;width:100%;height:46%;
+  background:linear-gradient(rgba(255,255,255,.85),rgba(255,255,255,.1));
 }
-
 .card:hover {
-  transform: translateY(-6px) scale(1.03);
-  box-shadow:
-    0 12px 26px rgba(0,0,0,.5),
-    inset 0 0 26px rgba(255,255,255,.92);
-  border-color: #7befff;
+  transform:translateY(-6px) scale(1.04) rotate(-0.8deg);
+  box-shadow:0 16px 38px rgba(0,0,0,.65);
+  border-color:#4ff0ff;
 }
+.card img { width:100%;height:100%;object-fit:cover; }
 
-.card img {
-  width:100%; height:100%;
-  object-fit:cover;
-}
-
-/* READER : FENÊTRE AERO SUREXPLOSÉE */
+/* READER */
 .reader {
   position:relative;
-  min-height:360px;
-  border-radius: var(--radius);
   padding:40px;
-  border:1px solid #dff8ff;
-  background:linear-gradient(
-    to bottom,
-    rgba(255,255,255,.9),
-    rgba(180,230,255,.8)
-  );
-  box-shadow:
-    0 0 0 2px rgba(0,140,255,.6),
-    0 18px 36px rgba(0,0,0,.55);
+  border-radius:var(--radius);
+  border:2px solid #bff3ff;
+  min-height:360px;
+  background:linear-gradient(to bottom,#fff,#e6faff);
+  box-shadow:0 0 0 2px #62d9ff,0 26px 48px rgba(0,0,0,.6);
   animation:fadeIn .32s ease-out;
 }
-
 .reader::after {
   content:"";
-  position:absolute; inset:0;
-  background:linear-gradient(
-    to bottom,
-    rgba(255,255,255,.48),
-    rgba(255,255,255,0)
-  );
-  pointer-events:none;
+  position:absolute;inset:0;
+  background:linear-gradient(rgba(255,255,255,.4),rgba(255,255,255,0));
 }
-
 .reader .content {
-  font-size: 17px;
-  line-height: 1.6;
-  color: #00325f;
-  text-shadow: 0 1px 0 rgba(255,255,255,.8);
+  font-size:18px;
+  line-height:1.6;
+  color:#003b64;
 }
-
-/* Anim */
 @keyframes fadeIn {
-  from { opacity:0; transform:translateY(12px); }
-  to { opacity:1; transform:translateY(0); }
+  from {opacity:0;transform:translateY(14px);}
+  to {opacity:1;transform:translateY(0);}
 }
-
 </style>
 
 
