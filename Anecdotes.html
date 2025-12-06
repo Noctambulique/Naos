@@ -4,56 +4,161 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Carrés minimalistes</title>
-  <style>
-    :root{
-      --bg:#ffffff;
-      --text:#000000;
-      --square-bg:#ffffff;
-      --square-border:#000;
-      --square-size:130px;
-      --gap:14px;
-      --radius:6px;
-      --font:system-ui, sans-serif;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{
-      background:var(--bg);
-      color:var(--text);
-      font-family:var(--font);
-      padding:40px;
-      display:flex;justify-content:center;align-items:center;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(var(--square-size),1fr));
-      gap:var(--gap);
-      width:100%;max-width:900px;
-      transition:opacity .35s ease;
-    }
-    .square{
-      border:1px solid var(--square-border);
-      height:var(--square-size);
-      display:flex;align-items:center;justify-content:center;
-      border-radius:var(--radius);
-      cursor:pointer;
-      padding:10px;
-      user-select:none;
-    }
-    .title{font-size:14px;text-align:center}
-    .viewer{
-      position:fixed;inset:0;
-      background:#fff;
-      display:flex;align-items:center;justify-content:center;
-      padding:40px;
-      opacity:0;pointer-events:none;
-      transition:opacity .3s ease;
-    }
-    .viewer.open{opacity:1;pointer-events:auto}
-    .card{max-width:700px;width:100%}
-    .card h1{font-size:24px;margin-bottom:10px}
-    .card p{white-space:pre-wrap;line-height:1.5;font-size:15px}
-    .btn{border:1px solid #000;background:none;padding:6px 12px;cursor:pointer;margin-top:20px}
-  </style>
+ <style>
+:root {
+  --gap: 22px;
+  --radius: 14px;
+
+  --aero-blue-top: #54c7ff;
+  --aero-blue-bottom: #0073d9;
+
+  --aero-green: #8bf25b;
+  --aero-white: #e8faff;
+  --aero-glass: rgba(255, 255, 255, 0.55);
+
+  --shadow-dark: 0 8px 22px rgba(0, 0, 0, 0.45);
+}
+
+/* FOND FRUTIGER AERO */
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background:
+    radial-gradient(circle at 70% 20%, #bafffc 0%, #5dc8ff 35%, #0074d9 100%);
+  background-attachment: fixed;
+  color: #002242;
+  overflow-x: hidden;
+}
+
+/* Ajout nuageux + bulles flottantes */
+html::before {
+  content:"";
+  position: fixed;
+  top:0; left:0;
+  width:100vw; height:100vh;
+  pointer-events:none;
+  background:
+    url('https://frutiger-aero.org/img/frutiger-aero-6.webp') center/cover no-repeat;
+  opacity: .22;
+  filter: blur(2px);
+}
+
+/* Mise en page */
+.wrap {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 38px;
+  box-sizing: border-box;
+}
+
+/* Titres façon Vista */
+.title {
+  font-weight: 600;
+  margin: 0 0 14px;
+  color: #003e73;
+  text-shadow: 0 2px 0 rgba(255,255,255,.7);
+}
+
+/* Grille */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--gap);
+}
+
+/* VRAIES CARTES FRUTIGER AERO */
+.card {
+  position: relative;
+  border-radius: var(--radius);
+  overflow:hidden;
+  min-height: 180px;
+  border: 1px solid rgba(255,255,255,0.8);
+
+  background: linear-gradient(
+    135deg,
+    var(--aero-white) 0%,
+    rgba(255,255,255,.75) 40%,
+    var(--aero-glass) 100%
+  );
+  box-shadow:
+    var(--shadow-dark),
+    inset 0 0 20px rgba(255,255,255,0.7);
+
+  cursor: pointer;
+  transition: .18s ease-out;
+  backdrop-filter: blur(4px);
+}
+
+/* Reflet glossy typique Web 2.0 */
+.card::before {
+  content:"";
+  position:absolute;
+  top:0; left:0;
+  width:100%; height:45%;
+  background:linear-gradient(
+    rgba(255,255,255,.85),
+    rgba(255,255,255,.1)
+  );
+  pointer-events:none;
+}
+
+.card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow:
+    0 12px 26px rgba(0,0,0,.5),
+    inset 0 0 26px rgba(255,255,255,.92);
+  border-color: #7befff;
+}
+
+.card img {
+  width:100%; height:100%;
+  object-fit:cover;
+}
+
+/* READER : FENÊTRE AERO SUREXPLOSÉE */
+.reader {
+  position:relative;
+  min-height:360px;
+  border-radius: var(--radius);
+  padding:40px;
+  border:1px solid #dff8ff;
+  background:linear-gradient(
+    to bottom,
+    rgba(255,255,255,.9),
+    rgba(180,230,255,.8)
+  );
+  box-shadow:
+    0 0 0 2px rgba(0,140,255,.6),
+    0 18px 36px rgba(0,0,0,.55);
+  animation:fadeIn .32s ease-out;
+}
+
+.reader::after {
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(
+    to bottom,
+    rgba(255,255,255,.48),
+    rgba(255,255,255,0)
+  );
+  pointer-events:none;
+}
+
+.reader .content {
+  font-size: 17px;
+  line-height: 1.6;
+  color: #00325f;
+  text-shadow: 0 1px 0 rgba(255,255,255,.8);
+}
+
+/* Anim */
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(12px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+</style>
 </head>
 <body>
   <div id="grid" class="grid"></div>
