@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Page interactive mobile</title>
+
 <style>
   body{
     margin:0;
@@ -11,14 +12,25 @@
     background:#f2f2f2;
     overflow:hidden;
   }
+
+  /* 📌 Arrière-plan portrait ici */
   #container{
     position:relative;
     width:100vw;
     height:100vh;
     overflow:auto;
     touch-action:manipulation;
-    background:#fff;
+
+    /* ---- CONFIG IMAGE ---- */
+    background-image:url("IMAGE.jpg"); /* Remplace par ton image */
+    background-repeat:no-repeat;
+    background-position:center top;
+    background-size:contain; /* cover = image pleine / contain = image entière */
+    /* ---------------------- */
+
+    background-color:#fff; /* visible si l'image ne couvre pas tout */
   }
+
   .marker{
     position:absolute;
     width:80px;
@@ -61,20 +73,17 @@
     cursor:pointer;
     z-index:200;
   }
-.hidden{
-  display:none;
-}
-
+.hidden{display:none;}
 </style>
 </head>
 <body>
+
 <div id="returnBtn" onclick="closePanel()">Retour</div>
 <div id="container"></div>
 
 <div id="panel">
   <div id="panelText" style="white-space:pre-line; font-size:16px; line-height:1.4;"></div>
 </div>
-
 <script>
   const data = [
   { x: 050, y: 10, img: "Philo/Bonheur.png", size: 80, type: "info", 
