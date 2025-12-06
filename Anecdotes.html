@@ -4,153 +4,151 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Carrés minimalistes</title>
-:root {
-  --bg: linear-gradient(135deg,#74e0ff 0%,#34b6ff 50%,#0074d9 100%);
-  --text:#003b67;
-  --square-size:140px;
-  --gap:16px;
-  --radius:12px;
-  --font:"Segoe UI", Tahoma, sans-serif;
-  --border-glow:#66e5ff;
-}
 
-/* Base */
-* { box-sizing:border-box; margin:0; padding:0; }
-body {
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--font);
-  padding:60px 40px;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  min-height:100vh;
-  backdrop-filter:blur(2px);
-}
+  <style>
+  :root {
+    --bg: linear-gradient(135deg,#74e0ff 0%,#34b6ff 50%,#0074d9 100%);
+    --text:#003b67;
+    --square-size:140px;
+    --gap:16px;
+    --radius:12px;
+    --font:"Segoe UI", Tahoma, sans-serif;
+    --border-glow:#66e5ff;
+  }
 
-/* Légère texture glossy */
-body::after {
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  background:
-    linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,0) 45%),
-    url("https://frutiger-aero.org/img/bg-noise.png") center/cover;
-  opacity:.25;
-}
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font);
+    padding:60px 40px;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    backdrop-filter:blur(2px);
+  }
 
-/* Grille */
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(var(--square-size),1fr));
-  gap:var(--gap);
-  width:100%;
-  max-width:900px;
-  transition:opacity .35s ease;
-}
+  body::after {
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,0) 45%),
+      url("https://frutiger-aero.org/img/bg-noise.png") center/cover;
+    opacity:.25;
+  }
 
-/* Carrés style Windows Live */
-.square {
-  border:1px solid rgba(255,255,255,.75);
-  border-radius:var(--radius);
-  background:
-    linear-gradient(145deg,#ffffff 0%,#c8f6ff 55%,#9cecff 100%);
-  height:var(--square-size);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  padding:10px;
-  user-select:none;
-  box-shadow:
-    0 4px 10px rgba(0,0,0,.25),
-    inset 0 0 18px rgba(255,255,255,.65);
-  transition:.25s ease;
-}
+  .grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(var(--square-size),1fr));
+    gap:var(--gap);
+    width:100%;
+    max-width:900px;
+    transition:opacity .35s ease;
+  }
 
-.square:hover {
-  transform:translateY(-6px) scale(1.05);
-  border-color:var(--border-glow);
-  box-shadow:
-    0 14px 28px rgba(0,0,0,.35),
-    inset 0 0 22px rgba(255,255,255,.75);
-}
+  .square {
+    border:1px solid rgba(255,255,255,.75);
+    border-radius:var(--radius);
+    background:
+      linear-gradient(145deg,#ffffff 0%,#c8f6ff 55%,#9cecff 100%);
+    height:var(--square-size);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    padding:10px;
+    user-select:none;
+    box-shadow:
+      0 4px 10px rgba(0,0,0,.25),
+      inset 0 0 18px rgba(255,255,255,.65);
+    transition:.25s ease;
+  }
 
-.title {
-  font-size:15px;
-  font-weight:600;
-  text-align:center;
-  color:var(--text);
-  text-shadow:0 1px 0 rgba(255,255,255,.8);
-}
+  .square:hover {
+    transform:translateY(-6px) scale(1.05);
+    border-color:var(--border-glow);
+    box-shadow:
+      0 14px 28px rgba(0,0,0,.35),
+      inset 0 0 22px rgba(255,255,255,.75);
+  }
 
-/* Viewer aéro glass */
-.viewer {
-  position:fixed;
-  inset:0;
-  background:rgba(255,255,255,.45);
-  backdrop-filter:blur(12px) saturate(140%);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:40px;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .3s ease;
-}
-.viewer.open {
-  opacity:1;
-  pointer-events:auto;
-}
+  .title {
+    font-size:15px;
+    font-weight:600;
+    text-align:center;
+    color:var(--text);
+    text-shadow:0 1px 0 rgba(255,255,255,.8);
+  }
 
-/* Carte dans viewer (fenêtre Vista) */
-.card {
-  max-width:720px;
-  width:100%;
-  background:linear-gradient(to bottom,#fff,#e6f9ff);
-  border:2px solid #a3e6ff;
-  border-radius:18px;
-  box-shadow:
-    0 10px 40px rgba(0,0,0,.45),
-    inset 0 0 18px rgba(255,255,255,.85);
-  padding:36px;
-}
+  .viewer {
+    position:fixed;
+    inset:0;
+    background:rgba(255,255,255,.45);
+    backdrop-filter:blur(12px) saturate(140%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .viewer.open {
+    opacity:1;
+    pointer-events:auto;
+  }
 
-.card h1 {
-  font-size:26px;
-  margin-bottom:14px;
-  text-shadow:0 1px 0 rgba(255,255,255,.9);
-  color:#00548e;
-}
+  .card {
+    max-width:720px;
+    width:100%;
+    background:linear-gradient(to bottom,#fff,#e6f9ff);
+    border:2px solid #a3e6ff;
+    border-radius:18px;
+    box-shadow:
+      0 10px 40px rgba(0,0,0,.45),
+      inset 0 0 18px rgba(255,255,255,.85);
+    padding:36px;
+  }
 
-.card p {
-  white-space:pre-wrap;
-  line-height:1.6;
-  font-size:17px;
-  font-weight:450;
-  color:#003b67;
-}
+  .card h1 {
+    font-size:26px;
+    margin-bottom:14px;
+    text-shadow:0 1px 0 rgba(255,255,255,.9);
+    color:#00548e;
+  }
 
-/* Bouton style Windows Live */
-.btn {
-  border:2px solid #008cd8;
-  background:linear-gradient(#dfffff,#9fe8ff);
-  border-radius:8px;
-  padding:8px 18px;
-  cursor:pointer;
-  font-weight:600;
-  color:#005c9e;
-  box-shadow:0 3px 8px rgba(0,0,0,.25);
-  transition:.2s;
-}
-.btn:hover {
-  background:linear-gradient(#ffffff,#c3f4ff);
-  box-shadow:0 6px 14px rgba(0,0,0,.35);
-  transform:translateY(-2px);
-}
+  .card p {
+    white-space:pre-wrap;
+    line-height:1.6;
+    font-size:17px;
+    font-weight:450;
+    color:#003b67;
+  }
+
+  .btn {
+    border:2px solid #008cd8;
+    background:linear-gradient(#dfffff,#9fe8ff);
+    border-radius:8px;
+    padding:8px 18px;
+    cursor:pointer;
+    font-weight:600;
+    color:#005c9e;
+    box-shadow:0 3px 8px rgba(0,0,0,.25);
+    transition:.2s;
+  }
+
+  .btn:hover {
+    background:linear-gradient(#ffffff,#c3f4ff);
+    box-shadow:0 6px 14px rgba(0,0,0,.35);
+    transform:translateY(-2px);
+  }
+  </style>
 
 </head>
+
 <body>
   <div id="grid" class="grid"></div>
 
