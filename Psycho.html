@@ -13,19 +13,18 @@
 body {
   margin: 0;
   font-family: 'Montserrat', sans-serif;
-  background: url("https://static.wikia.nocookie.net/aesthetics/images/c/c2/Fort_Hill_High_School%2C_MD%2C_at_night.jpg/revision/latest/smart/width/400/height/225?cb=20200614023513") center/cover no-repeat;
+  background: url("https://i.pinimg.com/1200x/98/24/38/982438cce33418f9e1b26f4a2489ae72.jpg") center/cover no-repeat; /* ton nouveau fond */
   color: white;
 }
 
-
-  #map {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background: #111 url("Map/noir.png") center/cover no-repeat;
-    opacity: 1;
-    transition: opacity 0.8s ease;
-  }
+#map {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: transparent; /* IMPORTANT : laisse passer le fond du body */
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
 
   #lines {
     position: absolute;
