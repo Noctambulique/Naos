@@ -6,169 +6,168 @@
   <title>Carrés minimalistes</title>
 
   <style>
- :root {
-  --bg: radial-gradient(circle at 50% 0%, #d9f1ff 0%, #9ed5ff 45%, #0070c9 100%);
-  --text: #003b67;
-  --square-size: 150px;
-  --gap: 18px;
-  --radius: 14px;
-  --font: "Segoe UI", Tahoma, sans-serif;
+ :root{
+  --text:#003255;
+  --square-size:150px;
+  --gap:22px;
+  --radius:18px;
+  --font:"Segoe UI", Tahoma, sans-serif;
 }
 
 /* Reset */
-* { margin:0; padding:0; box-sizing:border-box; }
+*{margin:0;padding:0;box-sizing:border-box}
 
-/* Fond + halo haut Windows 7 */
-body {
+body{
   min-height:100vh;
-  background: var(--bg);
-  font-family: var(--font);
-  color: var(--text);
-  padding:70px 40px;
+  background:url("https://i.redd.it/frutiger-aero-bliss-windows-xp-wallpaper-v0-e1qk8viiotge1.jpg?width=3500&format=pjpg&auto=webp&s=77817de61b5375d2dbc623c1c14096934364322c")
+    center/cover fixed no-repeat;
+  font-family:var(--font);
+  color:var(--text);
+  padding:80px 30px;
   display:flex;
   justify-content:center;
   align-items:flex-start;
-  overflow-x:hidden;
+  backdrop-filter:saturate(145%);
+  overflow:hidden;
 }
 
-body::before {
+/* Halo lumineux façon W7 */
+body::before{
   content:"";
-  position:fixed;
-  top:0; left:0; right:0;
-  height:180px;
+  position:fixed;inset:0;
+  background:radial-gradient(circle at 50% -20%,
+    rgba(255,255,255,.85),
+    rgba(255,255,255,0) 70%);
+  filter:blur(45px);
   pointer-events:none;
-  background: radial-gradient(circle at 50% 0%,
-    rgba(255,255,255,.9) 0%,
-    rgba(255,255,255,0) 75%
-  );
-  filter:blur(32px);
-  opacity:.55;
+  opacity:.85;
 }
 
-/* Grid */
-.grid {
+/* Grille */
+.grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(var(--square-size),1fr));
   gap:var(--gap);
   width:100%;
-  max-width:960px;
+  max-width:1100px;
   transition:opacity .35s ease;
 }
 
-/* Carrés — vrai Aero Glass */
-.square {
-  background: linear-gradient(135deg,
-    rgba(255,255,255,.82) 0%,
-    rgba(219,244,255,.72) 45%,
-    rgba(170,230,255,.62) 100%
-  );
-  border-radius: var(--radius);
-  height: var(--square-size);
+/* Tuiles AERO GLASS */
+.square{
+  background:linear-gradient(130deg,
+    rgba(255,255,255,.92) 0%,
+    rgba(185,235,255,.78) 50%,
+    rgba(115,210,255,.75) 100%);
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,.95);
+  backdrop-filter:blur(7px) saturate(180%);
+  height:var(--square-size);
   display:flex;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
   cursor:pointer;
-  padding:12px;
-  user-select:none;
-  border:1px solid rgba(255,255,255,.9);
+  padding:10px;
   box-shadow:
-    0 4px 12px rgba(0,40,80,.32),
-    inset 0 1px 1px rgba(255,255,255,.9),
-    inset 0 -4px 12px rgba(0,60,120,.25);
-  transition:.25s cubic-bezier(.22,.61,.36,1);
+    0 8px 26px rgba(0,70,130,.28),
+    inset 0 1px 0 rgba(255,255,255,.85),
+    inset 0 -6px 14px rgba(0,100,200,.28);
+  transition:.25s cubic-bezier(.19,.65,.23,1.2);
 }
 
-.square:hover {
-  transform:translateY(-7px) scale(1.08);
+/* Hover dynamique + lumière */
+.square:hover{
+  transform:translateY(-10px) scale(1.1);
   box-shadow:
-    0 14px 30px rgba(0,40,80,.35),
-    inset 0 2px 2px rgba(255,255,255,.95);
+    0 16px 40px rgba(0,70,130,.38),
+    inset 0 2px 1px rgba(255,255,255,.96);
+  background:linear-gradient(130deg,
+    rgba(255,255,255,.96),
+    rgba(205,245,255,.90),
+    rgba(135,230,255,.88));
 }
 
-/* Titre sur le carré */
-.title {
-  text-align:center;
-  font-size:16px;
-  line-height:1.2;
+/* Texte tuile */
+.title{
+  font-size:18px;
   font-weight:700;
-  color:#004a75;
-  text-shadow:0 1px 0 rgba(255,255,255,.95);
+  text-align:center;
+  text-shadow:0 1px 0 rgba(255,255,255,1),
+              0 0 6px rgba(255,255,255,.75);
 }
 
-/* Fenêtre Viewer style Windows 7 */
-.viewer {
-  position:fixed;
-  inset:0;
-  background:rgba(0,45,85,.28);
-  backdrop-filter:blur(12px) saturate(180%);
+/* Viewer */
+.viewer{
+  position:fixed;inset:0;
+  background:rgba(0,50,100,.35);
+  backdrop-filter:blur(10px) saturate(160%);
   display:flex;
   justify-content:center;
   align-items:center;
-  padding:40px;
+  padding:50px;
   opacity:0;
   pointer-events:none;
-  transition:opacity .3s ease;
+  transition:opacity .35s ease;
 }
-.viewer.open {
+.viewer.open{
   opacity:1;
   pointer-events:auto;
 }
 
-/* Carte fenêtre Explorer */
-.card {
+/* Fenêtre style Windows Aero */
+.card{
   width:100%;
-  max-width:760px;
-  padding:40px;
-  border-radius:18px;
-  background:linear-gradient(to bottom,#ffffff 0%,#e8f5ff 100%);
-  border:1px solid rgba(255,255,255,.75);
+  max-width:780px;
+  padding:40px 45px;
+  border-radius:20px;
+  background:linear-gradient(to bottom,
+    rgba(255,255,255,.95),
+    rgba(225,245,255,.88));
+  border:1px solid rgba(255,255,255,.92);
   box-shadow:
-    0 10px 40px rgba(0,0,0,.45),
-    inset 0 1px 0 rgba(255,255,255,.8),
-    inset 0 -4px 12px rgba(0,100,180,.25);
-  animation:win7Open .38s cubic-bezier(.19,.75,.35,1) both;
+    0 18px 48px rgba(0,0,0,.45),
+    inset 0 2px 0 rgba(255,255,255,.9),
+    inset 0 -8px 20px rgba(50,120,200,.2);
+  animation:pop .32s cubic-bezier(.19,.75,.35,1) both;
 }
 
-@keyframes win7Open {
-  from { transform:scale(.85) translateY(20px); opacity:0; }
-  to   { transform:scale(1) translateY(0); opacity:1; }
+@keyframes pop{
+  from{transform:scale(.85) translateY(30px);opacity:0;}
+  to{transform:none;opacity:1;}
 }
 
-/* Texte viewer */
-.card h1 {
+.card h1{
   font-size:28px;
   margin-bottom:18px;
-  font-weight:700;
-  color:#004f9a;
-  text-shadow:0 1px 0 rgba(255,255,255,1);
+  color:#0057a8;
+  text-shadow:0 1px 0 rgba(255,255,255,.9);
 }
-
-.card p {
-  font-size:17px;
+.card p{
+  font-size:18px;
   line-height:1.6;
-  color:#00385f;
+  color:#002d50;
   white-space:pre-wrap;
 }
 
 /* Bouton Windows 7 */
-.btn {
+.btn{
   margin-top:28px;
-  padding:9px 20px;
-  background:linear-gradient(#d2f5ff,#98e1ff);
-  border:1px solid #0080d2;
-  border-radius:10px;
+  padding:10px 24px;
+  background:linear-gradient(#dfffff,#9ae4ff);
+  border:1px solid #0076c9;
+  border-radius:12px;
   font-weight:600;
   cursor:pointer;
-  color:#00528f;
-  text-shadow:0 1px 0 rgba(255,255,255,.9);
-  box-shadow:0 4px 10px rgba(0,0,0,.25);
+  color:#005091;
+  box-shadow:0 5px 14px rgba(0,0,0,.28);
+  text-shadow:0 1px 0 rgba(255,255,255,1);
   transition:.2s ease;
 }
-.btn:hover {
-  background:linear-gradient(#ffffff,#bdf0ff);
+.btn:hover{
   transform:translateY(-3px);
-  box-shadow:0 7px 16px rgba(0,0,0,.35);
+  background:linear-gradient(#ffffff,#c4f1ff);
 }
+
 
   </style>
 
