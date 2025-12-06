@@ -16,23 +16,47 @@ body{
   position:relative;
   width:100vw;
   height:100vh;
-  overflow:auto;
-  touch-action:manipulation;
-  background:transparent; /* 👈 important */
+  overflow-y:auto;
+  padding:20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(90px,1fr));
+  gap:18px;
+  justify-items:center;
+  background:transparent;
 }
 
-  .marker{
-    position:absolute;
-    width:80px;
-    height:80px;
-    border-radius:12px;
-    overflow:hidden;
-    box-shadow:0 2px 6px rgba(0,0,0,0.2);
-    cursor:pointer;
-  }
-  .marker img{
-    width:100%; height:100%; object-fit:cover;
-  }
+/* Tuiles style Windows 7 Aero Glass */
+.marker{
+  width:80px;
+  height:80px;
+  border-radius:20px;
+  overflow:hidden;
+  backdrop-filter:blur(12px) saturate(1.4);
+  -webkit-backdrop-filter:blur(12px) saturate(1.4);
+  background:rgba(255,255,255,.32);
+  box-shadow:
+    0 4px 14px rgba(0,80,255,.25),
+    inset 0 1px 3px rgba(255,255,255,.8);
+  border:1px solid rgba(255,255,255,.45);
+  transition:.25s ease;
+}
+
+/* Hover très Aero */
+.marker:hover{
+  transform:translateY(-4px);
+  background:rgba(255,255,255,.45);
+  box-shadow:
+    0 8px 28px rgba(0,80,255,.35),
+    inset 0 1px 4px rgba(255,255,255,1);
+}
+
+.marker img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  padding:12px;
+}
+
 
   #panel{
     position:fixed;
