@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carte Personnalisable</title>
+
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+      margin: 0;
+      background-color: #f0f0f0;
+      font-family: Arial, sans-serif;
+      font-size: 12px; /* 🔽 Police réduite */
+    }
+
+    #map {
+      display: grid;
+      grid-template-columns: repeat(8, 130px); /* 🔼 Cases plus larges */
+      gap: 4px;
+      justify-content: center;
+    }
+
+    .cell {
+      width: 130px;   /* 🔼 Largeur augmentée */
+      height: 70px;   /* 🔼 Hauteur augmentée */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #bebff1;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-size: 12px; /* 🔽 Police plus petite dans les cases */
+    }
+
+    .cell:hover {
+      background-color: #e0e0e0;
+    }
+
+    #infoBox {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px;
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      display: none;
+      max-width: 200px;
+      font-size: 12px; /* cohérent avec la taille globale */
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+  <div id="infoBox"></div>
+
+  <script>
+    // Configuration des cellules (personnalise ici)
+    const cellsData = [
+      { label: "Les années collège.", text: "Les années collège.", color: "#bebff1" },
+      { label: "‎", text: "Dejeuner péniblement devant M6", color: "#bebff1" },
+      { label: "‎", text: "Le cartable me creuse les épaules", color: "#bebff1" },
+      { label: "‎", text: "Collège, ce géant en béton", color: "#bebff1" },
+      { label: "‎", text: "Vivre au rythme des sonneries", color: "#bebff1" },
+      { label: "‎", text: "Un dernier regard vers l'école, perdre ses repères", color: "#bebff1" },
+      { label: "‎", text: "Vivre au rythme des sonneries", color: "#bebff1" },
+      { label: "‎", text: "Tenaillé par le stress, assommé par les cours", color: "#bebff1" },
+      { label: "‎", text: "Se fonder dans le cadre, cesser d'exister", color: "#bebff1" },
+      { label: "‎", text: "Les autres comprennent quelque chose qui m'échappe", color: "#bebff1" },
+      { label: "‎", text: "Mes rêves romantiques se heurtent à la réalité des filles qui gloussent", color: "#bebff1" },
+      { label: "‎", text: "Quelque chose cloche, mais quoi ?", color: "#bebff1" },
+      { label: "‎", text: "Construire des sarbacanes pour lutter", color: "#bebff1" },
+      { label: "‎", text: "Sauter au dessus du muret", color: "#bebff1" },
+      { label: "‎", text: "Tirer au lance-pierre sur la tole", color: "#bebff1" },
+      { label: "‎", text: "Ecouter skyrock, les peines de coeur, de sexualité, de diputes", color: "#bebff1" },
+      { label: "‎", text: "Avec les animateurs, fantasmer une bande d'ami", color: "#bebff1" },
+      { label: "Les années geeks. Et tout est repeuplé.", text: "Les années geeks. Et tout est repeuplé.", color: "#bebff1" },
+      { label: "‎", text: "Se découvrir une sociabilité sur le forum sortirensemble et wanadoo", color: "#bebff1" },
+      { label: "‎", text: "Se vivre sans corps, libéré", color: "#bebff1" },
+      { label: "‎", text: "Des forums entre skyrock et discord", color: "#bebff1" },
+      { label: "‎", text: "Coder des map avec Thibdumont sur SDZ", color: "#bebff1" },
+      { label: "‎", text: "En vocal sur wow avec Halandra et Azeroth", color: "#bebff1" },
+      { label: "‎", text: "Jouer un personnage féminin, ma transidentité émerge", color: "#bebff1" },
+      { label: "‎", text: "Faire des rp érotiques", color: "#bebff1" },
+      { label: "Les années émotives, où on traverse le feu et la glace‎", text: "Les années émotives, où on traverse le feu et la glace", color: "#bebff1" },
+      { label: "‎", text: "Faire des rp érotiques", color: "#bebff1" },
+      { label: "‎", text: "Rencontrer Clémentine et Magdaléna ", color: "#bebff1" },
+      { label: "‎", text: "S'intéresser à Magdaléna, perdre Clémentine", color: "#bebff1" },
+      { label: "‎", text: "Mon côté geek me répugne, je me réfugie dans les livres et la musique", color: "#bebff1" },
+      { label: "‎", text: "Embrasser le mode de vie de Clémentine", color: "#bebff1" },
+      { label: "‎", text: "Elle refuse mes excuses, obsédé par l'amour je rate mon bac", color: "#bebff1" },
+      { label: "‎", text: "J'accroche une lettre à son portail, elle me met un rateau. Sa lettre contient 3 majuscules : JTM", color: "#bebff1" },
+      { label: "‎", text: "Je tombe amoureux d'Amélie, une fille sur le forum", color: "#bebff1" },
+      { label: "‎", text: "Je vais la voir mais il ne se passe rien", color: "#bebff1" },
+      { label: "‎", text: "Vivre au rythme des dissertations de philo et des forums Genaisse", color: "#bebff1" },
+      { label: "‎", text: "Rencontrer Palingénésie en terminal", color: "#bebff1" },
+      { label: "‎", text: "Rencontrer Brany, partir en fugue chez elle à Bordeau", color: "#bebff1" },
+      { label: "‎", text: "Elle me domine, ce qui me plait. Une journée ensemble dans l'herbe", color: "#bebff1" },
+      { label: "‎", text: "Entrer en fac de philosophie", color: "#bebff1" },
+      { label: "‎", text: "Branny n'est pas assez dominante et trop studieuse", color: "#bebff1" },
+      { label: "‎", text: "Reprendre contact avec une fille à qui je parlais sur MSN", color: "#bebff1" },
+      { label: "‎", text: "En date dans un bar au dernier étage de la fnac, elle est magnifique", color: "#bebff1" },
+      { label: "‎", text: "Tu veux pas la mettre, tragédie au lit, débander sans comprendre", color: "#bebff1" },
+      { label: "‎", text: "Le sexe devient inquiétude", color: "#bebff1" },
+      { label: "‎", text: "Cette fois elle s'appelle Suzanne. Elle me repproche de payer une amende", color: "#bebff1" },
+      { label: "‎", text: "Devenir un homme virile pour plaire aux femmes", color: "#bebff1" },
+      { label: "‎", text: "Perdre une chaussure en fuyant les controleurs", color: "#bebff1" },
+      { label: "‎J'aime les femmes mais les femmes ne s'aiment pas", text: "J'aime les femmes mais les femmes ne s'aiment pas", color: "#bebff1" },
+      { label: "‎", text: "Embrasser Palingénésie", color: "#bebff1" },
+      { label: "‎", text: "Palingénésie m'inquiète : sa sexualité me dépasse", color: "#bebff1" },
+      { label: "‎", text: "Travailler chez Quick", color: "#bebff1" },
+      { label: "‎", text: "Lire Dostoiveski à la lumière des réverbères", color: "#bebff1" },
+      { label: "‎", text: "Faire une licence d'histoire", color: "#bebff1" },
+      { label: "‎", text: "Vivre en économisant, vivre en autarcie", color: "#bebff1" },
+      { label: "‎", text: "Passer à droite, sans être kitsh", color: "#bebff1" },
+      { label: "‎", text: "Ne pas parvenir à dominer Palingénésie", color: "#bebff1" },
+      { label: "‎", text: "Echouer dans mes études", color: "#bebff1" },
+      { label: "‎", text: "Partir dans le monde viril de l'armée", color: "#bebff1" },
+      { label: "‎", text: "Partir en exercice dans le froid", color: "#bebff1" },
+      { label: "‎", text: "Profiter d'un air de musique à la Carpiagne", color: "#bebff1" },
+      { label: "‎", text: "Tout est ritualisé, ça tourne en rond", color: "#bebff1" },
+      { label: "‎", text: "Faire le cancre avec Mohamed, l'aider et se découvrir une vocation de prof", color: "#bebff1" },
+      { label: "‎", text: "Nostalgique de Brany, profiter de mes week-end de permission", color: "#bebff1" },
+      { label: "‎", text: "Palingénésie vient me voir, et me libère", color: "#bebff1" },
+      { label: "‎", text: "Je quitte l'armée", color: "#bebff1" },
+      { label: "‎", text: "Retour à la vie civile, flirter avec Finoa", color: "#bebff1" },
+      { label: "‎", text: "Palingénésie est enceinte, je lache Fiona", color: "#bebff1" },
+      { label: "‎", text: "Valider mes semestres, malgré le manque de miroirs", color: "#bebff1" },
+      { label: "‎", text: "Avec Ostrava, qui écoute mes histoires", color: "#bebff1" },
+      { label: "‎", text: "Le guider un peu, lui conseiller des lectures", color: "#bebff1" },
+      { label: "‎", text: "Palingénésie accouche, s'installer ensemble", color: "#bebff1" },
+      { label: "‎", text: "Faire la diva sur Coolsmile, s'exhiber. J'ai honte, mais je recommence.", color: "#bebff1" },
+      { label: "‎", text: "Enseigner ay lycée, se sentir inutile etabandonner", color: "#bebff1" },
+      { label: "‎", text: "Travailler chez quick, dans l'effervescence de l'aéroport", color: "#bebff1" },
+      { label: "‎", text: "Sur discord avec Ostrava, au chaudron magique", color: "#bebff1" },
+      { label: "‎", text: "Ash me perturbe, je tombe amoureux, redécouvrir la passion", color: "#bebff1" },
+      { label: "‎", text: "Vivre chez Walpurgis, qui me domine", color: "#bebff1" },
+      { label: "‎", text: "Plautine me laisse quelques mots sibyllins sur discord. Cette relation n'a t'elle pas assez duré ?", color: "#bebff1" },
+      { label: "‎", text: "Se remettre ensemble", color: "#bebff1" },
+      { label: "‎", text: "S'intéresser vraiment à la psychologie, développer mon modèle", color: "#bebff1" },
+      { label: "‎", text: "Echanger sur mes théories avec Sokaris, une intuitive", color: "#bebff1" },
+      { label: "‎", text: "Créer le crayon rouge", color: "#bebff1" },
+      { label: "Les années quintessentes‎", text: "Les années quintessentes", color: "#bebff1" },
+      { label: "‎", text: "Sur Discord, les relations st font et se défont", color: "#bebff1" },
+      { label: "‎", text: "Je suis impressionné par certains", color: "#bebff1" },
+      { label: "‎", text: "Vésanie arrive sur un serveur que je croyais avoir fermé", color: "#bebff1" },
+      { label: "‎", text: "Être fasciné par elle, débarquer à Paris", color: "#bebff1" },
+      { label: "‎", text: "Palingénésie me rejoint", color: "#bebff1" },
+      { label: "‎", text: "Ecrire des mots à Vésanie, régner avec elle sur discord", color: "#bebff1" },
+      { label: "‎", text: "Me laser un peu, renouer avec Palingénésie autour de Wow", color: "#bebff1" },
+      { label: "‎", text: "Vésanie disparait, je me lance dans une quête désespérée pour la retrouver", color: "#bebff1" },
+      { label: "‎", text: "En guerre contre sa famille", color: "#bebff1" },
+      { label: "‎", text: "Parler avec Anais, figure atypique de droite", color: "#bebff1" },
+      { label: "‎", text: "Les femmes ne me stimulent plus", color: "#bebff1" },
+      { label: "‎", text: "Se faire connaitre sur coco", color: "#bebff1" },
+      { label: "‎", text: "Enchainer les échecs", color: "#bebff1" },
+      { label: "‎", text: "Percer dans le débat trans à droite ? Echec", color: "#bebff1" },
+      { label: "‎", text: "Refus de financement pour transmania", color: "#bebff1" },
+      { label: "‎", text: "Gagner de l'argent sur chaturbate ? Abandonné", color: "#bebff1" },
+      { label: "‎", text: "Raviver mes liens familaux ? Echec", color: "#bebff1" },
+      { label: "‎", text: "Devenir compétent en 3D ? Impossible", color: "#bebff1" },
+      { label: "‎", text: "Vivre ma sexualité ? Aucun candidat", color: "#bebff1" },
+      { label: "‎", text: "Revivre l'expérience Wow ? Les gens sont trop laids d'âme", color: "#bebff1" },
+      { label: "‎", text: "Vivre le rêve geek irl ? La boutique m'ennui", color: "#bebff1" },
+      { label: "‎", text: "Devenir prof ? Réforme repoussé", color: "#bebff1" },
+      { label: "‎", text: "Mon corps me lâche", color: "#bebff1" },
+      { label: "‎", text: "Revenir au skate et la modélisation", color: "#bebff1" },
+    ];
+
+    const map = document.getElementById("map");
+    const infoBox = document.getElementById("infoBox");
+
+    cellsData.forEach((cell) => {
+      const div = document.createElement("div");
+      div.className = "cell";
+      div.style.backgroundColor = cell.color;
+      div.textContent = cell.label;
+      div.onclick = () => {
+        infoBox.textContent = cell.text;
+        infoBox.style.display = "block";
+      };
+      map.appendChild(div);
+    });
+  </script>
+</body>
+</html>
