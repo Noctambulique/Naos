@@ -54,24 +54,25 @@ html::before {
   overflow:hidden;
   min-height: 160px;
   padding: 16px;
-  border: 1px solid rgba(255,255,255,0.8);
+  border: 2px solid rgba(255,255,255,0.9);
   background: linear-gradient(
-    135deg,
-    var(--aero-white) 0%,
-    rgba(255,255,255,.75) 40%,
-    var(--aero-glass) 100%
+    160deg,
+    rgba(255,255,255,0.95) 0%,
+    rgba(230,248,255,0.85) 55%,
+    rgba(255,255,255,0.75) 100%
   );
   box-shadow:
-    var(--shadow-dark),
-    inset 0 0 20px rgba(255,255,255,0.7);
+    0 6px 16px rgba(0,0,0,.32),
+    inset 0 0 20px rgba(255,255,255,0.8);
   cursor: pointer;
   transition: .18s ease-out;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px) saturate(140%);
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
 }
+
 
 /* Reflet glossy */
 .card::before {
