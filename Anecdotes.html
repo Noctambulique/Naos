@@ -6,145 +6,170 @@
   <title>Carrés minimalistes</title>
 
   <style>
-  :root {
-    --bg: linear-gradient(135deg,#74e0ff 0%,#34b6ff 50%,#0074d9 100%);
-    --text:#003b67;
-    --square-size:140px;
-    --gap:16px;
-    --radius:12px;
-    --font:"Segoe UI", Tahoma, sans-serif;
-    --border-glow:#66e5ff;
-  }
+ :root {
+  --bg: radial-gradient(circle at 50% 0%, #d9f1ff 0%, #9ed5ff 45%, #0070c9 100%);
+  --text: #003b67;
+  --square-size: 150px;
+  --gap: 18px;
+  --radius: 14px;
+  --font: "Segoe UI", Tahoma, sans-serif;
+}
 
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body {
-    background:var(--bg);
-    color:var(--text);
-    font-family:var(--font);
-    padding:60px 40px;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    min-height:100vh;
-    backdrop-filter:blur(2px);
-  }
+/* Reset */
+* { margin:0; padding:0; box-sizing:border-box; }
 
-  body::after {
-    content:"";
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    background:
-      linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,0) 45%),
-      url("https://frutiger-aero.org/img/bg-noise.png") center/cover;
-    opacity:.25;
-  }
+/* Fond + halo haut Windows 7 */
+body {
+  min-height:100vh;
+  background: var(--bg);
+  font-family: var(--font);
+  color: var(--text);
+  padding:70px 40px;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  overflow-x:hidden;
+}
 
-  .grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(var(--square-size),1fr));
-    gap:var(--gap);
-    width:100%;
-    max-width:900px;
-    transition:opacity .35s ease;
-  }
+body::before {
+  content:"";
+  position:fixed;
+  top:0; left:0; right:0;
+  height:180px;
+  pointer-events:none;
+  background: radial-gradient(circle at 50% 0%,
+    rgba(255,255,255,.9) 0%,
+    rgba(255,255,255,0) 75%
+  );
+  filter:blur(32px);
+  opacity:.55;
+}
 
-  .square {
-    border:1px solid rgba(255,255,255,.75);
-    border-radius:var(--radius);
-    background:
-      linear-gradient(145deg,#ffffff 0%,#c8f6ff 55%,#9cecff 100%);
-    height:var(--square-size);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    padding:10px;
-    user-select:none;
-    box-shadow:
-      0 4px 10px rgba(0,0,0,.25),
-      inset 0 0 18px rgba(255,255,255,.65);
-    transition:.25s ease;
-  }
+/* Grid */
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(var(--square-size),1fr));
+  gap:var(--gap);
+  width:100%;
+  max-width:960px;
+  transition:opacity .35s ease;
+}
 
-  .square:hover {
-    transform:translateY(-6px) scale(1.05);
-    border-color:var(--border-glow);
-    box-shadow:
-      0 14px 28px rgba(0,0,0,.35),
-      inset 0 0 22px rgba(255,255,255,.75);
-  }
+/* Carrés — vrai Aero Glass */
+.square {
+  background: linear-gradient(135deg,
+    rgba(255,255,255,.82) 0%,
+    rgba(219,244,255,.72) 45%,
+    rgba(170,230,255,.62) 100%
+  );
+  border-radius: var(--radius);
+  height: var(--square-size);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  padding:12px;
+  user-select:none;
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow:
+    0 4px 12px rgba(0,40,80,.32),
+    inset 0 1px 1px rgba(255,255,255,.9),
+    inset 0 -4px 12px rgba(0,60,120,.25);
+  transition:.25s cubic-bezier(.22,.61,.36,1);
+}
 
-  .title {
-    font-size:15px;
-    font-weight:600;
-    text-align:center;
-    color:var(--text);
-    text-shadow:0 1px 0 rgba(255,255,255,.8);
-  }
+.square:hover {
+  transform:translateY(-7px) scale(1.08);
+  box-shadow:
+    0 14px 30px rgba(0,40,80,.35),
+    inset 0 2px 2px rgba(255,255,255,.95);
+}
 
-  .viewer {
-    position:fixed;
-    inset:0;
-    background:rgba(255,255,255,.45);
-    backdrop-filter:blur(12px) saturate(140%);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:40px;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .3s ease;
-  }
-  .viewer.open {
-    opacity:1;
-    pointer-events:auto;
-  }
+/* Titre sur le carré */
+.title {
+  text-align:center;
+  font-size:16px;
+  line-height:1.2;
+  font-weight:700;
+  color:#004a75;
+  text-shadow:0 1px 0 rgba(255,255,255,.95);
+}
 
-  .card {
-    max-width:720px;
-    width:100%;
-    background:linear-gradient(to bottom,#fff,#e6f9ff);
-    border:2px solid #a3e6ff;
-    border-radius:18px;
-    box-shadow:
-      0 10px 40px rgba(0,0,0,.45),
-      inset 0 0 18px rgba(255,255,255,.85);
-    padding:36px;
-  }
+/* Fenêtre Viewer style Windows 7 */
+.viewer {
+  position:fixed;
+  inset:0;
+  background:rgba(0,45,85,.28);
+  backdrop-filter:blur(12px) saturate(180%);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:40px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s ease;
+}
+.viewer.open {
+  opacity:1;
+  pointer-events:auto;
+}
 
-  .card h1 {
-    font-size:26px;
-    margin-bottom:14px;
-    text-shadow:0 1px 0 rgba(255,255,255,.9);
-    color:#00548e;
-  }
+/* Carte fenêtre Explorer */
+.card {
+  width:100%;
+  max-width:760px;
+  padding:40px;
+  border-radius:18px;
+  background:linear-gradient(to bottom,#ffffff 0%,#e8f5ff 100%);
+  border:1px solid rgba(255,255,255,.75);
+  box-shadow:
+    0 10px 40px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.8),
+    inset 0 -4px 12px rgba(0,100,180,.25);
+  animation:win7Open .38s cubic-bezier(.19,.75,.35,1) both;
+}
 
-  .card p {
-    white-space:pre-wrap;
-    line-height:1.6;
-    font-size:17px;
-    font-weight:450;
-    color:#003b67;
-  }
+@keyframes win7Open {
+  from { transform:scale(.85) translateY(20px); opacity:0; }
+  to   { transform:scale(1) translateY(0); opacity:1; }
+}
 
-  .btn {
-    border:2px solid #008cd8;
-    background:linear-gradient(#dfffff,#9fe8ff);
-    border-radius:8px;
-    padding:8px 18px;
-    cursor:pointer;
-    font-weight:600;
-    color:#005c9e;
-    box-shadow:0 3px 8px rgba(0,0,0,.25);
-    transition:.2s;
-  }
+/* Texte viewer */
+.card h1 {
+  font-size:28px;
+  margin-bottom:18px;
+  font-weight:700;
+  color:#004f9a;
+  text-shadow:0 1px 0 rgba(255,255,255,1);
+}
 
-  .btn:hover {
-    background:linear-gradient(#ffffff,#c3f4ff);
-    box-shadow:0 6px 14px rgba(0,0,0,.35);
-    transform:translateY(-2px);
-  }
+.card p {
+  font-size:17px;
+  line-height:1.6;
+  color:#00385f;
+  white-space:pre-wrap;
+}
+
+/* Bouton Windows 7 */
+.btn {
+  margin-top:28px;
+  padding:9px 20px;
+  background:linear-gradient(#d2f5ff,#98e1ff);
+  border:1px solid #0080d2;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
+  color:#00528f;
+  text-shadow:0 1px 0 rgba(255,255,255,.9);
+  box-shadow:0 4px 10px rgba(0,0,0,.25);
+  transition:.2s ease;
+}
+.btn:hover {
+  background:linear-gradient(#ffffff,#bdf0ff);
+  transform:translateY(-3px);
+  box-shadow:0 7px 16px rgba(0,0,0,.35);
+}
+
   </style>
 
 </head>
