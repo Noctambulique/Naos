@@ -12,14 +12,15 @@ body{
   overflow:hidden; /* 👉 OK, tu gères le scroll sur #container */
 }
 
-  #container{
-    position:relative;
-    width:100vw;
-    height:100vh;
-    overflow:auto;
-    touch-action:manipulation;
-    background:#fff;
-  }
+#container{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  overflow:auto;
+  touch-action:manipulation;
+  background:transparent; /* 👈 important */
+}
+
   .marker{
     position:absolute;
     width:80px;
