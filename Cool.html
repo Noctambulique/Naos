@@ -3,23 +3,109 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    :root{--gap:18px;--radius:14px}
-    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
-    body{background:#f3f4f6;padding:30px;box-sizing:border-box}
-    .wrap{max-width:1100px;margin:0 auto}
+<style>
+  :root {
+    --gap: 18px;
+    --radius: 14px;
+    --surface: rgba(255, 255, 255, 0.55);
+    --border: rgba(255, 255, 255, 0.32);
+    --shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+    --shadow-hover: 0 14px 38px rgba(0, 0, 0, 0.18);
+    --backdrop-blur: blur(22px);
+  }
 
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--gap)}
-    .card{background:white;border-radius:var(--radius);overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:150px;box-shadow:0 6px 18px rgba(2,6,23,0.08);transition:transform .18s,box-shadow .18s}
-    .card:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(2,6,23,0.12)}
-    .card img{width:100%;height:100%;object-fit:cover;display:block}
-    .title{font-weight:700;margin:0 0 12px 0}
+  html, body {
+    height: 100%; margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial;
+    -webkit-font-smoothing: antialiased;
+    background: linear-gradient(145deg, #e5e9f0 0%, #fafdff 60%, #e3e8f3 100%);
+    backdrop-filter: var(--backdrop-blur);
+  }
 
-    .reader{background:#fff;padding:28px;border-radius:12px;min-height:320px;box-shadow:0 10px 30px rgba(2,6,23,0.08)}
-    .reader .content{white-space:pre-wrap;line-height:1.5;color:#111}
+  .wrap {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 36px;
+    box-sizing: border-box;
+  }
 
-    @media (max-width:520px){:root{--gap:12px}}
-  </style>
+  /* TITRES */
+  .title {
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    margin: 0 0 14px 4px;
+    color: #111;
+  }
+
+  /* GRID */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--gap);
+  }
+
+  /* CARDS FLUENT */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    box-shadow: var(--shadow);
+    backdrop-filter: var(--backdrop-blur);
+    transition: transform .25s cubic-bezier(.2, .8, .2, 1),
+                box-shadow .25s,
+                background .25s;
+  }
+
+  .card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-hover);
+    background: rgba(255, 255, 255, 0.66);
+  }
+
+  .card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+
+  /* READER COMPOSANT */
+  .reader {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px 36px;
+    border-radius: calc(var(--radius) + 4px);
+    min-height: 340px;
+    box-shadow: var(--shadow);
+    backdrop-filter: var(--backdrop-blur);
+    animation: fadeIn .4s ease;
+  }
+
+  .reader .content {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 16px;
+    color: #0d0d0d;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 520px) {
+    :root { --gap: 12px; }
+    .wrap { padding: 18px; }
+  }
+</style>
+
 </head>
 <body>
   <div class="wrap">
