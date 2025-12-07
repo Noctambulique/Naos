@@ -6,7 +6,7 @@
         justify-content: center;
         align-items: center;
 
-        background-image: url("https://i.pinimg.com/736x/a5/7a/ea/a57aea1d2c676a695ecbf1bcd7bb824c.jpg"); /* 🔁 Mets ton image */
+        background-image: url("https://i.pinimg.com/736x/a5/7a/ea/a57aea1d2c676a695ecbf1bcd7bb824c.jpg"); /* ← Remplace par ton image */
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -15,20 +15,21 @@
         color: #1B1B1B;
     }
 
-    /* Cadre du tableau */
-    .table-wrapper {
-        background-color: rgba(255, 255, 255, 0.95); /* Cadre blanc transparent */
+    /* Cadre autour du tableau */
+    .table-container {
+        width: 60%;              /* 📌 largeur du cadre (modifiable) */
+        max-width: 900px;        /* limite la largeur max */
+        min-width: 320px;
         padding: 20px;
+        background: rgba(255, 255, 255, 0.92);
         border-radius: 10px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-        backdrop-filter: blur(6px); /* Effet vitre Windows */
-        max-width: 900px;
-        width: 85%;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+        backdrop-filter: blur(6px); /* effet vitre Windows */
     }
 
     table {
+        width: 100%; /* Le tableau reste bien dans le cadre */
         border-collapse: collapse;
-        width: 100%;
         background-color: #FFFFFF;
         border: 1px solid #AAB4C3;
         border-radius: 4px;
