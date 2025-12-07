@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
-<title>Tableau Scroll & Cadre</title>
+<title>Tableau Scroll & Cadre Fixé</title>
 
 <style>
     body {
@@ -22,13 +22,14 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 30%; /* 📌 encore plus petit */
-        height: 50vh; /* 📌 cadre fixe avec scroll interne */
+        width: 30%;
+        height: 60vh; /* 📌 Cadre fixe */
         background: rgba(255, 255, 255, 0.85);
         padding: 15px;
         border-radius: 12px;
         box-shadow: 0 8px 20px rgba(0,0,0,0.45);
         backdrop-filter: blur(6px);
+        overflow: hidden; /* Empêche tout dépassement */
     }
 
     .scroll-area {
@@ -41,12 +42,15 @@
     table {
         width: 100%;
         border-collapse: collapse;
+        table-layout: fixed; /* 📌 Empêche l’extension horizontale */
     }
 
     table th, table td {
         border: 1px solid #C8D0DA;
         padding: 6px;
         font-size: 13px;
+        word-break: break-word; /* 📌 Coupe les liens trop longs */
+        text-align: left;
     }
 
     table th {
@@ -81,7 +85,6 @@
     }
 
 </style>
-
 </head>
 <body>
 
