@@ -83,6 +83,16 @@
     z-index:200;
   }
 .hidden{display:none;}
+
+  /* 📱 Ajuste la taille de la page et de l’image sur mobile */
+@media (max-width: 768px) {
+  #container {
+    width: 80vw;     /* un peu plus large parce que l’écran est étroit */
+    height: 60vh;    /* moins haut → l’image se voit mieux */
+    background-size: 70%; /* 🔽 réduit encore un peu l’image */
+    background-position: center;
+  }
+}
 </style>
 </head>
 <body>
