@@ -7,15 +7,21 @@
 
 <style>
   body{
-    margin:0;padding:40px;
-    background:#f5eee6;
+    margin:0;
+    padding:40px;
     font-family:Georgia,serif;
     color:#3b2f2f;
+
+    /* 🔹 Image de fond (à personnaliser) */
+    background-image:url("https://i.pinimg.com/736x/c4/f7/28/c4f72869f79da8ab95252babde10b62d.jpg");
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
   }
 
   /* Cadre principal */
   .wrap{
-    background:#fff7f0;
+    background:rgba(255,247,240,0.92);
     padding:30px;
     border-radius:12px;
     box-shadow:0 6px 20px rgba(0,0,0,0.15);
@@ -23,28 +29,34 @@
     max-width:420px;
     margin:auto;
     text-align:center;
+    backdrop-filter:blur(3px);
   }
 
   h1{font-size:22px;margin:0 0 5px 0}
   p{font-size:13px;margin:0 0 20px 0;color:#8a7b74}
 
-  /* Playlist */
+  /* Playlist en 3 colonnes */
   .playlist{
-    max-width:420px;
-    margin:20px auto 0 auto;
-    background:#fff7f0;
+    width:100%;
+    max-width:930px;
+    margin:25px auto;
+    background:rgba(255,247,240,0.90);
     border-radius:10px;
     padding:10px 0;
     box-shadow:0 4px 14px rgba(0,0,0,0.1);
+
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:6px;
   }
 
   .track{
-    padding:10px 15px;
+    padding:10px 12px;
     border-bottom:1px solid #e6d8cc;
     cursor:pointer;
     transition:0.2s;
+    text-align:center;
   }
-  .track:last-child{border-bottom:none;}
   .track:hover{
     background:#f0e4d9;
   }
@@ -53,7 +65,12 @@
     font-weight:bold;
   }
 
-  /* Bouton Play/Pause extérieur */
+  /* Supprime les bordures au mauvais endroit pour la grille */
+  .track:nth-last-child(-n+3){
+    border-bottom:none;
+  }
+
+  /* Bouton Play/Pause */
   #playPause{
     position:fixed;
     right:30px;
@@ -67,7 +84,16 @@
     cursor:pointer;
     box-shadow:0 5px 15px rgba(0,0,0,0.25);
   }
+
+  /* Responsive (si écran petit, redevient en 1 colonne) */
+  @media (max-width:700px){
+    .playlist{
+      grid-template-columns:1fr;
+      max-width:420px;
+    }
+  }
 </style>
+
 </head>
 
 <body>
@@ -125,6 +151,7 @@ const tracks = [
 { title:"Tu veux pas", artist:"Inès Souki", url:"https://www.dropbox.com/scl/fi/bcl32r8cwvdmoqjid4rpv/Tu-veux-pas-In-s-Souki.mp3?dl=1" },
 { title:"Veridis Quo", artist:"Daft Punk", url:"https://www.dropbox.com/scl/fi/8t8p1u0115hcpxcwrtxb7/Veridis-Quo-Daft-Punk.mp3?dl=1" },
 { title:"Au revoir mon amour", artist:"Zélie", url:"https://www.dropbox.com/scl/fi/xhgkzieawaacafmqadqfc/Z-lie-Au-revoir-mon-amour-Live-Session-cover.mp3?dl=1" },
+{ title:"Foulard rouge", artist:"Eve", url:"https://www.dropbox.com/scl/fi/71ffwawi2qkx65hagpj1j/Foulard-rouge.mp3?dl=1" },
 ];
 
 /* -------------------- VARIABLES -------------------- */
