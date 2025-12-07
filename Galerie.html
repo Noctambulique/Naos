@@ -3,40 +3,94 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Galerie</title>
+<title>Galerie Aero</title>
 
 <style>
+  /* ------------------------- */
+  /*      AERO GLOBAL STYLE     */
+  /* ------------------------- */
   body{
     margin:0;
     padding:20px;
-    background:#fafafa;
-    font-family:sans-serif;
+    background:linear-gradient(180deg, #2a80d7 0%, #0f4ea3 40%, #0e3569 100%);
+    font-family:"Segoe UI", sans-serif;
+    color:#fff;
+    overflow-x:hidden;
   }
 
+  h2{
+    text-align:center;
+    font-size:34px;
+    font-weight:300;
+    margin-bottom:25px;
+    text-shadow:0 2px 8px rgba(0,0,0,0.7);
+  }
+
+  /* ------------------------- */
+  /*     AERO GLASS PANEL      */
+  /* ------------------------- */
   .zone{
     position:relative;
     width:100%;
-    border:2px dashed #ccc;
-    overflow:visible;
+    padding:40px 0;
+    border-radius:18px;
+
+    /* effet verre Windows 7 */
+    background:rgba(255,255,255,0.22);
+    backdrop-filter:blur(14px) saturate(150%);
+    -webkit-backdrop-filter:blur(14px) saturate(150%);
+
+    /* bordure lumineuse */
+    border:1px solid rgba(255,255,255,0.55);
+    box-shadow:
+      inset 0 0 25px rgba(255,255,255,0.33),
+      0 18px 35px rgba(0,0,0,0.45),
+      0 0 40px rgba(40,130,255,0.35);
   }
 
+  /* ------------------------- */
+  /*     IMAGES AERO STYLE     */
+  /* ------------------------- */
   .zone img{
     position:absolute;
     max-width:260px;
-    border-radius:10px;
-    transition:0.3s;
+    border-radius:8px;
+
+    /* effet glossy W7 */
+    box-shadow:
+      0 10px 25px rgba(0,0,0,0.65),
+      0 0 15px rgba(160,200,255,0.35),
+      inset 0 0 18px rgba(255,255,255,0.18);
+
+    transform:rotate(-1deg) scale(1);
+    transition:
+      transform 0.35s cubic-bezier(0.16, 0.84, 0.44, 1),
+      filter 0.25s,
+      box-shadow 0.3s;
     cursor:pointer;
+
+    /* bordure subtile */
+    border:1px solid rgba(255,255,255,0.45);
   }
 
   .zone img:hover{
-    transform:scale(1.1);
+    transform:scale(1.2) rotate(1deg);
+    filter:brightness(1.2);
+
+    /* halo bleu façon “focus fenêtre” */
+    box-shadow:
+      0 0 22px rgba(70,150,255,0.85),
+      0 12px 35px rgba(0,0,0,0.55),
+      inset 0 0 18px rgba(255,255,255,0.28);
+
+    z-index:20;
   }
 </style>
 </head>
 
 <body>
 
-<h2>Galerie</h2>
+<h2>Galerie Aero</h2>
 
 <div class="zone" id="zone">
 
@@ -53,13 +107,14 @@
   <img src="D hiver/20240126_021823.jpg">
   <img src="D hiver/original_807d23e7-f9ee-477b-bd02-6e061991e824_Screenshot_20241012_173633_Gmail.jpg">
   <img src="D hiver/Screenshot_20241207_084201_Photos.jpg">
+
 </div>
 
 <script>
+  /* IDENTIQUE À TON SYSTÈME, JUSTE MIS EN AÉRO */
   const zone = document.getElementById("zone");
   const imgs = [...zone.querySelectorAll("img")];
 
-  // Cellules beaucoup plus grandes pour espacer fortement
   const cellW = 480;
   const cellH = 480;
 
@@ -67,7 +122,6 @@
   const cols = Math.max(1, Math.floor(zoneW / cellW));
   const rows = Math.ceil(imgs.length / cols);
 
-  // Hauteur de la zone (grande marge supplémentaire)
   zone.style.height = (rows * cellH + 300) + "px";
 
   async function layout(){
@@ -82,7 +136,6 @@
       const baseX = col * cellW;
       const baseY = row * cellH;
 
-      // Grand espace interne dans chaque cellule
       const maxOffsetX = Math.max(0, cellW - img.width - 80);
       const maxOffsetY = Math.max(0, cellH - img.height - 80);
 
