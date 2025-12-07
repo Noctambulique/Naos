@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
-<title>SheetJS Table Export</title>
+<title>Tableau Scroll & Cadre</title>
 
 <style>
     body {
@@ -11,51 +11,75 @@
         display: flex;
         justify-content: center;
         align-items: center;
-
         background-image: url("https://i.pinimg.com/736x/a5/7a/ea/a57aea1d2c676a695ecbf1bcd7bb824c.jpg");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        color: #1B1B1B;
     }
 
     .table-container {
-        width: 35%;
-        max-width: 900px;
-        min-width: 320px;
-        padding: 20px;
-        background: rgba(255, 255, 255, 0.92);
-        border-radius: 10px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 30%; /* 📌 encore plus petit */
+        height: 50vh; /* 📌 cadre fixe avec scroll interne */
+        background: rgba(255, 255, 255, 0.85);
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.45);
         backdrop-filter: blur(6px);
+    }
+
+    .scroll-area {
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        scrollbar-width: thin;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        background-color: #FFFFFF;
-        border: 1px solid #AAB4C3;
-        overflow: hidden;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
     }
 
     table th, table td {
         border: 1px solid #C8D0DA;
-        padding: 10px;
+        padding: 6px;
+        font-size: 13px;
     }
 
     table th {
         background: linear-gradient(#DAE4F2, #B8C7D8);
         font-weight: 600;
-        text-align: left;
     }
 
     table tr:hover td {
         background-color: #DCE8F9;
-        transition: background-color 0.2s;
     }
+
+    .scroll-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 10px;
+    }
+
+    button {
+        background: #4078D6;
+        color: white;
+        border: none;
+        padding: 8px 13px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+        transition: 0.2s;
+    }
+
+    button:hover {
+        background: #2559B6;
+    }
+
 </style>
 
 </head>
