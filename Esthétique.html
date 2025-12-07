@@ -1,8 +1,29 @@
 <style>
     body {
-        background-color: #E9EEF5; /* fond discret façon Windows */
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* police Windows */
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        background-image: url("https://i.pinimg.com/736x/a5/7a/ea/a57aea1d2c676a695ecbf1bcd7bb824c.jpg"); /* 🔁 Mets ton image */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         color: #1B1B1B;
+    }
+
+    /* Cadre du tableau */
+    .table-wrapper {
+        background-color: rgba(255, 255, 255, 0.95); /* Cadre blanc transparent */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+        backdrop-filter: blur(6px); /* Effet vitre Windows */
+        max-width: 900px;
+        width: 85%;
     }
 
     table {
@@ -12,7 +33,7 @@
         border: 1px solid #AAB4C3;
         border-radius: 4px;
         overflow: hidden;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12); /* effet “fenêtre” */
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
     }
 
     table th, table td {
@@ -21,13 +42,13 @@
     }
 
     table th {
-        background: linear-gradient(#DAE4F2, #B8C7D8); /* bandeau Windows */
+        background: linear-gradient(#DAE4F2, #B8C7D8);
         font-weight: 600;
         text-align: left;
     }
 
     table tr:hover td {
-        background-color: #DCE8F9; /* sélection façon Windows Explorer */
+        background-color: #DCE8F9;
         transition: background-color 0.2s;
     }
 </style>
