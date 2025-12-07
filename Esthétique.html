@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
-<title>Tableau Scroll & Cadre Fixé</title>
+<title>Tableau Scroll & Boutons</title>
 
 <style>
     body {
@@ -14,22 +14,26 @@
         background-image: url("https://i.pinimg.com/736x/a5/7a/ea/a57aea1d2c676a695ecbf1bcd7bb824c.jpg");
         background-size: cover;
         background-position: center;
-        background-repeat: no-repeat;
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .table-container {
+    .frame {
         display: flex;
-        flex-direction: column;
         align-items: center;
+        gap: 12px; /* espace entre tableau et boutons */
+    }
+
+    .table-container {
         width: 30%;
-        height: 60vh; /* 📌 Cadre fixe */
+        height: 60vh; /* zone fixe */
         background: rgba(255, 255, 255, 0.85);
         padding: 15px;
         border-radius: 12px;
         box-shadow: 0 8px 20px rgba(0,0,0,0.45);
         backdrop-filter: blur(6px);
-        overflow: hidden; /* Empêche tout dépassement */
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
     }
 
     .scroll-area {
@@ -42,15 +46,14 @@
     table {
         width: 100%;
         border-collapse: collapse;
-        table-layout: fixed; /* 📌 Empêche l’extension horizontale */
+        table-layout: fixed;
     }
 
     table th, table td {
         border: 1px solid #C8D0DA;
         padding: 6px;
         font-size: 13px;
-        word-break: break-word; /* 📌 Coupe les liens trop longs */
-        text-align: left;
+        word-break: break-word;
     }
 
     table th {
@@ -64,26 +67,26 @@
 
     .scroll-buttons {
         display: flex;
-        gap: 12px;
-        margin-top: 10px;
+        flex-direction: column;
+        gap: 10px;
     }
 
     button {
         background: #4078D6;
         color: white;
         border: none;
-        padding: 8px 13px;
+        padding: 8px 10px;
         border-radius: 6px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 16px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.25);
         transition: 0.2s;
+        width: 40px;
     }
 
     button:hover {
         background: #2559B6;
     }
-
 </style>
 </head>
 <body>
