@@ -9,9 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 
   <style>
-    /* -------------------- STYLE GLOBAL -------------------- */
     :root{
-      --bg: #faf9f6;                     /* blanc chaud vintage */
+      --bg: #faf9f6;
       --gap: 12px;
       --box-size: 140px;
       --radius: 10px;
@@ -31,11 +30,9 @@
       background:var(--bg);
       font-family:var(--font-body);
       color:var(--text-color);
-      -webkit-font-smoothing:antialiased;
       position:relative;
     }
 
-    /* Grain discret pour effet papier vintage */
     body::before{
       content:"";
       position:absolute;
@@ -57,7 +54,6 @@
       gap: var(--gap);
     }
 
-    /* -------------------- CASES -------------------- */
     .box{
       background:#fffdfb;
       border:var(--border);
@@ -67,39 +63,27 @@
       align-items:center;
       justify-content:center;
       padding:10px;
-      min-width:var(--box-size);
-      min-height:var(--box-size);
       cursor:pointer;
       user-select:none;
       overflow:hidden;
       position:relative;
-      transition:box-shadow 0.18s ease, transform 0.18s ease, background 0.2s;
+      transition:box-shadow 0.18s ease, transform 0.18s ease;
     }
-
-    .box:hover{
-      box-shadow:var(--shadow-hover);
-      transform:translateY(-2px);
-    }
-
-    .box:active{
-      transform:translateY(1px);
-    }
+    .box:hover{ box-shadow:var(--shadow-hover); transform:translateY(-2px); }
+    .box:active{ transform:translateY(1px); }
 
     .content{
       width:100%;
       height:100%;
       outline:none;
       font-size:25px;
-      line-height:1.25;
       text-align:center;
       display:flex;
       align-items:center;
       justify-content:center;
       padding:6px;
-      word-break:break-word;
-      color:var(--text-color);
       font-family:var(--font-title);
-      letter-spacing:0.2px;
+      color:var(--text-color);
     }
 
     .placeholder{
@@ -107,25 +91,20 @@
       font-style:italic;
     }
 
-    /* Petit indicateur de lien */
     .hint{
       position:absolute;
       right:8px;
       bottom:8px;
       font-size:11px;
       color:var(--muted);
-      opacity:0.85;
-      pointer-events:none;
     }
 
-    /* Mode édition : ombre plus douce et fond clair */
     .editing{
       background:#fffefc;
       box-shadow:0 4px 12px rgba(0,0,0,0.08);
       border-color:rgba(0,0,0,0.25);
     }
 
-    /* Responsive */
     @media (max-width:640px){
       :root{ --box-size: 100px; --cols: 3; }
       .content{ font-size:13px; }
@@ -135,11 +114,10 @@
 
 <body>
   <div class="grid-wrap">
-    <div id="grid" class="grid" aria-label="Grille de cases éditables"></div>
+    <div id="grid" class="grid"></div>
   </div>
 
   <script>
-    /* -------------------- CONFIGURATION -------------------- */
     const GRID_CONFIG = {
       cols: 6,
       rows: 4,
@@ -148,24 +126,20 @@
     };
 
     const BOXES = [
-      { id:'b1',  title:'Octavie', url:'Bio/Octavie' },
+      { id:'b1', title:'Octavie', url:'Bio/Octavie' },
     ];
 
-    /* -------------------- RESTE DU CODE (INCHANGÉ) -------------------- */
     const root = document.documentElement;
     root.style.setProperty('--cols', GRID_CONFIG.cols);
     root.style.setProperty('--box-size', GRID_CONFIG.boxSizePx + 'px');
     root.style.setProperty('--gap', GRID_CONFIG.gapPx + 'px');
 
-    const STORAGE_KEY = 'editable-link-grid:v1';
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
     const total = GRID_CONFIG.cols * GRID_CONFIG.rows;
     const fullBoxes = [];
 
     for(let i=0;i<total;i++){
       const fromConfig = BOXES[i] || { id:'auto_'+i, title:'', url:'' };
-      const persisted = (saved[fromConfig.id] || {});
-      fullBoxes.push({ ...fromConfig, ...persisted });
+      fullBoxes.push({...fromConfig});
     }
 
     const gridEl = document.getElementById('grid');
@@ -174,12 +148,12 @@
       const el = document.createElement('div');
       el.className = 'box';
       el.dataset.id = box.id;
-      el.dataset.url = box.url||'';
+      el.dataset.url = box.url;
 
       const content = document.createElement('div');
       content.className = 'content';
       content.tabIndex = 0;
-      content.innerText = box.title || '';
+      content.innerText = box.title;
       if(!box.title) content.classList.add('placeholder');
 
       const hint = document.createElement('div');
@@ -191,30 +165,22 @@
 
       el.addEventListener('click', ()=>{
         if(el.classList.contains('editing')) return;
-        const url = el.dataset.url;
-        if(url) window.open(url,'_blank');
+        if(el.dataset.url) window.open(el.dataset.url,'_blank');
       });
 
       el.addEventListener('dblclick', ()=> enterEditMode(el));
-
       content.addEventListener('keydown', e=>{
         if(e.key === 'Enter'){
           e.preventDefault();
           if(el.classList.contains('editing')) exitEditMode(el);
-          else {
-            const url = el.dataset.url;
-            if(url) window.open(url,'_blank');
-          }
+          else if(el.dataset.url) window.open(el.dataset.url,'_blank');
         }
         if(e.key.toLowerCase()==='e'){
           e.preventDefault();
           enterEditMode(el);
         }
       });
-
-      content.addEventListener('blur', ()=>{
-        if(el.classList.contains('editing')) exitEditMode(el);
-      });
+      content.addEventListener('blur', ()=>{ if(el.classList.contains('editing')) exitEditMode(el); });
     });
 
     function enterEditMode(el){
@@ -223,58 +189,16 @@
       content.contentEditable = 'true';
       content.classList.remove('placeholder');
       content.focus();
-      document.execCommand('selectAll', false, null);
-      document.getSelection().collapseToEnd();
+      document.execCommand('selectAll');
     }
 
     function exitEditMode(el){
-      const id = el.dataset.id;
       const content = el.querySelector('.content');
       el.classList.remove('editing');
       content.contentEditable = 'false';
       const newText = content.innerText.trim();
       if(!newText) content.classList.add('placeholder');
-
-      const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      state[id] = state[id] || {};
-      state[id].title = newText;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
-
-    window.EditableGrid = {
-      setUrl(id,url){
-        const el = document.querySelector('.box[data-id="'+id+'"]');
-        if(el) el.dataset.url = url;
-        const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
-        state[id] = state[id] || {};
-        state[id].url = url;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      },
-      setTitle(id,title){
-        const el = document.querySelector('.box[data-id="'+id+'"]');
-        if(!el) return;
-        const content = el.querySelector('.content');
-        content.innerText = title;
-        if(!title) content.classList.add('placeholder'); else content.classList.remove('placeholder');
-        const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
-        state[id] = state[id] || {};
-        state[id].title = title;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      },
-      clearStorage(){ localStorage.removeItem(STORAGE_KEY); location.reload(); }
-    };
-
-    (function persistInitial(){
-      const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
-      let changed = false;
-      BOXES.forEach(b=>{
-        if(!state[b.id]){
-          state[b.id] = {title:b.title||'', url:b.url||''};
-          changed = true;
-        }
-      });
-      if(changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    })();
   </script>
 </body>
 </html>
