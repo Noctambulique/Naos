@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
-<title>Esthetique</title>
+<title>Table Scroll Controls</title>
 
 <style>
     body {
@@ -14,82 +14,91 @@
         background-image: url("https://i.pinimg.com/736x/a5/7a/ea/a57aea1d2c676a695ecbf1bcd7bb824c.jpg");
         background-size: cover;
         background-position: center;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "Segoe UI", Tahoma, sans-serif;
     }
 
     .frame {
         display: flex;
         align-items: center;
-        gap: 12px; /* espace entre tableau et boutons */
+        gap: 20px;
     }
 
     .table-container {
-        width: 30%;
-        height: 60vh; /* zone fixe */
-        background: rgba(255, 255, 255, 0.85);
-        padding: 15px;
+        width: 450px;          /* suffisamment large pour ton tableau */
+        height: 65vh;          /* hauteur fixe pour obliger le scroll */
+        background: rgba(255, 255, 255, 0.92);
+        padding: 12px;
         border-radius: 12px;
         box-shadow: 0 8px 20px rgba(0,0,0,0.45);
-        backdrop-filter: blur(6px);
         overflow: hidden;
-        display: flex;
-        justify-content: center;
     }
 
     .scroll-area {
         width: 100%;
         height: 100%;
-        overflow-y: auto;
-        scrollbar-width: thin;
+        overflow-y: scroll;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        table-layout: fixed;
     }
 
-    table th, table td {
+    th, td {
         border: 1px solid #C8D0DA;
         padding: 6px;
         font-size: 13px;
-        word-break: break-word;
     }
 
-    table th {
+    th {
         background: linear-gradient(#DAE4F2, #B8C7D8);
-        font-weight: 600;
+        text-align: left;
     }
 
-    table tr:hover td {
+    tr:hover td {
         background-color: #DCE8F9;
     }
 
     .scroll-buttons {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
     }
 
     button {
-        background: #4078D6;
+        width: 50px;
+        height: 50px;
+        background: #2559B6;
         color: white;
         border: none;
-        padding: 8px 10px;
-        border-radius: 6px;
+        border-radius: 50%;
+        font-size: 24px;
         cursor: pointer;
-        font-size: 16px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+        font-weight: bold;
         transition: 0.2s;
-        width: 40px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.35);
     }
 
     button:hover {
-        background: #2559B6;
+        background: #1c4087;
+        transform: scale(1.1);
     }
 </style>
 </head>
 <body>
+
+<div class="frame">
+
+    <!-- Boutons -->
+    <div class="scroll-buttons">
+        <button onclick="scrollUp()">▲</button>
+        <button onclick="scrollDown()">▼</button>
+    </div>
+
+    <!-- Cadre du tableau -->
+    <div class="table-container">
+        <div class="scroll-area" id="scrollable">
+            <table>
 
 <div class="table-container">
     <!-- 🔽 Ton tableau Excel ici 🔽 -->
