@@ -287,8 +287,10 @@ pointLabels: {
     applyAxesBtn.addEventListener('click', ()=>{
       const n = Math.max(3, Math.min(24, Number(axesCountInput.value) || 5));
       axesCountInput.value = n;
-      makeInputs(makeDefaultAxes(n));
-      updateChartPreview();
+     const labels = makeDefaultAxes(n);
+const values = Array.from({length:n}, ()=> Math.round(Math.random()*10));
+makeInputs(labels, values);
+updateChartPreview();
     });
 
     randomizeBtn.addEventListener('click', ()=>{
