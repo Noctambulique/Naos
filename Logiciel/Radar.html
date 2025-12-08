@@ -198,12 +198,22 @@
                 font: { size: 15, weight: '700' },
                 backdropColor: 'transparent'
               },
-              pointLabels: {
-                display: true,
-                color: '#0f172a',
-                font: { size: 20, weight: '600' },
-                padding: 10
-              },
+pointLabels: {
+  display: true,
+  color: '#0f172a',
+  font: ctx => {
+    const count = ctx.chart.data.labels.length;
+    let base = 22;
+
+    if(count > 10) base = 18;
+    if(count > 14) base = 14;
+    if(count > 18) base = 10;
+    if(count > 22) base = 8;
+
+    return { size: base, weight: '600' };
+  },
+  padding: 6
+},
               grid: {
                 display: showGrid.checked,
                 lineWidth: 3.5,           // anneaux nets mais pas agressifs
