@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carte Personnalisable</title>
+
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+      margin: 0;
+      background-color: #f0f0f0;
+      font-family: Arial, sans-serif;
+      font-size: 12px; /* 🔽 Police réduite */
+    }
+
+    #map {
+      display: grid;
+      grid-template-columns: repeat(8, 130px); /* 🔼 Cases plus larges */
+      gap: 4px;
+      justify-content: center;
+    }
+
+    .cell {
+      width: 130px;   /* 🔼 Largeur augmentée */
+      height: 70px;   /* 🔼 Hauteur augmentée */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #bebff1;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-size: 12px; /* 🔽 Police plus petite dans les cases */
+    }
+
+    .cell:hover {
+      background-color: #e0e0e0;
+    }
+
+    #infoBox {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px;
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      display: none;
+      max-width: 200px;
+      font-size: 12px; /* cohérent avec la taille globale */
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+  <div id="infoBox"></div>
+
+  <script>
+    // Configuration des cellules (personnalise ici)
+    const cellsData = [
+      { label: "", text: "Margueritte tricotte de pulls et les revends à sa soeur pour acheter de la laine.", color: "#bebff1" },
+      { label: "", text: "Elle étudie chez les religieuses", color: "#bebff1" },
+      { label: "", text: "Elle pratique la peinture, le chant, le piano", color: "#bebff1" },
+      { label: "", text: "C'est une fille sociable", color: "#bebff1" },
+      { label: "", text: "On l'appelle madame mauvais temps, Margueritte est un peu capricieuse et impatiente", color: "#bebff1" },
+      { label: "", text: "Très croyante jusqu'à sa vingtaine, jusqu'à ce que son père esquive un peu l'église", color: "#bebff1" },
+      { label: "", text: "Lire la comtesse de Segur", color: "#bebff1" },
+      { label: "", text: "Premier copain vers 15 ans, George, un garçon très beau", color: "#bebff1" },
+      { label: "", text: "X", color: "#bebff1" },
+    ];
+
+    const map = document.getElementById("map");
+    const infoBox = document.getElementById("infoBox");
+
+    cellsData.forEach((cell) => {
+      const div = document.createElement("div");
+      div.className = "cell";
+      div.style.backgroundColor = cell.color;
+      div.textContent = cell.label;
+      div.onclick = () => {
+        infoBox.textContent = cell.text;
+        infoBox.style.display = "block";
+      };
+      map.appendChild(div);
+    });
+  </script>
+</body>
+</html>
