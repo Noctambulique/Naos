@@ -5,13 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Grille éditable minimaliste</title>
 
-  <!-- Polices élégantes, rétro-minimalistes -->
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 
   <style>
-    /* -------------------- STYLE GLOBAL -------------------- */
     :root{
-      --bg: #faf9f6;                     /* blanc chaud vintage */
+      --bg: #faf9f6;
       --gap: 12px;
       --box-size: 140px;
       --radius: 10px;
@@ -35,7 +33,6 @@
       position:relative;
     }
 
-    /* Grain discret pour effet papier vintage */
     body::before{
       content:"";
       position:absolute;
@@ -45,10 +42,7 @@
       pointer-events:none;
     }
 
-    .grid-wrap{
-      display:flex;
-      justify-content:center;
-    }
+    .grid-wrap{ display:flex; justify-content:center; }
 
     .grid{
       display:grid;
@@ -57,7 +51,6 @@
       gap: var(--gap);
     }
 
-    /* -------------------- CASES -------------------- */
     .box{
       background:#fffdfb;
       border:var(--border);
@@ -81,9 +74,7 @@
       transform:translateY(-2px);
     }
 
-    .box:active{
-      transform:translateY(1px);
-    }
+    .box:active{ transform:translateY(1px); }
 
     .content{
       width:100%;
@@ -107,7 +98,6 @@
       font-style:italic;
     }
 
-    /* Petit indicateur de lien */
     .hint{
       position:absolute;
       right:8px;
@@ -118,14 +108,12 @@
       pointer-events:none;
     }
 
-    /* Mode édition : ombre plus douce et fond clair */
     .editing{
       background:#fffefc;
       box-shadow:0 4px 12px rgba(0,0,0,0.08);
       border-color:rgba(0,0,0,0.25);
     }
 
-    /* Responsive */
     @media (max-width:640px){
       :root{ --box-size: 100px; --cols: 3; }
       .content{ font-size:13px; }
@@ -135,17 +123,11 @@
 
 <body>
   <div class="grid-wrap">
-    <div id="grid" class="grid" aria-label="Grille de cases éditables"></div>
+    <div id="grid" class="grid"></div>
   </div>
 
   <script>
-    /* -------------------- CONFIGURATION -------------------- */
-    const GRID_CONFIG = {
-      cols: 6,
-      rows: 4,
-      boxSizePx: 140,
-      gapPx: 12,
-    };
+    const GRID_CONFIG = { cols: 6, rows: 4, boxSizePx: 140, gapPx: 12 };
 
     const BOXES = [
       { id:'b1',  title:'Calendrier', url:'https://calendar.google.com' },
@@ -158,23 +140,37 @@
       { id:'b8',  title:'Lescan', url:'https://lelscans.net/scan-one-piece/1084/2' },
       { id:'b9', title:'Chatgpt', url:'https://chatgpt.com' },
       { id:'b10', title:'Fmt', url:'https://fmteam.fr/comics/one-punch-man' },
+      { id:'b10', title:'Modélisation', url:'https://posemy.art/app/?lang=fr' },
     ];
 
-    /* -------------------- RESTE DU CODE (INCHANGÉ) -------------------- */
     const root = document.documentElement;
     root.style.setProperty('--cols', GRID_CONFIG.cols);
     root.style.setProperty('--box-size', GRID_CONFIG.boxSizePx + 'px');
     root.style.setProperty('--gap', GRID_CONFIG.gapPx + 'px');
 
     const STORAGE_KEY = 'editable-link-grid:v1';
+
+    /* -------- FIX : initialisation stockée AVANT la construction des boîtes -------- */
+    (function persistInitial(){
+      const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+      let changed = false;
+      BOXES.forEach(b=>{
+        if(!state[b.id]){
+          state[b.id] = {title:b.title||'', url:b.url||''};
+          changed = true;
+        }
+      });
+      if(changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    })();
+
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
     const total = GRID_CONFIG.cols * GRID_CONFIG.rows;
     const fullBoxes = [];
 
     for(let i=0;i<total;i++){
-      const fromConfig = BOXES[i] || { id:'auto_'+i, title:'', url:'' };
-      const persisted = (saved[fromConfig.id] || {});
-      fullBoxes.push({ ...fromConfig, ...persisted });
+      const base = BOXES[i] || { id:'auto_'+i, title:'', url:'' };
+      const persisted = saved[base.id] || {};
+      fullBoxes.push({ ...base, ...persisted });
     }
 
     const gridEl = document.getElementById('grid');
@@ -272,18 +268,6 @@
       },
       clearStorage(){ localStorage.removeItem(STORAGE_KEY); location.reload(); }
     };
-
-    (function persistInitial(){
-      const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
-      let changed = false;
-      BOXES.forEach(b=>{
-        if(!state[b.id]){
-          state[b.id] = {title:b.title||'', url:b.url||''};
-          changed = true;
-        }
-      });
-      if(changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    })();
   </script>
 </body>
 </html>
