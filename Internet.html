@@ -46,8 +46,7 @@
 
     .grid{
       display:grid;
-      grid-template-columns: repeat(var(--cols, 6), var(--box-size));
-      grid-auto-rows: var(--box-size);
+      grid-template-columns: repeat(var(--cols), var(--box-size));
       gap: var(--gap);
     }
 
@@ -60,8 +59,8 @@
       align-items:center;
       justify-content:center;
       padding:10px;
-      min-width:var(--box-size);
-      min-height:var(--box-size);
+      width:var(--box-size);
+      height:var(--box-size);
       cursor:pointer;
       user-select:none;
       overflow:hidden;
@@ -127,8 +126,7 @@
   </div>
 
   <script>
-    const GRID_CONFIG = { cols: 6, rows: 4, boxSizePx: 140, gapPx: 12 };
-
+    /* ---------------------- CONFIG ---------------------- */
     const BOXES = [
       { id:'b1',  title:'Calendrier', url:'https://calendar.google.com' },
       { id:'b2',  title:'Mail', url:'https://mail.google.com' },
@@ -138,54 +136,59 @@
       { id:'b6',  title:'Tool24', url:'https://tools.pdf24.org/fr/ocr-pdf' },
       { id:'b7',  title:'GitHub', url:'https://github.com' },
       { id:'b8',  title:'Lescan', url:'https://lelscans.net/scan-one-piece/1084/2' },
-      { id:'b9', title:'Chatgpt', url:'https://chatgpt.com' },
+      { id:'b9',  title:'Chatgpt', url:'https://chatgpt.com' },
       { id:'b10', title:'Fmt', url:'https://fmteam.fr/comics/one-punch-man' },
-      { id:'b10', title:'Modélisation', url:'https://posemy.art/app/?lang=fr' },
+      { id:'b11', title:'Modélisation', url:'https://posemy.art/app/?lang=fr' },
     ];
-
-    const root = document.documentElement;
-    root.style.setProperty('--cols', GRID_CONFIG.cols);
-    root.style.setProperty('--box-size', GRID_CONFIG.boxSizePx + 'px');
-    root.style.setProperty('--gap', GRID_CONFIG.gapPx + 'px');
 
     const STORAGE_KEY = 'editable-link-grid:v1';
 
-    /* -------- FIX : initialisation stockée AVANT la construction des boîtes -------- */
-    (function persistInitial(){
-      const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    /* AUTO-CALCUL COLONNES (Option B) */
+    const cols = Math.ceil(Math.sqrt(BOXES.length));
+    document.documentElement.style.setProperty('--cols', cols);
+
+    /* ------------------ SYNCHRO BOXES → STORAGE (Option A) ------------------ */
+    (function syncToStorage(){
+      const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
       let changed = false;
-      BOXES.forEach(b=>{
-        if(!state[b.id]){
-          state[b.id] = {title:b.title||'', url:b.url||''};
+
+      BOXES.forEach(b => {
+        if(!state[b.id]) state[b.id] = {};
+
+        // les titres modifiés sont conservés
+        if(state[b.id].title === undefined) {
+          state[b.id].title = b.title;
+          changed = true;
+        }
+
+        // mais les URL suivent BOXES (source de vérité)
+        if(state[b.id].url !== b.url) {
+          state[b.id].url = b.url;
           changed = true;
         }
       });
-      if(changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+      if(changed)
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     })();
 
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    const total = GRID_CONFIG.cols * GRID_CONFIG.rows;
-    const fullBoxes = [];
 
-    for(let i=0;i<total;i++){
-      const base = BOXES[i] || { id:'auto_'+i, title:'', url:'' };
-      const persisted = saved[base.id] || {};
-      fullBoxes.push({ ...base, ...persisted });
-    }
-
+    /* ---------------------- CONSTRUCTION DE LA GRILLE ---------------------- */
     const gridEl = document.getElementById('grid');
 
-    fullBoxes.forEach(box => {
+    BOXES.forEach(box => {
+      const data = saved[box.id];
       const el = document.createElement('div');
       el.className = 'box';
       el.dataset.id = box.id;
-      el.dataset.url = box.url||'';
+      el.dataset.url = data.url || '';
 
       const content = document.createElement('div');
       content.className = 'content';
       content.tabIndex = 0;
-      content.innerText = box.title || '';
-      if(!box.title) content.classList.add('placeholder');
+      content.innerText = data.title || '';
+      if(!data.title) content.classList.add('placeholder');
 
       const hint = document.createElement('div');
       hint.className = 'hint';
@@ -194,24 +197,22 @@
       el.appendChild(hint);
       gridEl.appendChild(el);
 
+      /* OUVERTURE URL */
       el.addEventListener('click', ()=>{
         if(el.classList.contains('editing')) return;
-        const url = el.dataset.url;
-        if(url) window.open(url,'_blank');
+        if(el.dataset.url) window.open(el.dataset.url,'_blank');
       });
 
+      /* EDIT */
       el.addEventListener('dblclick', ()=> enterEditMode(el));
 
       content.addEventListener('keydown', e=>{
         if(e.key === 'Enter'){
           e.preventDefault();
           if(el.classList.contains('editing')) exitEditMode(el);
-          else {
-            const url = el.dataset.url;
-            if(url) window.open(url,'_blank');
-          }
+          else if(el.dataset.url) window.open(el.dataset.url,'_blank');
         }
-        if(e.key.toLowerCase()==='e'){
+        if(e.key.toLowerCase() === 'e'){
           e.preventDefault();
           enterEditMode(el);
         }
@@ -222,12 +223,15 @@
       });
     });
 
+    /* ---------------------- EDIT MODE ---------------------- */
+
     function enterEditMode(el){
       const content = el.querySelector('.content');
       el.classList.add('editing');
       content.contentEditable = 'true';
       content.classList.remove('placeholder');
       content.focus();
+
       document.execCommand('selectAll', false, null);
       document.getSelection().collapseToEnd();
     }
@@ -237,36 +241,49 @@
       const content = el.querySelector('.content');
       el.classList.remove('editing');
       content.contentEditable = 'false';
+
       const newText = content.innerText.trim();
       if(!newText) content.classList.add('placeholder');
 
       const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      state[id] = state[id] || {};
       state[id].title = newText;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
+    /* ---------------------- API JS CONSOLE ---------------------- */
     window.EditableGrid = {
       setUrl(id,url){
-        const el = document.querySelector('.box[data-id="'+id+'"]');
+        const el = document.querySelector(`.box[data-id="${id}"]`);
         if(el) el.dataset.url = url;
+
         const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
         state[id] = state[id] || {};
         state[id].url = url;
+
+        // Comme option A → l'URL sera écrasée au prochain reload par BOXES,
+        // donc ceci n’est que temporaire
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       },
+
       setTitle(id,title){
-        const el = document.querySelector('.box[data-id="'+id+'"]');
+        const el = document.querySelector(`.box[data-id="${id}"]`);
         if(!el) return;
         const content = el.querySelector('.content');
+
         content.innerText = title;
-        if(!title) content.classList.add('placeholder'); else content.classList.remove('placeholder');
+        if(!title) content.classList.add('placeholder');
+        else content.classList.remove('placeholder');
+
         const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
         state[id] = state[id] || {};
         state[id].title = title;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       },
-      clearStorage(){ localStorage.removeItem(STORAGE_KEY); location.reload(); }
+
+      clearStorage(){
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
     };
   </script>
 </body>
