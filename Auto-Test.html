@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Résumé productivité</title>
+  <style>
+    body{font-family:Arial, sans-serif; max-width:700px; margin:20px auto; line-height:1.5;}
+    label{display:block; margin-top:12px; font-weight:bold;}
+    input, select{width:100%; padding:6px; margin-top:4px;}
+    button{margin-top:18px; padding:10px 16px; border:none; background:#007bff; color:white; cursor:pointer; border-radius:6px;}
+    #output{margin-top:20px; background:#f4f4f4; padding:12px; border-radius:6px; white-space:pre; font-family:monospace;}
+  </style>
+</head>
+<body>
+
+<h1>Générateur de ligne de données</h1>
+<p>Remplis les facteurs ci-dessous. Le système génère automatiquement une ligne résumée contenant uniquement des chiffres, dans un ordre constant.</p>
+
+<form id="form">
+  <label>Avoir pris soin de soi (0-10)
+    <input type="number" id="soin" min="0" max="10" value="5">
+  </label>
+
+  <label>Avoir créé (0-10)
+    <input type="number" id="cree" min="0" max="10" value="5">
+  </label>
+
+  <label>Position (0 = assise, 1 = couchée)
+    <select id="position">
+      <option value="0">Assise</option>
+      <option value="1">Couchée</option>
+    </select>
+  </label>
+
+  <label>Sport (minutes)
+    <input type="number" id="sport" min="0" max="1440" value="0">
+  </label>
+
+  <label>Relation sociale (0-10)
+    <input type="number" id="social" min="0" max="10" value="5">
+  </label>
+
+  <label>Qualité de la nourriture (1-5)
+    <input type="number" id="qualite" min="1" max="5" value="3">
+  </label>
+
+  <label>Faim sur la journée (0-10)
+    <input type="number" id="faim" min="0" max="10" value="5">
+  </label>
+
+  <label>Avoir pris l'air (0 = non, 1 = oui)
+    <select id="air">
+      <option value="0">Non</option>
+      <option value="1">Oui</option>
+    </select>
+  </label>
+
+  <label>Temps actif (heures)
+    <input type="number" id="temps" min="0" max="24" step="0.1" value="8">
+  </label>
+
+  <label>Auto-évaluation productivité (0-100)
+    <input type="number" id="prod" min="0" max="100" value="50">
+  </label>
+
+  <button type="button" id="generate">Générer la ligne</button>
+</form>
+
+<h2>Ligne générée</h2>
+<div id="output">—</div>
+
+<script>
+document.getElementById("generate").addEventListener("click", () => {
+  const vals = [
+    document.getElementById("soin").value,
+    document.getElementById("cree").value,
+    document.getElementById("position").value,
+    document.getElementById("sport").value,
+    document.getElementById("social").value,
+    document.getElementById("qualite").value,
+    document.getElementById("faim").value,
+    document.getElementById("air").value,
+    document.getElementById("temps").value,
+    document.getElementById("prod").value
+  ];
+
+  document.getElementById("output").textContent = vals.join(" ; ");
+});
+</script>
+
+</body>
+</html>
