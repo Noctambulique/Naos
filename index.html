@@ -237,12 +237,7 @@ const old = mapEl.querySelectorAll('.marker, .label-marker, .label-e');
     filteredLocations = LOCATIONS.filter(loc => loc.label && loc.label.includes(suit));
   }
   
-// 🔵 BONUS : mode focus narratif (touche E)
-if (eStep >= 0) {
-  filteredLocations = filteredLocations.filter(
-    loc => loc.eGroup === eStep || loc.eGroup === undefined
-  );
-      }
+
   
   filteredLocations.forEach((loc, idx) => {
     let element;
