@@ -71,6 +71,26 @@
     #hud {font-size:12px}
     :root{--player-size:28px; --marker-size:28px;}
   }
+
+  .marker.e-active {
+  filter: drop-shadow(0 0 12px gold);
+  transform: scale(1.15);
+}
+
+.label-e {
+  position: absolute;
+  transform: translate(-50%, -120%);
+  background: rgba(255,215,0,0.95);
+  color: #000;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 50;
+}
+
+  
 </style>
 </head>
 <body>
@@ -110,9 +130,9 @@ let CURRENT_MAP_ID = "ville-centre";
 
 /* --- LOCATIONS : marqueurs normaux --- */
 let LOCATIONS = [
-  { x: 390, y: 393, img: "Map/Maison1.png", type: "map", link: "Savoir.html", label:"Savoir, Roi de ♦️", size: 80 },
-  { x: 366, y: 814, img: "Map/Maison1.png", type: "map", link: "Frise Philo.html", label:"Histoire Philo, Dame de ♦️", size: 80 },
-  { x: 649, y: 1164, img: "Map/Maison1.png", type: "map", link: "Psycho.html", label:"Psycho, Valet de ♦️", size: 80 },
+  { x: 390, y: 393, img: "Map/Maison1.png", type: "map", link: "Savoir.html", label:"Savoir, Roi de ♦️", size: 80 , eLabel: "Maison du savoir", eGroup: 0 },
+  { x: 366, y: 814, img: "Map/Maison1.png", type: "map", link: "Frise Philo.html", label:"Histoire Philo, Dame de ♦️", size: 80, eLabel: "Maison du savoir", eGroup: 1  },
+  { x: 649, y: 1164, img: "Map/Maison1.png", type: "map", link: "Psycho.html", label:"Psycho, Valet de ♦️", size: 80, eLabel: "Maison du savoir", eGroup: 2  },
   { x: 721, y: 1046, img: "Map/Maison1.png", type: "map", link: "Philo.html", label:"Philo-map, 10 de ♦️", size: 80 },
   { x: 468, y: 590, img: "Map/Maison1.png", type: "map", link: "Biblio.html", label:"Biblio-Map, 9 de ♦️", size: 80 },
   { x: 982, y: 717, img: "Map/Maison1.png", type: "map", link: "Cool.html", label:"Trucs cools, 8 de ♦️", size: 80 },
@@ -161,7 +181,9 @@ let state = {
 
 let modeDeplacement = false; // 👈 au départ le déplacement est désactivé
 let modeLabel = false;       // Touche B : affiche texte à la place des icônes
+let eStep = -1; // 👈 étape actuelle du mode E
 
+  
 // 🔎 Filtrage par symboles (touche C)
 let filterStep = -1; // -1 = aucun filtre actif
 const SUITS = ["♦️", "♠️", "♣️", "❤️"];
@@ -205,7 +227,7 @@ function loadMap(mapIdOrObj){
 /* RENDERMARKERS : affiche les marqueurs normaux (LOCATIONS) */
 function renderMarkers(){
   // On supprime les anciens marqueurs
-  const old = mapEl.querySelectorAll('.marker, .label-marker');
+const old = mapEl.querySelectorAll('.marker, .label-marker, .label-e');
   old.forEach(n => n.remove());
 
   // Appliquer le filtrage en fonction du symbole sélectionné
@@ -252,6 +274,20 @@ function renderMarkers(){
     element.style.top = loc.y + 'px';
     element.dataset.idx = idx;
 
+// 🔵 MODE E : affichage progressif des labels
+if (!modeLabel && loc.eLabel !== undefined && eStep >= 0 && loc.eGroup <= eStep) {
+  element.classList.add('e-active');
+
+  const eLabel = document.createElement('div');
+  eLabel.className = 'label-e';
+  eLabel.textContent = loc.eLabel;
+  eLabel.style.left = loc.x + 'px';
+  eLabel.style.top = loc.y + 'px';
+
+  mapEl.appendChild(eLabel);
+}
+
+    
     // Interaction
     element.addEventListener('click', ev => {
       ev.stopPropagation();
@@ -267,7 +303,7 @@ function renderMarkers(){
 /* --- Curseurs personnalisés : affichés lorsque l’on appuie sur D --- */
 function showCustomCursors() {
   // retirer anciens marqueurs
-  const old = mapEl.querySelectorAll('.marker, .label-marker');
+const old = mapEl.querySelectorAll('.marker, .label-marker, .label-e');
   old.forEach(n => n.remove());
 
   // ajouter les curseurs
@@ -399,6 +435,25 @@ window.addEventListener('keydown', (e) => {
     return;
 
   }
+// 🔄 Touche E : afficher les labels un par un
+if (key === 'e') {
+  // trouver le nombre max de groupes
+  const maxGroup = Math.max(
+    ...LOCATIONS
+      .filter(l => l.eGroup !== undefined)
+      .map(l => l.eGroup)
+  );
+
+  eStep++;
+
+  if (eStep > maxGroup) {
+    eStep = -1; // reset
+  }
+
+  renderMarkers();
+  console.log("E step :", eStep);
+  return;
+}
 
   // Activer mouvements uniquement si modeDeplacement actif
   if (modeDeplacement) {
