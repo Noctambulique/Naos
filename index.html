@@ -236,7 +236,14 @@ const old = mapEl.querySelectorAll('.marker, .label-marker, .label-e');
     const suit = SUITS[filterStep];
     filteredLocations = LOCATIONS.filter(loc => loc.label && loc.label.includes(suit));
   }
-
+  
+// 🔵 BONUS : mode focus narratif (touche E)
+if (eStep >= 0) {
+  filteredLocations = filteredLocations.filter(
+    loc => loc.eGroup === eStep || loc.eGroup === undefined
+  );
+      }
+  
   filteredLocations.forEach((loc, idx) => {
     let element;
 
@@ -275,7 +282,7 @@ const old = mapEl.querySelectorAll('.marker, .label-marker, .label-e');
     element.dataset.idx = idx;
 
 // 🔵 MODE E : affichage progressif des labels
-if (!modeLabel && loc.eLabel !== undefined && eStep >= 0 && loc.eGroup <= eStep) {
+if (!modeLabel && loc.eLabel !== undefined && loc.eGroup === eStep) {
   element.classList.add('e-active');
 
   const eLabel = document.createElement('div');
