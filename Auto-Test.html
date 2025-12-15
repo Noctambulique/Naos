@@ -140,16 +140,25 @@ function signe(y){
 }
 
 function definirEtat(b,s){
+  // b = bonheur, s = stimulation
+
+  if(b==="+" && s==="−") return "Apaisement";
   if(b==="+" && s==="+") return "Euphorie";
-  if(b==="-" && s==="-") return "Épuisement";
-  if(b==="-" && s==="+") return "Apaisement";
+
+  if(b==="−" && s==="+") return "Tension";
+  if(b==="−" && s==="−") return "Abattement";
+
   if(b==="0" && s==="0") return "Travail";
+
   if(b==="+") return "Heureux";
-  if(b==="-") return "Tristesse";
+  if(b==="−") return "Tristesse";
+
   if(s==="+") return "Stimulé";
-  if(s==="-") return "Fatigue";
+  if(s==="−") return "Fatigue";
+
   return "—";
 }
+
 
 /* ===== BOUCLE ===== */
 function loop(){
