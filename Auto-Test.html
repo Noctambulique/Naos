@@ -48,29 +48,38 @@ function updateLabels(){Object.values(sliders).forEach((s,i)=>document.getElemen
 
 function impactCourbe1(){
   let dy=0;
-  dy-= sliders.imprevu.value*8;                  // choc négatif fort
-  dy-= sliders.rejet.value*6;                    // rejet social
-  dy+= (sliders.sommeil.value-0.5)*10;           // sommeil majeur
-  dy+= sliders.sport.value*1.5;                  // sport léger
-  dy+= (mid()-y1)/200*sliders.musique.value;    // musique ramène vers centre si bas
-  if(sliders.nourriture.value<0.3) dy-=4;        // nourriture très basse pénalise
-  dy+= sliders.soleil.value*6;                   // soleil positif mais éphémère
-  dy+= sliders.dehors.value*3;                   // dehors moyen
+    let dy=0;
+  dy-= sliders.imprevu.value*3;                  // choc négatif fort mais contenu
+  dy-= sliders.rejet.value*2.5;                  // rejet social
+  dy+= (sliders.sommeil.value-0.5)*4;            // sommeil majeur mais borné
+  dy+= sliders.sport.value*0.6;                  // sport léger
+  dy+= (mid()-y1)/300*sliders.musique.value;    // musique : recentrage doux
+  if(sliders.nourriture.value<0.3) dy-=1.5;      // nourriture critique
+  dy+= sliders.soleil.value*2.5;                 // soleil positif, transitoire
+  dy+= sliders.dehors.value*1.2;                 // dehors moyen
   return dy;
 }
 
 function loop(){
-  ctx.fillStyle='rgba(255,255,255,0.06)';         // effacement progressif
+  ctx.fillStyle='rgba(255,255,255,0.03)';         // trace plus longue         // effacement progressif
   ctx.fillRect(0,0,canvas.clientWidth,canvas.clientHeight);
 
-  // axes
-  ctx.strokeStyle='#94a3b8';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,mid());ctx.lineTo(canvas.clientWidth,mid());ctx.stroke();
+  // axes et indications
+  ctx.strokeStyle='#94a3b8';ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(0,mid());ctx.lineTo(canvas.clientWidth,mid());
+  ctx.stroke();
+
+  ctx.fillStyle='#64748b';ctx.font='12px system-ui';
+  ctx.fillText('Ça va ↑',8,mid()-8);
+  ctx.fillText('Ça ne va pas ↓',8,mid()+18);
 
   // courbe 1 (pilotée)
   y1+=impactCourbe1();
+  y1=Math.max(20,Math.min(canvas.clientHeight-20,y1));
 
   // courbe 2 (dérive aléatoire)
-  y2+= (Math.random()-0.5)*3 + (mid()-y2)/400;
+  y2+= (Math.random()-0.5)*2 + (mid()-y2)/500;()-0.5)*3 + (mid()-y2)/400;
 
   ctx.fillStyle='#2563eb';ctx.fillRect(x,y1,2,2);
   ctx.fillStyle='#dc2626';ctx.fillRect(x,y2,2,2);
