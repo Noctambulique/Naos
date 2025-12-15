@@ -41,6 +41,7 @@ window.addEventListener('resize',resize);resize();
 
 let x=0;const step=1;const mid=()=>canvas.clientHeight/2;
 let y1=mid(),y2=mid();
+let prevY1=null, prevY2=null;
 
 const sliders={imprevu,rejet,sommeil,sport,musique,nourriture,soleil,dehors};
 Object.values(sliders).forEach(s=>s.oninput=()=>updateLabels());
@@ -61,8 +62,8 @@ function impactCourbe1(){
 }
 
 function loop(){
-  ctx.fillStyle='rgba(255,255,255,0.03)';         // trace plus longue         // effacement progressif
-  ctx.fillRect(0,0,canvas.clientWidth,canvas.clientHeight);
+  ctx.fillStyle='rgba(255,255,255,0.02)';         // effacement très léger
+  ctx.fillRect(0,0,canvas.clientWidth,canvas.clientHeight);(0,0,canvas.clientWidth,canvas.clientHeight);
 
   // axes et indications
   ctx.strokeStyle='#94a3b8';ctx.lineWidth=1;
@@ -81,11 +82,15 @@ function loop(){
   // courbe 2 (dérive aléatoire)
   y2+= (Math.random()-0.5)*2 + (mid()-y2)/500;()-0.5)*3 + (mid()-y2)/400;
 
-  ctx.fillStyle='#2563eb';ctx.fillRect(x,y1,2,2);
-  ctx.fillStyle='#dc2626';ctx.fillRect(x,y2,2,2);
+  ctx.strokeStyle='#2563eb';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x-1,prevY1||y1);ctx.lineTo(x,y1);ctx.stroke();
+  prevY1=y1;
+  ctx.strokeStyle='#dc2626';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x-1,prevY2||y2);ctx.lineTo(x,y2);ctx.stroke();
+  prevY2=y2;
 
   x+=step;
-  if(x>canvas.clientWidth){x=0;y1=mid();y2=mid();}
+  if(x>canvas.clientWidth){x=0;y1=mid();y2=mid();prevY1=null;prevY2=null;}
   requestAnimationFrame(loop);
 }
 loop();
