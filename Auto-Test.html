@@ -3,35 +3,63 @@
 <head>
 <meta charset="utf-8">
 <title>État mental dynamique</title>
+
 <style>
 :root{
-  --bg:#f8fafc; --panel:#fff;
-  --blue:#2563eb; --red:#dc2626;
-  --axis:#94a3b8; --text:#0f172a;
+  --bg:#f8fafc;
+  --panel:#ffffff;
+  --blue:#2563eb;
+  --red:#dc2626;
+  --axis:#94a3b8;
+  --text:#0f172a;
 }
+
 *{box-sizing:border-box}
+
 body{
-  margin:0; display:flex; height:100vh;
+  margin:0;
+  display:flex;
+  height:100vh;
   font-family:system-ui,sans-serif;
-  background:var(--bg); color:var(--text);
+  background:var(--bg);
+  color:var(--text);
 }
+
 aside{
-  width:300px; padding:16px;
+  width:300px;
+  padding:16px;
   background:var(--panel);
   border-right:1px solid #e2e8f0;
 }
-.control{margin-bottom:10px;font-size:13px}
+
+.control{
+  margin-bottom:10px;
+  font-size:13px;
+}
+
 input{width:100%}
 
-main{flex:1; position:relative}
-canvas{width:100%; height:100%}
+main{
+  flex:1;
+  position:relative;
+}
 
+canvas{
+  width:100%;
+  height:100%;
+}
+
+/* ===== ÉTAT ===== */
 #etat{
-  position:absolute; top:12px; right:12px;
-  background:white; padding:12px 18px;
+  position:absolute;
+  top:12px;
+  right:12px;
+  background:white;
+  padding:12px 18px;
   border-radius:12px;
   box-shadow:0 4px 20px rgba(0,0,0,.08);
-  font-weight:600; font-size:14px;
+  font-weight:600;
+  font-size:14px;
 }
 
 /* ===== LÉGENDE ===== */
@@ -46,14 +74,18 @@ canvas{width:100%; height:100%}
   font-size:12px;
   line-height:1.5;
 }
+
 #legende span{
   display:inline-block;
-  width:10px; height:10px;
+  width:10px;
+  height:10px;
   border-radius:50%;
   margin-right:6px;
 }
-#legende .bleu{background:#2563eb}
-#legende .rouge{background:#dc2626}
+
+#legende .bleu{background:var(--blue)}
+#legende .rouge{background:var(--red)}
+
 #legende .axe{
   margin-top:6px;
   color:#475569;
@@ -61,6 +93,7 @@ canvas{width:100%; height:100%}
 }
 </style>
 </head>
+
 <body>
 
 <aside>
@@ -91,22 +124,26 @@ La stimulation évolue de manière autonome.
 </main>
 
 <script>
+/* ===== CANVAS ===== */
 const c = document.getElementById("c");
 const ctx = c.getContext("2d");
 const etatBox = document.getElementById("etat");
 
 function resize(){
-  const r = devicePixelRatio||1;
-  c.width = c.clientWidth*r;
-  c.height = c.clientHeight*r;
+  const r = devicePixelRatio || 1;
+  c.width = c.clientWidth * r;
+  c.height = c.clientHeight * r;
   ctx.setTransform(r,0,0,r,0,0);
 }
-resize(); addEventListener("resize",resize);
+resize();
+addEventListener("resize", resize);
 
-const mid = () => c.clientHeight/2;
+const mid = () => c.clientHeight / 2;
 const seuil = 35;
 
+/* ===== TEMPS ===== */
 let x = 0;
+let t = 0;
 
 /* ===== BONHEUR (BLEU) ===== */
 let yBonheur = mid();
@@ -114,98 +151,113 @@ let prevBonheur = yBonheur;
 
 function bonheurImpact(){
   let d = 0;
-  d += (sommeil.value-0.5)*2.2;
-  d += (soleil.value-0.5)*1.8;
-  d += (nourriture.value-0.5)*1.5;
-  d += (musique.value-0.5)*0.8;
-  d += (sport.value-0.5)*0.6;
-  d -= (imprevu.value-0.5)*1.2;
-  d += (mid()-yBonheur)/600;
+
+  d += (sommeil.value   - 0.5) * 2.2;
+  d += (soleil.value    - 0.5) * 1.8;
+  d += (nourriture.value- 0.5) * 1.5;
+  d += (musique.value   - 0.5) * 0.8;
+  d += (sport.value     - 0.5) * 0.6;
+  d -= (imprevu.value   - 0.5) * 1.2;
+
+  // retour naturel vers l'équilibre
+  d += (mid() - yBonheur) / 600;
+
   return d;
 }
 
-/* ===== STIMULATION (ROUGE) ===== */
-let t = 0;
+/* ===== STIMULATION (ROUGE, AUTONOME) ===== */
 function stimulationY(){
   const amplitude = 120;
-  const bruit = Math.sin(t*0.47)*12;
-  return mid() + Math.sin(t)*amplitude + bruit;
+  const irregularite = Math.sin(t * 0.47) * 12;
+  return mid() + Math.sin(t) * amplitude + irregularite;
 }
 
 /* ===== INTERPRÉTATION ===== */
 function signe(y){
-  if(y < mid()-seuil) return "+";
-  if(y > mid()+seuil) return "-";
+  if (y < mid() - seuil) return "+";
+  if (y > mid() + seuil) return "-";
   return "0";
 }
 
-function definirEtat(b,s){
-  // b = bonheur, s = stimulation
+function definirEtat(b, s){
+  // états combinés
+  if (b === "+" && s === "-") return "Apaisement";
+  if (b === "+" && s === "+") return "Euphorie";
 
-  if(b==="+" && s==="−") return "Apaisement";
-  if(b==="+" && s==="+") return "Euphorie";
+  if (b === "-" && s === "+") return "Tension";
+  if (b === "-" && s === "-") return "Abattement";
 
-  if(b==="−" && s==="+") return "Tension";
-  if(b==="−" && s==="−") return "Abattement";
+  // neutre
+  if (b === "0" && s === "0") return "Travail";
 
-  if(b==="0" && s==="0") return "Travail";
+  // dominants
+  if (b === "+") return "Heureux";
+  if (b === "-") return "Tristesse";
 
-  if(b==="+") return "Heureux";
-  if(b==="−") return "Tristesse";
-
-  if(s==="+") return "Stimulé";
-  if(s==="−") return "Fatigue";
+  if (s === "+") return "Stimulé";
+  if (s === "-") return "Fatigue";
 
   return "—";
 }
 
-
 /* ===== BOUCLE ===== */
 function loop(){
-  ctx.fillStyle="rgba(248,250,252,0.06)";
+  ctx.fillStyle = "rgba(248,250,252,0.06)";
   ctx.fillRect(0,0,c.clientWidth,c.clientHeight);
 
-  ctx.strokeStyle="#94a3b8";
+  // axe central
+  ctx.strokeStyle = "#94a3b8";
   ctx.beginPath();
-  ctx.moveTo(0,mid());
-  ctx.lineTo(c.clientWidth,mid());
+  ctx.moveTo(0, mid());
+  ctx.lineTo(c.clientWidth, mid());
   ctx.stroke();
 
+  // mise à jour bonheur
   yBonheur += bonheurImpact();
-  yBonheur = Math.max(20,Math.min(c.clientHeight-20,yBonheur));
+  yBonheur = Math.max(20, Math.min(c.clientHeight - 20, yBonheur));
 
+  // stimulation
   const yStim = stimulationY();
   t += 0.015;
 
-  ctx.strokeStyle="#2563eb";
-  ctx.lineWidth=3.5;
+  // courbe bonheur
+  ctx.strokeStyle = "#2563eb";
+  ctx.lineWidth = 3.5;
   ctx.beginPath();
-  ctx.moveTo(x-1,prevBonheur);
-  ctx.lineTo(x,yBonheur);
+  ctx.moveTo(x - 1, prevBonheur);
+  ctx.lineTo(x, yBonheur);
   ctx.stroke();
 
-  ctx.strokeStyle="#dc2626";
-  ctx.lineWidth=3;
+  // stimulation (trace verticale)
+  ctx.strokeStyle = "#dc2626";
+  ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(x,yStim);
-  ctx.lineTo(x+1,yStim);
+  ctx.moveTo(x, yStim);
+  ctx.lineTo(x + 1, yStim);
   ctx.stroke();
+
+  // affichage état
+  const b = signe(yBonheur);
+  const s = signe(yStim);
 
   etatBox.innerHTML = `
-    <div>${definirEtat(signe(yBonheur), signe(yStim))}</div>
+    <div>${definirEtat(b, s)}</div>
     <div style="font-size:11px;color:#64748b;margin-top:4px">
-      Bonheur : ${signe(yBonheur)} | Stimulation : ${signe(yStim)}
+      Bonheur : ${b} | Stimulation : ${s}
     </div>
   `;
 
   prevBonheur = yBonheur;
   x++;
-  if(x > c.clientWidth){
+
+  if (x > c.clientWidth){
     x = 0;
     prevBonheur = yBonheur = mid();
   }
+
   requestAnimationFrame(loop);
 }
+
 loop();
 </script>
 </body>
