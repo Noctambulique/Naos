@@ -42,19 +42,19 @@ body{
 
 .card{
   position:relative;
-  background:
-    linear-gradient(135deg,#ffffff,#f8fafc);
+  background:linear-gradient(135deg,#ffffff,#f8fafc);
   border-radius:var(--radius);
   border:1px solid var(--border);
   box-shadow:var(--shadow);
-  padding:12px;
   aspect-ratio:2.5/3.5;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
   cursor:pointer;
-  transition:.25s ease;
   overflow:hidden;
+  transition:.25s ease;
+}
+
+.card:hover{
+  transform:translateY(-6px) rotate(-0.5deg);
+  box-shadow:0 22px 40px rgba(0,0,0,.45);
 }
 
 .card::before{
@@ -66,11 +66,6 @@ body{
   pointer-events:none;
 }
 
-.card:hover{
-  transform:translateY(-6px) rotate(-0.6deg);
-  box-shadow:0 22px 40px rgba(0,0,0,.45);
-}
-
 .card.red{color:var(--red)}
 .card.black{color:var(--black)}
 
@@ -79,18 +74,25 @@ body{
    ========================= */
 
 .corner{
+  position:absolute;
   font-family:'Playfair Display',serif;
   font-weight:700;
-  font-size:.95rem;
+  font-size:.9rem;
   line-height:1.05;
   display:flex;
   flex-direction:column;
   align-items:flex-start;
 }
 
+.corner.top{
+  top:10px;
+  left:10px;
+}
+
 .corner.bottom{
+  bottom:28px;
+  right:10px;
   transform:rotate(180deg);
-  align-self:flex-end;
 }
 
 /* =========================
@@ -98,11 +100,15 @@ body{
    ========================= */
 
 .center{
-  text-align:center;
-  font-size:2.6rem;
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:2.8rem;
   font-family:'Playfair Display',serif;
-  opacity:.9;
-  user-select:none;
+  opacity:.85;
+  pointer-events:none;
 }
 
 /* =========================
@@ -111,12 +117,12 @@ body{
 
 .label{
   position:absolute;
-  bottom:10px;
-  left:10px;
-  right:10px;
+  bottom:8px;
+  left:8px;
+  right:8px;
   text-align:center;
-  font-size:.65rem;
-  letter-spacing:.04em;
+  font-size:.6rem;
+  letter-spacing:.05em;
   opacity:.65;
 }
 </style>
@@ -127,6 +133,10 @@ body{
 <div class="grid" id="grid"></div>
 
 <script>
+/* =========================
+   DONNÉES
+   ========================= */
+
 const nodes = [
   { link:"Savoir.html", label:"Savoir, Roi de ♦️" },
   { link:"Frise Philo.html", label:"Histoire Philo, Dame de ♦️" },
@@ -166,6 +176,10 @@ const nodes = [
   { link:"Cartes.html", label:"Cartes, 3 de ♣️" }
 ];
 
+/* =========================
+   PARSING
+   ========================= */
+
 function parseCard(label){
   const match = label.match(/(.+),\s*(.+)\sde\s(♦️|❤️|♠️|♣️)/);
   if(!match) return null;
@@ -178,6 +192,10 @@ function parseCard(label){
   };
 }
 
+/* =========================
+   RENDU
+   ========================= */
+
 const grid = document.getElementById("grid");
 
 nodes.forEach(n=>{
@@ -188,187 +206,10 @@ nodes.forEach(n=>{
   card.className = `card ${d.color}`;
 
   card.innerHTML = `
-    <div class="corner">${d.value}<span>${d.suit}</span></div>
+    <div class="corner top">${d.value}<span>${d.suit}</span></div>
     <div class="center">${d.suit}</div>
     <div class="corner bottom">${d.value}<span>${d.suit}</span></div>
     <div class="label">${d.title}</div>
-  `;
-
-  card.onclick = ()=>location.href = n.link;
-  grid.appendChild(card);
-});
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<title>Cartographie des cartes</title>
-
-<style>
-:root{
-  --bg:#0f172a;
-  --card:#ffffff;
-  --border:#cbd5f5;
-  --shadow:0 8px 20px rgba(0,0,0,.25);
-  --red:#dc2626;
-  --black:#020617;
-  --radius:14px;
-}
-
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  background:var(--bg);
-  font-family:system-ui,sans-serif;
-  padding:32px;
-  color:white;
-}
-
-h1{
-  text-align:center;
-  font-size:2.3rem;
-  margin-bottom:32px;
-}
-
-.grid{
-  max-width:1200px;
-  margin:auto;
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
-  gap:18px;
-}
-
-.card{
-  background:var(--card);
-  border-radius:var(--radius);
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
-  padding:10px;
-  aspect-ratio:2.5/3.5;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  cursor:pointer;
-  transition:.15s ease;
-}
-
-.card:hover{
-  transform:translateY(-4px);
-}
-
-.card.red{color:var(--red)}
-.card.black{color:var(--black)}
-
-.corner{
-  font-weight:700;
-  font-size:.9rem;
-}
-
-.center{
-  text-align:center;
-  font-size:2rem;
-  user-select:none;
-}
-
-.label{
-  text-align:center;
-  font-size:.65rem;
-  opacity:.7;
-}
-</style>
-</head>
-
-<body>
-
-
-<div class="grid" id="grid"></div>
-
-<script>
-/* =========================
-   TES DONNÉES (SOURCE UNIQUE)
-   ========================= */
-
-const nodes = [
-  { link: "Savoir.html", label:"Savoir, Roi de ♦️" },
-  { link: "Frise Philo.html", label:"Histoire Philo, Dame de ♦️" },
-  { link: "Psycho.html", label:"Psycho, Valet de ♦️" },
-  { link: "Philo.html", label:"Philo-map, 10 de ♦️" },
-  { link: "Biblio.html", label:"Biblio-Map, 9 de ♦️" },
-  { link: "Cool.html", label:"Trucs cools, 8 de ♦️" },
-  { link: "Esthétique.html", label:"Esthétique, 7 de ♦️" },
-
-  { link: "Biographie.html", label:"Biographie, Roi de ❤️" },
-  { link: "Culture.html", label:"Culture, Dame de ❤️" },
-  { link: "excelart.html", label:"Excel Culture, Valet de ❤️" },
-  { link: "Dressing.html", label:"Dressing, 10 de ❤️" },
-  { link: "Gardien.html", label:"Position, 9 de ❤️" },
-  { link: "Plante.html", label:"Plantes, 8 de ❤️" },
-  { link: "Artefact.html", label:"Artefact, 7 de ❤️" },
-  { link: "Galerie.html", label:"Galerie, 5 de ❤️" },
-
-  { link: "Conversation.html", label:"Répertoire, Dame de ♠️" },
-  { link: "Triade.html", label:"Triade, Valet de ♠️" },
-  { link: "Iceberg.html", label:"Iceberg, 10 de ♠️" },
-  { link: "Amis.html", label:"Gens, 9 de ♠️" },
-  { link: "Lubies.html", label:"Lubies, 8 de ♠️" },
-  { link: "Multivers.html", label:"Multivers, 7 de ♠️" },
-
-  { link: "Maison des Bio.html", label:"Musée des Bio, Roi de ♣️" },
-  { link: "Anecdotes.html", label:"Anecdotes, Dame de ♣️" },
-  { link: "Plan.html", label:"Plan, Valet de ♣️" },
-  { link: "Musique.html", label:"Musique, 10 de ♣️" },
-  { link: "Log.html", label:"Log, 9 de ♣️" },
-  { link: "Internet.html", label:"Internet, 8 de ♣️" },
-  { link: "Généalogie.html", label:"Généalogie, 7 de ♣️" },
-  { link: "Logiciel.html", label:"Logiciel, 6 de ♣️" },
-  { link: "Notice.html", label:"Notice, 5 de ♣️" },
-  { link: "Cuisine.html", label:"Cuisine, 4 de ♣️" },
-  { link: "Auto-Test.html", label:"Auto-Test, 3 de ♣️" }
-  { link: "Cartes.html", label:"Cartes, 3 de ♣️" }
-];
-
-/* =========================
-   PARSING INTELLIGENT
-   ========================= */
-
-function parseCard(label){
-  const match = label.match(/(.+),\s*(.+)\sde\s(♦️|❤️|♠️|♣️)/);
-  if(!match) return null;
-
-  const color = (match[3] === "♦️" || match[3] === "❤️") ? "red" : "black";
-
-  return {
-    title: match[1],
-    value: match[2],
-    suit: match[3],
-    color
-  };
-}
-
-/* =========================
-   RENDU
-   ========================= */
-
-const grid = document.getElementById("grid");
-
-nodes.forEach(n=>{
-  const cardData = parseCard(n.label);
-  if(!cardData) return;
-
-  const card = document.createElement("div");
-  card.className = `card ${cardData.color}`;
-
-  card.innerHTML = `
-    <div class="corner">${cardData.value}${cardData.suit}</div>
-    <div class="center">${cardData.suit}</div>
-    <div class="corner" style="transform:rotate(180deg)">
-      ${cardData.value}${cardData.suit}
-    </div>
-    <div class="label">${cardData.title}</div>
   `;
 
   card.onclick = ()=>location.href = n.link;
