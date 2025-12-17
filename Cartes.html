@@ -2,168 +2,174 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Jeu de cartes</title>
+<title>Cartographie des cartes</title>
 
 <style>
-/* =======================
-   VARIABLES PERSONNALISABLES
-   ======================= */
-:root {
-  --bg: #0f172a;
-  --card-bg: #ffffff;
-  --card-border: #cbd5f5;
-  --text-dark: #020617;
-  --red: #dc2626;
-  --black: #020617;
-  --radius: 14px;
-  --shadow: 0 8px 20px rgba(0,0,0,.25);
+:root{
+  --bg:#0f172a;
+  --card:#ffffff;
+  --border:#cbd5f5;
+  --shadow:0 8px 20px rgba(0,0,0,.25);
+  --red:#dc2626;
+  --black:#020617;
+  --radius:14px;
 }
 
-/* =======================
-   BASE
-   ======================= */
-* { box-sizing: border-box; }
+*{box-sizing:border-box}
 
-body {
-  margin: 0;
-  background: var(--bg);
-  font-family: system-ui, sans-serif;
-  color: white;
-  padding: 32px;
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:system-ui,sans-serif;
+  padding:32px;
+  color:white;
 }
 
-/* =======================
-   TITRE
-   ======================= */
-h1 {
-  text-align: center;
-  font-size: 2.2rem;
-  margin-bottom: 32px;
+h1{
+  text-align:center;
+  font-size:2.3rem;
+  margin-bottom:32px;
 }
 
-/* =======================
-   GRILLE DE CARTES
-   ======================= */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 18px;
-  max-width: 1100px;
-  margin: auto;
+.grid{
+  max-width:1200px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
+  gap:18px;
 }
 
-/* =======================
-   CARTE
-   ======================= */
-.card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  border: 1px solid var(--card-border);
-  box-shadow: var(--shadow);
-  padding: 10px;
-  aspect-ratio: 2.5 / 3.5;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: transform .15s ease, box-shadow .15s ease;
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  padding:10px;
+  aspect-ratio:2.5/3.5;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+  transition:.15s ease;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0,0,0,.35);
+.card:hover{
+  transform:translateY(-4px);
 }
 
-.card.red { color: var(--red); }
-.card.black { color: var(--black); }
+.card.red{color:var(--red)}
+.card.black{color:var(--black)}
 
-/* =======================
-   CONTENU DE LA CARTE
-   ======================= */
-.corner {
-  font-weight: 700;
-  font-size: 0.9rem;
+.corner{
+  font-weight:700;
+  font-size:.9rem;
 }
 
-.center {
-  text-align: center;
-  font-size: 2rem;
-  user-select: none;
+.center{
+  text-align:center;
+  font-size:2rem;
+  user-select:none;
+}
+
+.label{
+  text-align:center;
+  font-size:.65rem;
+  opacity:.7;
 }
 </style>
 </head>
 
 <body>
 
-<h1 id="title">Mon jeu de cartes</h1>
+<h1>Jeu de cartes — navigation mentale</h1>
 
 <div class="grid" id="grid"></div>
 
 <script>
-/* =======================
-   DONNÉES DU JEU
-   ======================= */
+/* =========================
+   TES DONNÉES (SOURCE UNIQUE)
+   ========================= */
 
-const suits = [
-  { name: "Pique", symbol: "♠", color: "black" },
-  { name: "Cœur", symbol: "♥", color: "red" },
-  { name: "Carreau", symbol: "♦", color: "red" },
-  { name: "Trèfle", symbol: "♣", color: "black" }
+const nodes = [
+  { link: "Savoir.html", label:"Savoir, Roi de ♦️" },
+  { link: "Frise Philo.html", label:"Histoire Philo, Dame de ♦️" },
+  { link: "Psycho.html", label:"Psycho, Valet de ♦️" },
+  { link: "Philo.html", label:"Philo-map, 10 de ♦️" },
+  { link: "Biblio.html", label:"Biblio-Map, 9 de ♦️" },
+  { link: "Cool.html", label:"Trucs cools, 8 de ♦️" },
+  { link: "Esthétique.html", label:"Esthétique, 7 de ♦️" },
+
+  { link: "Biographie.html", label:"Biographie, Roi de ❤️" },
+  { link: "Culture.html", label:"Culture, Dame de ❤️" },
+  { link: "excelart.html", label:"Excel Culture, Valet de ❤️" },
+  { link: "Dressing.html", label:"Dressing, 10 de ❤️" },
+  { link: "Gardien.html", label:"Position, 9 de ❤️" },
+  { link: "Plante.html", label:"Plantes, 8 de ❤️" },
+  { link: "Artefact.html", label:"Artefact, 7 de ❤️" },
+  { link: "Galerie.html", label:"Galerie, 5 de ❤️" },
+
+  { link: "Conversation.html", label:"Répertoire, Dame de ♠️" },
+  { link: "Triade.html", label:"Triade, Valet de ♠️" },
+  { link: "Iceberg.html", label:"Iceberg, 10 de ♠️" },
+  { link: "Amis.html", label:"Gens, 9 de ♠️" },
+  { link: "Lubies.html", label:"Lubies, 8 de ♠️" },
+  { link: "Multivers.html", label:"Multivers, 7 de ♠️" },
+
+  { link: "Maison des Bio.html", label:"Musée des Bio, Roi de ♣️" },
+  { link: "Anecdotes.html", label:"Anecdotes, Dame de ♣️" },
+  { link: "Plan.html", label:"Plan, Valet de ♣️" },
+  { link: "Musique.html", label:"Musique, 10 de ♣️" },
+  { link: "Log.html", label:"Log, 9 de ♣️" },
+  { link: "Internet.html", label:"Internet, 8 de ♣️" },
+  { link: "Généalogie.html", label:"Généalogie, 7 de ♣️" },
+  { link: "Logiciel.html", label:"Logiciel, 6 de ♣️" },
+  { link: "Notice.html", label:"Notice, 5 de ♣️" },
+  { link: "Cuisine.html", label:"Cuisine, 4 de ♣️" },
+  { link: "Auto-Test.html", label:"Auto-Test, 3 de ♣️" }
 ];
 
-const values = [
-  { label: "A", name: "As" },
-  { label: "2" }, { label: "3" }, { label: "4" },
-  { label: "5" }, { label: "6" }, { label: "7" },
-  { label: "8" }, { label: "9" }, { label: "10" },
-  { label: "J", name: "Valet" },
-  { label: "Q", name: "Dame" },
-  { label: "K", name: "Roi" }
-];
+/* =========================
+   PARSING INTELLIGENT
+   ========================= */
 
-/* =======================
-   LIEN PERSONNALISABLE
-   ======================= */
-/*
-  Tu peux :
-  - retourner toujours la même page
-  - retourner une page différente selon la carte
-*/
-function linkFor(card) {
-  // Exemple simple :
-  return "page-carte.html";
+function parseCard(label){
+  const match = label.match(/(.+),\s*(.+)\sde\s(♦️|❤️|♠️|♣️)/);
+  if(!match) return null;
 
-  // Exemple avancé :
-  // return `cartes/${card.value}_${card.suit}.html`;
+  const color = (match[3] === "♦️" || match[3] === "❤️") ? "red" : "black";
+
+  return {
+    title: match[1],
+    value: match[2],
+    suit: match[3],
+    color
+  };
 }
 
-/* =======================
-   GÉNÉRATION DES CARTES
-   ======================= */
+/* =========================
+   RENDU
+   ========================= */
+
 const grid = document.getElementById("grid");
 
-suits.forEach(suit => {
-  values.forEach(value => {
-    const card = document.createElement("div");
-    card.className = `card ${suit.color}`;
+nodes.forEach(n=>{
+  const cardData = parseCard(n.label);
+  if(!cardData) return;
 
-    card.innerHTML = `
-      <div class="corner">${value.label}${suit.symbol}</div>
-      <div class="center">${suit.symbol}</div>
-      <div class="corner" style="transform: rotate(180deg)">
-        ${value.label}${suit.symbol}
-      </div>
-    `;
+  const card = document.createElement("div");
+  card.className = `card ${cardData.color}`;
 
-    card.onclick = () => {
-      window.location.href = linkFor({
-        suit: suit.name,
-        value: value.label
-      });
-    };
+  card.innerHTML = `
+    <div class="corner">${cardData.value}${cardData.suit}</div>
+    <div class="center">${cardData.suit}</div>
+    <div class="corner" style="transform:rotate(180deg)">
+      ${cardData.value}${cardData.suit}
+    </div>
+    <div class="label">${cardData.title}</div>
+  `;
 
-    grid.appendChild(card);
-  });
+  card.onclick = ()=>location.href = n.link;
+  grid.appendChild(card);
 });
 </script>
 
