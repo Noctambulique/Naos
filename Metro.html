@@ -6,22 +6,18 @@
 <title>Naos</title>
 
 <style>
-:root{
-  --marker-size:90px;
-}
-
 html,body{
   margin:0;
   height:100%;
   overflow:hidden;
   font-family:system-ui,Segoe UI,Roboto,Arial;
+  background:#000;
 }
 
 #viewport{
   position:fixed;
   inset:0;
   overflow:hidden;
-  background:#000;
   touch-action:none;
 }
 
@@ -35,15 +31,32 @@ html,body{
   will-change:transform;
 }
 
-.marker{
+/* ===== MARKERS ===== */
+
+.marker-wrap{
   position:absolute;
-  width:var(--marker-size);
-  height:var(--marker-size);
-  margin-left:calc(var(--marker-size)/-2);
-  margin-top:calc(var(--marker-size)/-2);
+  transform:translate(-50%,-50%);
+  text-align:center;
+  z-index:10;
+  user-select:none;
+}
+
+.marker{
+  display:block;
   object-fit:contain;
   cursor:pointer;
-  z-index:10;
+}
+
+.marker-label{
+  margin-top:4px;
+  padding:2px 6px;
+  font-size:12px;
+  line-height:1.2;
+  color:#fff;
+  background:rgba(0,0,0,.65);
+  border-radius:6px;
+  white-space:nowrap;
+  pointer-events:none;
 }
 </style>
 </head>
@@ -64,12 +77,54 @@ const MAP = {
 };
 
 const LOCATIONS = [
-  { x:1316, y:757, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", link:"Gardien.html" },
-  { x:890,  y:505, img:"Map/Maison1.png", link:"Cuisine.html" },
-  { x:1436, y:850, img:"Map/Maison1.png", link:"Internet.html" },
-  { x:1076, y:597, img:"Map/Maison1.png", link:"Galerie.html" },
-  { x:241,  y:477, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", link:"Gardien.html" },
-  { x:873,  y:247, img:"Map/Maison1.png", link:"Logiciel.html" }
+  {
+    x:1316,
+    y:757,
+    img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png",
+    link:"Gardien.html",
+    label:"Secret — 6 ❤️",
+    size:95
+  },
+  {
+    x:890,
+    y:505,
+    img:"Map/Maison1.png",
+    link:"Cuisine.html",
+    label:"Cuisine — 4 ♣️",
+    size:110
+  },
+  {
+    x:1436,
+    y:850,
+    img:"Map/Maison1.png",
+    link:"Internet.html",
+    label:"Internet — 8 ♣️",
+    size:80
+  },
+  {
+    x:1076,
+    y:597,
+    img:"Map/Maison1.png",
+    link:"Galerie.html",
+    label:"Galerie — 5 ❤️",
+    size:100
+  },
+  {
+    x:241,
+    y:477,
+    img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png",
+    link:"Gardien.html",
+    label:"Sexualité — 4 ❤️",
+    size:90
+  },
+  {
+    x:873,
+    y:247,
+    img:"Map/Maison1.png",
+    link:"Logiciel.html",
+    label:"Logiciel — 6 ♣️",
+    size:75
+  }
 ];
 
 /* ================= STATE ================= */
@@ -80,27 +135,39 @@ const mapEl = document.getElementById("map");
 let cam = { x:0, y:0 };
 let drag = { active:false, x:0, y:0, cx:0, cy:0 };
 
-/* ================= INIT ================= */
+/* ================= INIT MAP ================= */
 
-mapEl.style.width = MAP.width+"px";
-mapEl.style.height = MAP.height+"px";
+mapEl.style.width = MAP.width + "px";
+mapEl.style.height = MAP.height + "px";
 mapEl.style.backgroundImage = `url("${MAP.bg}")`;
 
-/* === centrer la map à l’écran === */
+/* Centrage initial */
 cam.x = (viewport.clientWidth  - MAP.width ) / 2;
 cam.y = (viewport.clientHeight - MAP.height) / 2;
 applyCam();
 
-/* ================= MARKERS ================= */
+/* ================= CREATE MARKERS ================= */
 
 LOCATIONS.forEach(loc=>{
+  const wrap = document.createElement("div");
+  wrap.className = "marker-wrap";
+  wrap.style.left = loc.x + "px";
+  wrap.style.top  = loc.y + "px";
+
   const img = document.createElement("img");
   img.src = loc.img;
   img.className = "marker";
-  img.style.left = loc.x+"px";
-  img.style.top  = loc.y+"px";
+  img.style.width  = (loc.size || 80) + "px";
+  img.style.height = (loc.size || 80) + "px";
   img.onclick = ()=>location.href = loc.link;
-  mapEl.appendChild(img);
+
+  const label = document.createElement("div");
+  label.className = "marker-label";
+  label.textContent = loc.label || "";
+
+  wrap.appendChild(img);
+  wrap.appendChild(label);
+  mapEl.appendChild(wrap);
 });
 
 /* ================= CAMERA ================= */
