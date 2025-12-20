@@ -82,10 +82,10 @@ const MAP = {
 };
 
 const LOCATIONS = [
-  { x:1316, y:757, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", link:"Gardien.html", label:"Secret — 6 ❤️", size:95 },
+  { x:500, y:757, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", link:"Gardien.html", label:"Secret — 6 ❤️", size:95 },
   { x:890,  y:505, img:"Map/Maison1.png", link:"Cuisine.html", label:"Cuisine — 4 ♣️", size:110 },
-  { x:1436, y:850, img:"Map/Maison1.png", link:"Internet.html", label:"Internet — 8 ♣️", size:80 },
-  { x:1076, y:597, img:"Map/Maison1.png", link:"Galerie.html", label:"Galerie — 5 ❤️", size:100 },
+  { x:500, y:850, img:"Map/Maison1.png", link:"Internet.html", label:"Internet — 8 ♣️", size:80 },
+  { x:800, y:597, img:"Map/Maison1.png", link:"Galerie.html", label:"Galerie — 5 ❤️", size:100 },
   { x:241,  y:477, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", link:"Gardien.html", label:"Sexualité — 4 ❤️", size:90 },
   { x:873,  y:247, img:"Map/Maison1.png", link:"Logiciel.html", label:"Logiciel — 6 ♣️", size:75 }
 ];
@@ -121,4 +121,83 @@ LOCATIONS.forEach(loc=>{
 
   const label = document.createElement("div");
   label.className = "marker-label";
-  label.textContent
+  label.textContent = loc.label;
+
+  wrap.append(img,label);
+  mapEl.appendChild(wrap);
+});
+
+/* ================= CAMERA ================= */
+
+function clampCam(){
+  const vw = viewport.clientWidth;
+  const vh = viewport.clientHeight;
+
+  scale = Math.max(vw / MAP.width, vh / MAP.height);
+
+  const mapW = MAP.width  * scale;
+  const mapH = MAP.height * scale;
+
+  cam.x = mapW <= vw ? (vw - mapW)/2 : Math.min(0, Math.max(vw-mapW, cam.x));
+  cam.y = 0;
+
+  if(mapH > vh){
+    cam.y = Math.min(0, Math.max(vh-mapH, cam.y));
+  }
+}
+
+function renderCam(){
+  mapEl.style.transform =
+    `translate3d(${cam.x}px, ${cam.y}px, 0) scale(${scale})`;
+}
+
+function updateCam(){
+  clampCam();
+  renderCam();
+}
+
+updateCam();
+window.addEventListener("resize", updateCam);
+
+/* ================= DRAG ================= */
+
+function startDrag(x,y){
+  drag.active = true;
+  drag.startX = x;
+  drag.startY = y;
+  drag.camX   = cam.x;
+  drag.camY   = cam.y;
+}
+
+function moveDrag(x,y){
+  if(!drag.active) return;
+
+  const dx = x - drag.startX;
+  const dy = y - drag.startY;
+
+  const mapW = MAP.width * scale;
+  const mapH = MAP.height * scale;
+
+  if(mapW > viewport.clientWidth)  cam.x = drag.camX + dx;
+  if(mapH > viewport.clientHeight) cam.y = drag.camY + dy;
+
+  updateCam();
+}
+
+function endDrag(){ drag.active = false; }
+
+viewport.addEventListener("mousedown",e=>startDrag(e.clientX,e.clientY));
+window.addEventListener("mousemove",e=>moveDrag(e.clientX,e.clientY));
+window.addEventListener("mouseup",endDrag);
+
+viewport.addEventListener("touchstart",e=>{
+  const t=e.touches[0]; startDrag(t.clientX,t.clientY);
+});
+viewport.addEventListener("touchmove",e=>{
+  const t=e.touches[0]; moveDrag(t.clientX,t.clientY);
+});
+viewport.addEventListener("touchend",endDrag);
+</script>
+
+</body>
+</html>
