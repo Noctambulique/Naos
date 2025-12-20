@@ -7,45 +7,22 @@
 
 <style>
 :root{
-  --ui-bg: rgba(0,0,0,0.6);
-  --ui-color: #fff;
-  --player-size: 36px;
-  --marker-size: 90px;
+  --marker-size:90px;
 }
 
 html,body{
   margin:0;
   height:100%;
+  overflow:hidden;
   font-family:system-ui,Segoe UI,Roboto,Arial;
 }
 
-#app{
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-}
-
-#hud{
-  position:fixed;
-  left:10px;
-  top:10px;
-  z-index:50;
-  background:var(--ui-bg);
-  color:var(--ui-color);
-  padding:8px 12px;
-  border-radius:8px;
-  font-size:14px;
-  box-shadow:0 4px 12px rgba(0,0,0,.4);
-  user-select:none;
-}
-
-#hud b{min-width:80px;display:inline-block}
-
 #viewport{
-  position:relative;
-  flex:1;
+  position:fixed;
+  inset:0;
   overflow:hidden;
-  background:#111;
+  background:#000;
+  touch-action:none;
 }
 
 #map{
@@ -53,17 +30,9 @@ html,body{
   left:0;
   top:0;
   background-repeat:no-repeat;
-  background-position:top left;
-}
-
-#player{
-  position:absolute;
-  width:var(--player-size);
-  height:var(--player-size);
-  margin-left:calc(var(--player-size)/-2);
-  margin-top:calc(var(--player-size)/-2);
-  z-index:40;
-  pointer-events:none;
+  background-position:center;
+  background-size:cover;
+  will-change:transform;
 }
 
 .marker{
@@ -72,180 +41,117 @@ html,body{
   height:var(--marker-size);
   margin-left:calc(var(--marker-size)/-2);
   margin-top:calc(var(--marker-size)/-2);
-  z-index:35;
   object-fit:contain;
   cursor:pointer;
-}
-
-#modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.7);
-  z-index:100;
-  align-items:center;
-  justify-content:center;
-}
-
-#modal img{
-  max-width:90vw;
-  max-height:90vh;
-  border-radius:8px;
+  z-index:10;
 }
 </style>
 </head>
 
 <body>
-<div id="app">
-
-<div id="hud">
-  <div><b>Position</b> <span id="pos"></span></div>
-  <div><b>Map</b> <span id="mapName"></span></div>
-  <div><b>Lieu</b> <span id="locLabel"></span></div>
-</div>
 
 <div id="viewport">
-  <div id="map">
-    <img id="player" draggable="false"
-      src="data:image/svg+xml;utf8,
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'
-      fill='none' stroke='%23ffcc00' stroke-width='1.5'>
-      <circle cx='12' cy='10' r='3.2'/>
-      <path d='M12 2v3M12 21v-3M20 12h-3M7 12H4'/>
-      </svg>">
-  </div>
-</div>
-
-<div id="modal" onclick="hideModal()">
-  <img id="modalImg">
-</div>
-
+  <div id="map"></div>
 </div>
 
 <script>
-const MAPS = {
-  "ville-centre":{
-    name:"Ville – Centre",
-    bg:"Map/Metro Plan.png",
-    width:1600,
-    height:1600
-  }
+/* ================= CONFIG ================= */
+
+const MAP = {
+  bg:"Map/Metro Plan.png",
+  width:1600,
+  height:1600
 };
 
 const LOCATIONS = [
-  { x:1316, y:757, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", label:"Secret, 6 de ❤️" },
-  { x:890, y:505, img:"Map/Maison1.png", label:"Cuisine, 4 de ♣️" },
-  { x:1436, y:850, img:"Map/Maison1.png", label:"Internet, 8 de ♣️" },
-  { x:1076, y:597, img:"Map/Maison1.png", label:"Galerie, 5 de ❤️" },
-  { x:241, y:477, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", label:"Sexualité, 4 de ❤️" },
-  { x:873, y:247, img:"Map/Maison1.png", label:"Logiciel, 6 de ♣️" }
+  { x:1316, y:757, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", link:"Gardien.html" },
+  { x:890,  y:505, img:"Map/Maison1.png", link:"Cuisine.html" },
+  { x:1436, y:850, img:"Map/Maison1.png", link:"Internet.html" },
+  { x:1076, y:597, img:"Map/Maison1.png", link:"Galerie.html" },
+  { x:241,  y:477, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", link:"Gardien.html" },
+  { x:873,  y:247, img:"Map/Maison1.png", link:"Logiciel.html" }
 ];
 
-const PLAYER_SPEED = 800;
-const DETECTION_RADIUS = 80;
-
-const state = {
-  player:{x:0,y:0},
-  keys:{},
-  showLabel:false
-};
+/* ================= STATE ================= */
 
 const viewport = document.getElementById("viewport");
 const mapEl = document.getElementById("map");
-const playerEl = document.getElementById("player");
-const posEl = document.getElementById("pos");
-const mapNameEl = document.getElementById("mapName");
-const locLabelEl = document.getElementById("locLabel");
 
-function loadMap(){
-  const m = MAPS["ville-centre"];
-  mapEl.style.width = m.width+"px";
-  mapEl.style.height = m.height+"px";
-  mapEl.style.backgroundImage = `url("${m.bg}")`;
-  mapNameEl.textContent = m.name;
-}
+let cam = { x:0, y:0 };
+let drag = { active:false, x:0, y:0, cx:0, cy:0 };
 
-function createMarkers(){
-  LOCATIONS.forEach(loc=>{
-    const img = document.createElement("img");
-    img.src = loc.img;
-    img.className = "marker";
-    img.style.left = loc.x+"px";
-    img.style.top = loc.y+"px";
-    img.dataset.label = loc.label;
-    mapEl.appendChild(img);
-    loc.el = img;
-  });
-}
+/* ================= INIT ================= */
 
-function centerOnPlayer(){
-  const x = viewport.clientWidth/2 - state.player.x;
-  const y = viewport.clientHeight/2 - state.player.y;
-  mapEl.style.transform = `translate(${x}px,${y}px)`;
-  playerEl.style.left = state.player.x+"px";
-  playerEl.style.top = state.player.y+"px";
-}
+mapEl.style.width = MAP.width+"px";
+mapEl.style.height = MAP.height+"px";
+mapEl.style.backgroundImage = `url("${MAP.bg}")`;
 
-function updateLabel(){
-  if(!state.showLabel){
-    locLabelEl.textContent = "";
-    return;
-  }
+/* === centrer la map à l’écran === */
+cam.x = (viewport.clientWidth  - MAP.width ) / 2;
+cam.y = (viewport.clientHeight - MAP.height) / 2;
+applyCam();
 
-  let best = null;
-  let bestDist = Infinity;
+/* ================= MARKERS ================= */
 
-  LOCATIONS.forEach(l=>{
-    const d = Math.hypot(l.x-state.player.x,l.y-state.player.y);
-    if(d < DETECTION_RADIUS && d < bestDist){
-      best = l;
-      bestDist = d;
-    }
-  });
-
-  locLabelEl.textContent = best ? best.label : "";
-}
-
-window.addEventListener("keydown",e=>{
-  state.keys[e.key] = true;
-  if(e.key.toLowerCase()==="b") state.showLabel = true;
+LOCATIONS.forEach(loc=>{
+  const img = document.createElement("img");
+  img.src = loc.img;
+  img.className = "marker";
+  img.style.left = loc.x+"px";
+  img.style.top  = loc.y+"px";
+  img.onclick = ()=>location.href = loc.link;
+  mapEl.appendChild(img);
 });
 
-window.addEventListener("keyup",e=>{
-  state.keys[e.key] = false;
-  if(e.key.toLowerCase()==="b") state.showLabel = false;
-});
+/* ================= CAMERA ================= */
 
-let last = null;
-function loop(ts){
-  if(!last) last = ts;
-  const dt = (ts-last)/1000;
-  last = ts;
+function applyCam(){
+  const minX = viewport.clientWidth  - MAP.width;
+  const minY = viewport.clientHeight - MAP.height;
 
-  let dx=0,dy=0;
-  if(state.keys.w||state.keys.ArrowUp) dy--;
-  if(state.keys.s||state.keys.ArrowDown) dy++;
-  if(state.keys.a||state.keys.ArrowLeft) dx--;
-  if(state.keys.d||state.keys.ArrowRight) dx++;
+  cam.x = Math.min(0, Math.max(minX, cam.x));
+  cam.y = Math.min(0, Math.max(minY, cam.y));
 
-  if(dx||dy){
-    const l = Math.hypot(dx,dy);
-    state.player.x += dx/l*PLAYER_SPEED*dt;
-    state.player.y += dy/l*PLAYER_SPEED*dt;
-  }
-
-  posEl.textContent = `x:${state.player.x|0} y:${state.player.y|0}`;
-  centerOnPlayer();
-  updateLabel();
-  requestAnimationFrame(loop);
+  mapEl.style.transform = `translate(${cam.x}px,${cam.y}px)`;
 }
 
-loadMap();
-createMarkers();
-state.player.x = 800;
-state.player.y = 800;
-centerOnPlayer();
-requestAnimationFrame(loop);
+/* ================= DRAG ================= */
+
+function startDrag(x,y){
+  drag.active = true;
+  drag.x = x;
+  drag.y = y;
+  drag.cx = cam.x;
+  drag.cy = cam.y;
+}
+
+function moveDrag(x,y){
+  if(!drag.active) return;
+  cam.x = drag.cx + (x - drag.x);
+  cam.y = drag.cy + (y - drag.y);
+  applyCam();
+}
+
+function endDrag(){
+  drag.active = false;
+}
+
+/* souris */
+viewport.addEventListener("mousedown",e=>startDrag(e.clientX,e.clientY));
+window.addEventListener("mousemove",e=>moveDrag(e.clientX,e.clientY));
+window.addEventListener("mouseup",endDrag);
+
+/* tactile */
+viewport.addEventListener("touchstart",e=>{
+  const t = e.touches[0];
+  startDrag(t.clientX,t.clientY);
+});
+viewport.addEventListener("touchmove",e=>{
+  const t = e.touches[0];
+  moveDrag(t.clientX,t.clientY);
+});
+viewport.addEventListener("touchend",endDrag);
 </script>
+
 </body>
 </html>
