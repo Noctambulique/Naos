@@ -15,16 +15,12 @@ html,body{
   background:#000;
 }
 
-/* ===== VIEWPORT ===== */
-
 #viewport{
   position:fixed;
   inset:0;
   overflow:hidden;
   touch-action:none;
 }
-
-/* ===== MAP ===== */
 
 #map{
   position:absolute;
@@ -52,6 +48,9 @@ html,body{
 .marker{
   display:block;
   cursor:pointer;
+  width:100%;
+  height:auto;
+  object-fit:contain;
 }
 
 .marker-label{
@@ -99,13 +98,7 @@ const mapEl    = document.getElementById("map");
 let cam   = { x:0, y:0 };
 let scale = 1;
 
-let drag = {
-  active:false,
-  startX:0,
-  startY:0,
-  camX:0,
-  camY:0
-};
+let drag = { active:false, startX:0, startY:0, camX:0, camY:0 };
 
 /* ================= INIT MAP ================= */
 
@@ -122,110 +115,10 @@ LOCATIONS.forEach(loc=>{
   const img = document.createElement("img");
   img.className = "marker";
   img.src = loc.img;
-  img.style.width  = loc.size + "px";
-  img.style.height = loc.size + "px";
+  img.style.width = loc.size + "px";
+  img.style.height = "auto";
   img.onclick = ()=>location.href = loc.link;
 
   const label = document.createElement("div");
   label.className = "marker-label";
-  label.textContent = loc.label;
-
-  wrap.append(img,label);
-  mapEl.appendChild(wrap);
-});
-
-/* ================= CAMERA ================= */
-
-function clampCam(){
-
-  const vw = viewport.clientWidth;
-  const vh = viewport.clientHeight;
-
-  // Scale plein écran sans déformation
-  scale = Math.max(
-    vw / MAP.width,
-    vh / MAP.height
-  );
-
-  const mapW = MAP.width  * scale;
-  const mapH = MAP.height * scale;
-
-  /* X : centrage classique */
-  if(mapW <= vw){
-    cam.x = (vw - mapW) / 2;
-  }else{
-    cam.x = Math.min(0, Math.max(vw - mapW, cam.x));
-  }
-
-  /* Y : TOUJOURS ANCRÉ EN HAUT */
-  cam.y = 0;
-
-  /* si la map est plus grande que l'écran, on autorise le drag */
-  if(mapH > vh){
-    cam.y = Math.min(0, Math.max(vh - mapH, cam.y));
-  }
-}
-
-function renderCam(){
-  mapEl.style.transform =
-    `translate3d(${cam.x}px, ${cam.y}px, 0) scale(${scale})`;
-}
-
-function updateCam(){
-  clampCam();
-  renderCam();
-}
-
-/* ================= INIT ================= */
-
-updateCam();
-window.addEventListener("resize", updateCam);
-
-/* ================= DRAG ================= */
-
-function startDrag(x,y){
-  drag.active = true;
-  drag.startX = x;
-  drag.startY = y;
-  drag.camX   = cam.x;
-  drag.camY   = cam.y;
-}
-
-function moveDrag(x,y){
-  if(!drag.active) return;
-
-  const dx = x - drag.startX;
-  const dy = y - drag.startY;
-
-  const mapW = MAP.width  * scale;
-  const mapH = MAP.height * scale;
-
-  if(mapW > viewport.clientWidth)  cam.x = drag.camX + dx;
-  if(mapH > viewport.clientHeight) cam.y = drag.camY + dy;
-
-  updateCam();
-}
-
-function endDrag(){
-  drag.active = false;
-}
-
-/* souris */
-viewport.addEventListener("mousedown",e=>startDrag(e.clientX,e.clientY));
-window.addEventListener("mousemove",e=>moveDrag(e.clientX,e.clientY));
-window.addEventListener("mouseup",endDrag);
-
-/* tactile */
-viewport.addEventListener("touchstart",e=>{
-  const t = e.touches[0];
-  startDrag(t.clientX,t.clientY);
-});
-viewport.addEventListener("touchmove",e=>{
-  const t = e.touches[0];
-  moveDrag(t.clientX,t.clientY);
-});
-viewport.addEventListener("touchend",endDrag);
-</script>
-
-</body>
-</html>
+  label.textContent
