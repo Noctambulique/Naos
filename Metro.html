@@ -8,6 +8,7 @@
 <style>
 html,body{
   margin:0;
+  width:100%;
   height:100%;
   overflow:hidden;
   font-family:system-ui,Segoe UI,Roboto,Arial;
@@ -23,8 +24,6 @@ html,body{
 
 #map{
   position:absolute;
-  left:0;
-  top:0;
   width:1600px;
   height:1600px;
 
@@ -32,6 +31,7 @@ html,body{
   background-position:top left;
   background-size:1600px 1600px;
 
+  transform-origin:0 0;
   will-change:transform;
 }
 
@@ -47,7 +47,6 @@ html,body{
 
 .marker{
   display:block;
-  object-fit:contain;
   cursor:pointer;
 }
 
@@ -55,7 +54,6 @@ html,body{
   margin-top:4px;
   padding:2px 6px;
   font-size:12px;
-  line-height:1.2;
   color:#fff;
   background:rgba(0,0,0,.65);
   border-radius:6px;
@@ -92,10 +90,10 @@ const LOCATIONS = [
 /* ================= STATE ================= */
 
 const viewport = document.getElementById("viewport");
-const mapEl = document.getElementById("map");
+const mapEl    = document.getElementById("map");
 
 let cam  = { x:0, y:0 };
-let drag = { active:false, x:0, y:0, cx:0, cy:0 };
+let drag = { active:false, startX:0, startY:0, camX:0, camY:0 };
 
 /* ================= INIT MAP ================= */
 
@@ -111,7 +109,6 @@ LOCATIONS.forEach(loc=>{
 
   const img = document.createElement("img");
   img.src = loc.img;
-  img.className = "marker";
   img.style.width  = loc.size + "px";
   img.style.height = loc.size + "px";
   img.onclick = ()=>location.href = loc.link;
@@ -124,9 +121,9 @@ LOCATIONS.forEach(loc=>{
   mapEl.appendChild(wrap);
 });
 
-/* ================= CAMERA (CORRIGÉE) ================= */
+/* ================= CAMERA CORE ================= */
 
-function applyCam(){
+function clampCam(){
 
   const vw = viewport.clientWidth;
   const vh = viewport.clientHeight;
@@ -135,40 +132,52 @@ function applyCam(){
   if(MAP.width <= vw){
     cam.x = (vw - MAP.width) / 2;
   }else{
-    const minX = vw - MAP.width;
-    cam.x = Math.min(0, Math.max(minX, cam.x));
+    cam.x = Math.min(0, Math.max(vw - MAP.width, cam.x));
   }
 
   /* Axe Y */
   if(MAP.height <= vh){
     cam.y = (vh - MAP.height) / 2;
   }else{
-    const minY = vh - MAP.height;
-    cam.y = Math.min(0, Math.max(minY, cam.y));
+    cam.y = Math.min(0, Math.max(vh - MAP.height, cam.y));
   }
-
-  mapEl.style.transform = `translate(${cam.x}px, ${cam.y}px)`;
 }
 
-/* centrage initial */
-applyCam();
-window.addEventListener("resize", applyCam);
+function renderCam(){
+  mapEl.style.transform = `translate3d(${cam.x}px, ${cam.y}px, 0)`;
+}
+
+function updateCam(){
+  clampCam();
+  renderCam();
+}
+
+/* ================= INIT POSITION ================= */
+
+updateCam();
+window.addEventListener("resize", updateCam);
 
 /* ================= DRAG ================= */
 
 function startDrag(x,y){
   drag.active = true;
-  drag.x = x;
-  drag.y = y;
-  drag.cx = cam.x;
-  drag.cy = cam.y;
+  drag.startX = x;
+  drag.startY = y;
+  drag.camX   = cam.x;
+  drag.camY   = cam.y;
 }
 
 function moveDrag(x,y){
   if(!drag.active) return;
-  cam.x = drag.cx + (x - drag.x);
-  cam.y = drag.cy + (y - drag.y);
-  applyCam();
+
+  const dx = x - drag.startX;
+  const dy = y - drag.startY;
+
+  /* déplacement UNIQUEMENT si pertinent */
+  if(MAP.width  > viewport.clientWidth)  cam.x = drag.camX + dx;
+  if(MAP.height > viewport.clientHeight) cam.y = drag.camY + dy;
+
+  updateCam();
 }
 
 function endDrag(){
