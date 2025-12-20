@@ -35,7 +35,6 @@ html,body{
   will-change:transform;
 }
 
-
 /* ===== MARKERS ===== */
 
 .marker-wrap{
@@ -82,54 +81,12 @@ const MAP = {
 };
 
 const LOCATIONS = [
-  {
-    x:1316,
-    y:757,
-    img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png",
-    link:"Gardien.html",
-    label:"Secret — 6 ❤️",
-    size:95
-  },
-  {
-    x:890,
-    y:505,
-    img:"Map/Maison1.png",
-    link:"Cuisine.html",
-    label:"Cuisine — 4 ♣️",
-    size:110
-  },
-  {
-    x:1436,
-    y:850,
-    img:"Map/Maison1.png",
-    link:"Internet.html",
-    label:"Internet — 8 ♣️",
-    size:80
-  },
-  {
-    x:1076,
-    y:597,
-    img:"Map/Maison1.png",
-    link:"Galerie.html",
-    label:"Galerie — 5 ❤️",
-    size:100
-  },
-  {
-    x:241,
-    y:477,
-    img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png",
-    link:"Gardien.html",
-    label:"Sexualité — 4 ❤️",
-    size:90
-  },
-  {
-    x:873,
-    y:247,
-    img:"Map/Maison1.png",
-    link:"Logiciel.html",
-    label:"Logiciel — 6 ♣️",
-    size:75
-  }
+  { x:1316, y:757, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", link:"Gardien.html", label:"Secret — 6 ❤️", size:95 },
+  { x:890,  y:505, img:"Map/Maison1.png", link:"Cuisine.html", label:"Cuisine — 4 ♣️", size:110 },
+  { x:1436, y:850, img:"Map/Maison1.png", link:"Internet.html", label:"Internet — 8 ♣️", size:80 },
+  { x:1076, y:597, img:"Map/Maison1.png", link:"Galerie.html", label:"Galerie — 5 ❤️", size:100 },
+  { x:241,  y:477, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", link:"Gardien.html", label:"Sexualité — 4 ❤️", size:90 },
+  { x:873,  y:247, img:"Map/Maison1.png", link:"Logiciel.html", label:"Logiciel — 6 ♣️", size:75 }
 ];
 
 /* ================= STATE ================= */
@@ -137,21 +94,14 @@ const LOCATIONS = [
 const viewport = document.getElementById("viewport");
 const mapEl = document.getElementById("map");
 
-let cam = { x:0, y:0 };
+let cam  = { x:0, y:0 };
 let drag = { active:false, x:0, y:0, cx:0, cy:0 };
 
 /* ================= INIT MAP ================= */
 
-mapEl.style.width = MAP.width + "px";
-mapEl.style.height = MAP.height + "px";
 mapEl.style.backgroundImage = `url("${MAP.bg}")`;
 
-/* Centrage initial */
-cam.x = (viewport.clientWidth  - MAP.width ) / 2;
-cam.y = (viewport.clientHeight - MAP.height) / 2;
-applyCam();
-
-/* ================= CREATE MARKERS ================= */
+/* ================= MARKERS ================= */
 
 LOCATIONS.forEach(loc=>{
   const wrap = document.createElement("div");
@@ -162,30 +112,47 @@ LOCATIONS.forEach(loc=>{
   const img = document.createElement("img");
   img.src = loc.img;
   img.className = "marker";
-  img.style.width  = (loc.size || 80) + "px";
-  img.style.height = (loc.size || 80) + "px";
+  img.style.width  = loc.size + "px";
+  img.style.height = loc.size + "px";
   img.onclick = ()=>location.href = loc.link;
 
   const label = document.createElement("div");
   label.className = "marker-label";
-  label.textContent = loc.label || "";
+  label.textContent = loc.label;
 
-  wrap.appendChild(img);
-  wrap.appendChild(label);
+  wrap.append(img,label);
   mapEl.appendChild(wrap);
 });
 
-/* ================= CAMERA ================= */
+/* ================= CAMERA (CORRIGÉE) ================= */
 
 function applyCam(){
-  const minX = viewport.clientWidth  - MAP.width;
-  const minY = viewport.clientHeight - MAP.height;
 
-  cam.x = Math.min(0, Math.max(minX, cam.x));
-  cam.y = Math.min(0, Math.max(minY, cam.y));
+  const vw = viewport.clientWidth;
+  const vh = viewport.clientHeight;
 
-  mapEl.style.transform = `translate(${cam.x}px,${cam.y}px)`;
+  /* Axe X */
+  if(MAP.width <= vw){
+    cam.x = (vw - MAP.width) / 2;
+  }else{
+    const minX = vw - MAP.width;
+    cam.x = Math.min(0, Math.max(minX, cam.x));
+  }
+
+  /* Axe Y */
+  if(MAP.height <= vh){
+    cam.y = (vh - MAP.height) / 2;
+  }else{
+    const minY = vh - MAP.height;
+    cam.y = Math.min(0, Math.max(minY, cam.y));
+  }
+
+  mapEl.style.transform = `translate(${cam.x}px, ${cam.y}px)`;
 }
+
+/* centrage initial */
+applyCam();
+window.addEventListener("resize", applyCam);
 
 /* ================= DRAG ================= */
 
