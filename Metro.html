@@ -32,7 +32,7 @@ html,body{
   height:1600px;
 
   background-repeat:no-repeat;
-  background-position:center;
+  background-position:top center;
   background-size:contain;
 
   transform-origin:0 0;
@@ -141,7 +141,7 @@ function clampCam(){
   const vw = viewport.clientWidth;
   const vh = viewport.clientHeight;
 
-  // Scale automatique plein écran sans déformation
+  // Scale plein écran sans déformation
   scale = Math.max(
     vw / MAP.width,
     vh / MAP.height
@@ -150,15 +150,18 @@ function clampCam(){
   const mapW = MAP.width  * scale;
   const mapH = MAP.height * scale;
 
+  /* X : centrage classique */
   if(mapW <= vw){
     cam.x = (vw - mapW) / 2;
   }else{
     cam.x = Math.min(0, Math.max(vw - mapW, cam.x));
   }
 
-  if(mapH <= vh){
-    cam.y = (vh - mapH) / 2;
-  }else{
+  /* Y : TOUJOURS ANCRÉ EN HAUT */
+  cam.y = 0;
+
+  /* si la map est plus grande que l'écran, on autorise le drag */
+  if(mapH > vh){
     cam.y = Math.min(0, Math.max(vh - mapH, cam.y));
   }
 }
