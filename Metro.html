@@ -29,7 +29,7 @@ html,body{
   position:fixed;
   left:10px;
   top:10px;
-  z-index:30;
+  z-index:50;
   background:var(--ui-bg);
   color:var(--ui-color);
   padding:8px 12px;
@@ -45,16 +45,15 @@ html,body{
   position:relative;
   flex:1;
   overflow:hidden;
-  background:#222;
-  touch-action:none;
+  background:#111;
 }
 
 #map{
   position:absolute;
   left:0;
   top:0;
-  transform-origin:0 0;
-  background-size:cover;
+  background-repeat:no-repeat;
+  background-position:top left;
 }
 
 #player{
@@ -64,11 +63,8 @@ html,body{
   margin-left:calc(var(--player-size)/-2);
   margin-top:calc(var(--player-size)/-2);
   z-index:40;
-  cursor:grab;
-  display:block;
+  pointer-events:none;
 }
-
-#player:active{cursor:grabbing}
 
 .marker{
   position:absolute;
@@ -78,7 +74,7 @@ html,body{
   margin-top:calc(var(--marker-size)/-2);
   z-index:35;
   object-fit:contain;
-  user-select:none;
+  cursor:pointer;
 }
 
 #modal{
@@ -96,13 +92,6 @@ html,body{
   max-height:90vh;
   border-radius:8px;
 }
-
-@media(max-width:600px){
-  :root{
-    --player-size:28px;
-    --marker-size:28px;
-  }
-}
 </style>
 </head>
 
@@ -110,7 +99,7 @@ html,body{
 <div id="app">
 
 <div id="hud">
-  <div><b>Position</b> <span id="pos">x:0 y:0</span></div>
+  <div><b>Position</b> <span id="pos"></span></div>
   <div><b>Map</b> <span id="mapName"></span></div>
   <div><b>Lieu</b> <span id="locLabel"></span></div>
 </div>
@@ -134,12 +123,9 @@ html,body{
 </div>
 
 <script>
-/* ================= CONFIG ================= */
-
 const MAPS = {
   "ville-centre":{
-    id:"ville-centre",
-    name:"Ville - Centre",
+    name:"Ville – Centre",
     bg:"Map/Metro Plan.png",
     width:1600,
     height:1600
@@ -147,29 +133,22 @@ const MAPS = {
 };
 
 const LOCATIONS = [
-    { x: 1316, y: 757, img: "Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", type: "document", link: "Gardien.html", label:"Secret, 6 de ❤️", size: 80 },
-  { x: 890, y: 505, img: "Map/Maison1.png", type: "document", link: "Cuisine.html", label:"Cuisine, 4 de ♣️", size: 80 },
-  { x: 1436, y: 850, img: "Map/Maison1.png", type: "document", link: "Internet.html", label:"Internet, 8 de ♣️", size: 80 },
-  { x: 1076, y: 597, img: "Map/Maison1.png", type: "document", link: "Galerie.html", label:"Galerie, 5 de ❤️", size: 80, eLabel: "S'ancrer", eGroup: 6 },
-  { x: 241, y: 477, img: "Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", type: "document", link: "Gardien.html", label:"Sexualité, 4 de ❤️", size: 80 },
-  { x: 873, y: 247, img: "Map/Maison1.png", type: "document", link: "Logiciel.html", label:"Logiciel, 6 de ♣️", size: 80 },
-
+  { x:1316, y:757, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", label:"Secret, 6 de ❤️" },
+  { x:890, y:505, img:"Map/Maison1.png", label:"Cuisine, 4 de ♣️" },
+  { x:1436, y:850, img:"Map/Maison1.png", label:"Internet, 8 de ♣️" },
+  { x:1076, y:597, img:"Map/Maison1.png", label:"Galerie, 5 de ❤️" },
+  { x:241, y:477, img:"Map/20251209_0031_Bouche de Métro Nocturne_simple_compose_01kc04tdvfe89b447ny9471ewx.png", label:"Sexualité, 4 de ❤️" },
+  { x:873, y:247, img:"Map/Maison1.png", label:"Logiciel, 6 de ♣️" }
 ];
-const PLAYER_SPEED = 800;
-const CLICK_RADIUS = 40;
-const DETECTION_RADIUS = 60;
 
-let CURRENT_MAP_ID = "ville-centre";
+const PLAYER_SPEED = 800;
+const DETECTION_RADIUS = 80;
 
 const state = {
-  mapObj:null,
   player:{x:0,y:0},
   keys:{},
-  dragging:false,
-  lastTs:null
+  showLabel:false
 };
-
-/* ================= DOM ================= */
 
 const viewport = document.getElementById("viewport");
 const mapEl = document.getElementById("map");
@@ -177,105 +156,96 @@ const playerEl = document.getElementById("player");
 const posEl = document.getElementById("pos");
 const mapNameEl = document.getElementById("mapName");
 const locLabelEl = document.getElementById("locLabel");
-const modal = document.getElementById("modal");
-const modalImg = document.getElementById("modalImg");
 
-/* ================= MAP ================= */
-
-function loadMap(id){
-  const m = MAPS[id];
-  if(!m) return;
-  state.mapObj = m;
+function loadMap(){
+  const m = MAPS["ville-centre"];
   mapEl.style.width = m.width+"px";
   mapEl.style.height = m.height+"px";
   mapEl.style.backgroundImage = `url("${m.bg}")`;
   mapNameEl.textContent = m.name;
 }
 
-/* ================= PLAYER ================= */
-
-function clampPlayer(){
-  const m = state.mapObj;
-  if(!m) return;
-  state.player.x = Math.max(0,Math.min(m.width,state.player.x));
-  state.player.y = Math.max(0,Math.min(m.height,state.player.y));
+function createMarkers(){
+  LOCATIONS.forEach(loc=>{
+    const img = document.createElement("img");
+    img.src = loc.img;
+    img.className = "marker";
+    img.style.left = loc.x+"px";
+    img.style.top = loc.y+"px";
+    img.dataset.label = loc.label;
+    mapEl.appendChild(img);
+    loc.el = img;
+  });
 }
 
 function centerOnPlayer(){
-  const vpW = viewport.clientWidth;
-  const vpH = viewport.clientHeight;
-  const mapW = mapEl.clientWidth;
-  const mapH = mapEl.clientHeight;
-
-  let x = vpW/2 - state.player.x;
-  let y = vpH/2 - state.player.y;
-
-  x = Math.min(0,Math.max(vpW-mapW,x));
-  y = Math.min(0,Math.max(vpH-mapH,y));
-
+  const x = viewport.clientWidth/2 - state.player.x;
+  const y = viewport.clientHeight/2 - state.player.y;
   mapEl.style.transform = `translate(${x}px,${y}px)`;
   playerEl.style.left = state.player.x+"px";
   playerEl.style.top = state.player.y+"px";
 }
 
-/* ================= INPUT ================= */
+function updateLabel(){
+  if(!state.showLabel){
+    locLabelEl.textContent = "";
+    return;
+  }
+
+  let best = null;
+  let bestDist = Infinity;
+
+  LOCATIONS.forEach(l=>{
+    const d = Math.hypot(l.x-state.player.x,l.y-state.player.y);
+    if(d < DETECTION_RADIUS && d < bestDist){
+      best = l;
+      bestDist = d;
+    }
+  });
+
+  locLabelEl.textContent = best ? best.label : "";
+}
 
 window.addEventListener("keydown",e=>{
-  state.keys[e.key.toLowerCase()] = true;
+  state.keys[e.key] = true;
+  if(e.key.toLowerCase()==="b") state.showLabel = true;
 });
 
 window.addEventListener("keyup",e=>{
-  state.keys[e.key.toLowerCase()] = false;
+  state.keys[e.key] = false;
+  if(e.key.toLowerCase()==="b") state.showLabel = false;
 });
 
-/* ================= LOOP ================= */
-
+let last = null;
 function loop(ts){
-  if(!state.lastTs) state.lastTs = ts;
-  const dt = (ts-state.lastTs)/1000;
-  state.lastTs = ts;
+  if(!last) last = ts;
+  const dt = (ts-last)/1000;
+  last = ts;
 
-  let dx = 0, dy = 0;
-  if(state.keys.w||state.keys.arrowup) dy--;
-  if(state.keys.s||state.keys.arrowdown) dy++;
-  if(state.keys.a||state.keys.arrowleft) dx--;
-  if(state.keys.d||state.keys.arrowright) dx++;
+  let dx=0,dy=0;
+  if(state.keys.w||state.keys.ArrowUp) dy--;
+  if(state.keys.s||state.keys.ArrowDown) dy++;
+  if(state.keys.a||state.keys.ArrowLeft) dx--;
+  if(state.keys.d||state.keys.ArrowRight) dx++;
 
   if(dx||dy){
-    const len = Math.hypot(dx,dy)||1;
-    state.player.x += dx/len*PLAYER_SPEED*dt;
-    state.player.y += dy/len*PLAYER_SPEED*dt;
-    clampPlayer();
-    centerOnPlayer();
+    const l = Math.hypot(dx,dy);
+    state.player.x += dx/l*PLAYER_SPEED*dt;
+    state.player.y += dy/l*PLAYER_SPEED*dt;
   }
 
-  posEl.textContent = `x:${Math.round(state.player.x)} y:${Math.round(state.player.y)}`;
-  requestAnimationFrame(loop);
-}
-
-/* ================= MODAL ================= */
-
-function showModal(src){
-  modalImg.src = src;
-  modal.style.display="flex";
-}
-
-function hideModal(){
-  modal.style.display="none";
-  modalImg.src="";
-}
-
-/* ================= INIT ================= */
-
-function init(){
-  loadMap(CURRENT_MAP_ID);
-  state.player.x = state.mapObj.width/2;
-  state.player.y = state.mapObj.height/2;
+  posEl.textContent = `x:${state.player.x|0} y:${state.player.y|0}`;
   centerOnPlayer();
+  updateLabel();
   requestAnimationFrame(loop);
 }
 
-init();
+loadMap();
+createMarkers();
+state.player.x = 800;
+state.player.y = 800;
+centerOnPlayer();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>
