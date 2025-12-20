@@ -15,6 +15,8 @@ html,body{
   background:#000;
 }
 
+/* ===== VIEWPORT ===== */
+
 #viewport{
   position:fixed;
   inset:0;
@@ -22,14 +24,16 @@ html,body{
   touch-action:none;
 }
 
+/* ===== MAP ===== */
+
 #map{
   position:absolute;
   width:1600px;
   height:1600px;
 
   background-repeat:no-repeat;
-  background-position:top left;
-  background-size:1600px 1600px;
+  background-position:center;
+  background-size:contain;
 
   transform-origin:0 0;
   will-change:transform;
@@ -92,8 +96,16 @@ const LOCATIONS = [
 const viewport = document.getElementById("viewport");
 const mapEl    = document.getElementById("map");
 
-let cam  = { x:0, y:0 };
-let drag = { active:false, startX:0, startY:0, camX:0, camY:0 };
+let cam   = { x:0, y:0 };
+let scale = 1;
+
+let drag = {
+  active:false,
+  startX:0,
+  startY:0,
+  camX:0,
+  camY:0
+};
 
 /* ================= INIT MAP ================= */
 
@@ -108,6 +120,7 @@ LOCATIONS.forEach(loc=>{
   wrap.style.top  = loc.y + "px";
 
   const img = document.createElement("img");
+  img.className = "marker";
   img.src = loc.img;
   img.style.width  = loc.size + "px";
   img.style.height = loc.size + "px";
@@ -121,30 +134,38 @@ LOCATIONS.forEach(loc=>{
   mapEl.appendChild(wrap);
 });
 
-/* ================= CAMERA CORE ================= */
+/* ================= CAMERA ================= */
 
 function clampCam(){
 
   const vw = viewport.clientWidth;
   const vh = viewport.clientHeight;
 
-  /* Axe X */
-  if(MAP.width <= vw){
-    cam.x = (vw - MAP.width) / 2;
+  // Scale automatique plein écran sans déformation
+  scale = Math.max(
+    vw / MAP.width,
+    vh / MAP.height
+  );
+
+  const mapW = MAP.width  * scale;
+  const mapH = MAP.height * scale;
+
+  if(mapW <= vw){
+    cam.x = (vw - mapW) / 2;
   }else{
-    cam.x = Math.min(0, Math.max(vw - MAP.width, cam.x));
+    cam.x = Math.min(0, Math.max(vw - mapW, cam.x));
   }
 
-  /* Axe Y */
-  if(MAP.height <= vh){
-    cam.y = (vh - MAP.height) / 2;
+  if(mapH <= vh){
+    cam.y = (vh - mapH) / 2;
   }else{
-    cam.y = Math.min(0, Math.max(vh - MAP.height, cam.y));
+    cam.y = Math.min(0, Math.max(vh - mapH, cam.y));
   }
 }
 
 function renderCam(){
-  mapEl.style.transform = `translate3d(${cam.x}px, ${cam.y}px, 0)`;
+  mapEl.style.transform =
+    `translate3d(${cam.x}px, ${cam.y}px, 0) scale(${scale})`;
 }
 
 function updateCam(){
@@ -152,7 +173,7 @@ function updateCam(){
   renderCam();
 }
 
-/* ================= INIT POSITION ================= */
+/* ================= INIT ================= */
 
 updateCam();
 window.addEventListener("resize", updateCam);
@@ -173,9 +194,11 @@ function moveDrag(x,y){
   const dx = x - drag.startX;
   const dy = y - drag.startY;
 
-  /* déplacement UNIQUEMENT si pertinent */
-  if(MAP.width  > viewport.clientWidth)  cam.x = drag.camX + dx;
-  if(MAP.height > viewport.clientHeight) cam.y = drag.camY + dy;
+  const mapW = MAP.width  * scale;
+  const mapH = MAP.height * scale;
+
+  if(mapW > viewport.clientWidth)  cam.x = drag.camX + dx;
+  if(mapH > viewport.clientHeight) cam.y = drag.camY + dy;
 
   updateCam();
 }
