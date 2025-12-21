@@ -1,290 +1,226 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Grille éditable minimaliste</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Grille Aero</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
-  <style>
-    :root{
-      --bg: #faf9f6;
-      --gap: 12px;
-      --box-size: 140px;
-      --radius: 10px;
-      --border: 1px solid rgba(60, 50, 40, 0.15);
-      --shadow: 0 3px 10px rgba(0,0,0,0.04);
-      --shadow-hover: 0 5px 16px rgba(0,0,0,0.07);
-      --text-color: #222;
-      --muted: rgba(0,0,0,0.45);
-      --font-body: "Inter", sans-serif;
-      --font-title: "Cormorant Garamond", serif;
-    }
+<style>
+:root{
+  --bg1:#eaf2fb;
+  --bg2:#cfdff1;
 
-    html,body{
-      height:100%;
-      margin:0;
-      padding:26px;
-      background:var(--bg);
-      font-family:var(--font-body);
-      color:var(--text-color);
-      -webkit-font-smoothing:antialiased;
-      position:relative;
-    }
+  --glass: rgba(255,255,255,0.55);
+  --glass-strong: rgba(255,255,255,0.72);
 
-    body::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:url("https://uploads-ssl.webflow.com/5fbd9e08b4374f52b8cf23a0/6032e8dce1e52e2b63d72692_noise.png");
-      opacity:0.08;
-      pointer-events:none;
-    }
+  --border: rgba(255,255,255,0.65);
+  --border-dark: rgba(120,160,210,0.45);
 
-    .grid-wrap{ display:flex; justify-content:center; }
+  --highlight: rgba(255,255,255,0.85);
+  --shadow: 0 12px 30px rgba(0,60,120,0.25);
 
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(var(--cols), var(--box-size));
-      gap: var(--gap);
-    }
+  --box-size:140px;
+  --gap:14px;
+  --radius:14px;
 
-    .box{
-      background:#fffdfb;
-      border:var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:10px;
-      width:var(--box-size);
-      height:var(--box-size);
-      cursor:pointer;
-      user-select:none;
-      overflow:hidden;
-      position:relative;
-      transition:box-shadow 0.18s ease, transform 0.18s ease, background 0.2s;
-    }
+  --text:#0b2a44;
+  --muted:#4c6a88;
+}
 
-    .box:hover{
-      box-shadow:var(--shadow-hover);
-      transform:translateY(-2px);
-    }
+html{
+  height:100%;
+  background:
+    radial-gradient(circle at top, #f6fbff, transparent 60%),
+    linear-gradient(180deg, var(--bg1), var(--bg2));
+}
 
-    .box:active{ transform:translateY(1px); }
+html::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:url("https://uploads-ssl.webflow.com/5fbd9e08b4374f52b8cf23a0/6032e8dce1e52e2b63d72692_noise.png");
+  opacity:.06;
+  pointer-events:none;
+}
 
-    .content{
-      width:100%;
-      height:100%;
-      outline:none;
-      font-size:25px;
-      line-height:1.25;
-      text-align:center;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:6px;
-      word-break:break-word;
-      color:var(--text-color);
-      font-family:var(--font-title);
-      letter-spacing:0.2px;
-    }
+body{
+  margin:0;
+  padding:28px;
+  font-family:"Inter", system-ui, sans-serif;
+  color:var(--text);
+  height:100%;
+}
 
-    .placeholder{
-      color:var(--muted);
-      font-style:italic;
-    }
+.grid-wrap{
+  display:flex;
+  justify-content:center;
+}
 
-    .hint{
-      position:absolute;
-      right:8px;
-      bottom:8px;
-      font-size:11px;
-      color:var(--muted);
-      opacity:0.85;
-      pointer-events:none;
-    }
+.grid{
+  display:grid;
+  grid-template-columns:repeat(var(--cols),var(--box-size));
+  gap:var(--gap);
+}
 
-    .editing{
-      background:#fffefc;
-      box-shadow:0 4px 12px rgba(0,0,0,0.08);
-      border-color:rgba(0,0,0,0.25);
-    }
+.box{
+  width:var(--box-size);
+  height:var(--box-size);
+  position:relative;
+  border-radius:var(--radius);
 
-    @media (max-width:640px){
-      :root{ --box-size: 100px; --cols: 3; }
-      .content{ font-size:13px; }
-    }
-  </style>
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.35)),
+    var(--glass);
+
+  backdrop-filter: blur(14px) saturate(1.4);
+  border:1px solid var(--border);
+  box-shadow:
+    inset 0 1px 0 var(--highlight),
+    inset 0 -1px 0 rgba(255,255,255,.25),
+    var(--shadow);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  user-select:none;
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    background .2s;
+
+  will-change:transform,box-shadow;
+  contain:layout paint;
+  transform:translateZ(0);
+}
+
+.box::before{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius:inherit;
+  background:linear-gradient(
+    180deg,
+    rgba(255,255,255,.55),
+    rgba(255,255,255,0)
+  );
+  pointer-events:none;
+}
+
+.box:hover{
+  transform:translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 18px 38px rgba(0,80,160,.35);
+}
+
+.box:active{
+  transform:translateY(1px);
+}
+
+.content{
+  text-align:center;
+  font-size:22px;
+  font-weight:500;
+  line-height:1.2;
+  padding:10px;
+  outline:none;
+  color:var(--text);
+}
+
+.placeholder{
+  color:var(--muted);
+  font-style:italic;
+}
+
+.editing{
+  background:
+    linear-gradient(180deg,#ffffff,#dfeeff),
+    var(--glass-strong);
+  border-color:var(--border-dark);
+}
+
+@media(max-width:640px){
+  :root{ --box-size:100px; --cols:3; }
+  .content{ font-size:14px; }
+}
+</style>
 </head>
 
 <body>
-  <div class="grid-wrap">
-    <div id="grid" class="grid"></div>
-  </div>
+<div class="grid-wrap">
+  <div id="grid" class="grid"></div>
+</div>
 
-  <script>
-    /* ---------------------- CONFIG ---------------------- */
-    const BOXES = [
-      { id:'b1',  title:'Calendrier', url:'https://calendar.google.com' },
-      { id:'b2',  title:'Mail', url:'https://mail.google.com' },
-      { id:'b3',  title:'Reddit', url:'https://www.reddit.com' },
-      { id:'b4',  title:'Youtube', url:'https://www.youtube.com/' },
-      { id:'b5',  title:'Framapad', url:'https://framapad.org/abc/fr/' },
-      { id:'b6',  title:'Tool24', url:'https://tools.pdf24.org/fr/ocr-pdf' },
-      { id:'b7',  title:'GitHub', url:'https://github.com' },
-      { id:'b8',  title:'Lescan', url:'https://lelscans.net/scan-one-piece/1084/2' },
-      { id:'b9',  title:'Chatgpt', url:'https://chatgpt.com' },
-      { id:'b10', title:'Fmt', url:'https://fmteam.fr/comics/one-punch-man' },
-      { id:'b11', title:'Modélisation', url:'https://posemy.art/app/?lang=fr' },
-    ];
+<script>
+const BOXES = [
+  { id:'b1', title:'Calendrier', url:'https://calendar.google.com' },
+  { id:'b2', title:'Mail', url:'https://mail.google.com' },
+  { id:'b3', title:'Reddit', url:'https://www.reddit.com' },
+  { id:'b4', title:'YouTube', url:'https://www.youtube.com' },
+  { id:'b5', title:'Framapad', url:'https://framapad.org' },
+  { id:'b6', title:'PDF24', url:'https://tools.pdf24.org' },
+  { id:'b7', title:'GitHub', url:'https://github.com' },
+  { id:'b8', title:'Scans', url:'https://lelscans.net' },
+  { id:'b9', title:'ChatGPT', url:'https://chatgpt.com' }
+];
 
-    const STORAGE_KEY = 'editable-link-grid:v1';
+const STORAGE_KEY='aero-grid:v2';
+const cols=Math.ceil(Math.sqrt(BOXES.length));
+document.documentElement.style.setProperty('--cols',cols);
 
-    /* AUTO-CALCUL COLONNES (Option B) */
-    const cols = Math.ceil(Math.sqrt(BOXES.length));
-    document.documentElement.style.setProperty('--cols', cols);
+const state=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+const grid=document.getElementById('grid');
 
-    /* ------------------ SYNCHRO BOXES → STORAGE (Option A) ------------------ */
-    (function syncToStorage(){
-      const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      let changed = false;
+BOXES.forEach(b=>{
+  state[b.id]=state[b.id]||{title:b.title,url:b.url};
 
-      BOXES.forEach(b => {
-        if(!state[b.id]) state[b.id] = {};
+  const box=document.createElement('div');
+  box.className='box';
+  box.dataset.id=b.id;
+  box.dataset.url=state[b.id].url;
 
-        // les titres modifiés sont conservés
-        if(state[b.id].title === undefined) {
-          state[b.id].title = b.title;
-          changed = true;
-        }
+  const content=document.createElement('div');
+  content.className='content';
+  content.tabIndex=0;
+  content.innerText=state[b.id].title;
 
-        // mais les URL suivent BOXES (source de vérité)
-        if(state[b.id].url !== b.url) {
-          state[b.id].url = b.url;
-          changed = true;
-        }
-      });
+  box.appendChild(content);
+  grid.appendChild(box);
 
-      if(changed)
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    })();
+  box.onclick=()=>{
+    if(!box.classList.contains('editing'))
+      window.open(box.dataset.url,'_blank');
+  };
 
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  box.ondblclick=()=>edit(box);
 
-    /* ---------------------- CONSTRUCTION DE LA GRILLE ---------------------- */
-    const gridEl = document.getElementById('grid');
+  content.onkeydown=e=>{
+    if(e.key==='Enter'){ e.preventDefault(); save(box); }
+  };
 
-    BOXES.forEach(box => {
-      const data = saved[box.id];
-      const el = document.createElement('div');
-      el.className = 'box';
-      el.dataset.id = box.id;
-      el.dataset.url = data.url || '';
+  content.onblur=()=>save(box);
+});
 
-      const content = document.createElement('div');
-      content.className = 'content';
-      content.tabIndex = 0;
-      content.innerText = data.title || '';
-      if(!data.title) content.classList.add('placeholder');
+function edit(box){
+  box.classList.add('editing');
+  const c=box.querySelector('.content');
+  c.contentEditable=true;
+  c.focus();
+}
 
-      const hint = document.createElement('div');
-      hint.className = 'hint';
+function save(box){
+  if(!box.classList.contains('editing'))return;
+  const c=box.querySelector('.content');
+  c.contentEditable=false;
+  box.classList.remove('editing');
 
-      el.appendChild(content);
-      el.appendChild(hint);
-      gridEl.appendChild(el);
-
-      /* OUVERTURE URL */
-      el.addEventListener('click', ()=>{
-        if(el.classList.contains('editing')) return;
-        if(el.dataset.url) window.open(el.dataset.url,'_blank');
-      });
-
-      /* EDIT */
-      el.addEventListener('dblclick', ()=> enterEditMode(el));
-
-      content.addEventListener('keydown', e=>{
-        if(e.key === 'Enter'){
-          e.preventDefault();
-          if(el.classList.contains('editing')) exitEditMode(el);
-          else if(el.dataset.url) window.open(el.dataset.url,'_blank');
-        }
-        if(e.key.toLowerCase() === 'e'){
-          e.preventDefault();
-          enterEditMode(el);
-        }
-      });
-
-      content.addEventListener('blur', ()=>{
-        if(el.classList.contains('editing')) exitEditMode(el);
-      });
-    });
-
-    /* ---------------------- EDIT MODE ---------------------- */
-
-    function enterEditMode(el){
-      const content = el.querySelector('.content');
-      el.classList.add('editing');
-      content.contentEditable = 'true';
-      content.classList.remove('placeholder');
-      content.focus();
-
-      document.execCommand('selectAll', false, null);
-      document.getSelection().collapseToEnd();
-    }
-
-    function exitEditMode(el){
-      const id = el.dataset.id;
-      const content = el.querySelector('.content');
-      el.classList.remove('editing');
-      content.contentEditable = 'false';
-
-      const newText = content.innerText.trim();
-      if(!newText) content.classList.add('placeholder');
-
-      const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      state[id].title = newText;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-
-    /* ---------------------- API JS CONSOLE ---------------------- */
-    window.EditableGrid = {
-      setUrl(id,url){
-        const el = document.querySelector(`.box[data-id="${id}"]`);
-        if(el) el.dataset.url = url;
-
-        const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
-        state[id] = state[id] || {};
-        state[id].url = url;
-
-        // Comme option A → l'URL sera écrasée au prochain reload par BOXES,
-        // donc ceci n’est que temporaire
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      },
-
-      setTitle(id,title){
-        const el = document.querySelector(`.box[data-id="${id}"]`);
-        if(!el) return;
-        const content = el.querySelector('.content');
-
-        content.innerText = title;
-        if(!title) content.classList.add('placeholder');
-        else content.classList.remove('placeholder');
-
-        const state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
-        state[id] = state[id] || {};
-        state[id].title = title;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      },
-
-      clearStorage(){
-        localStorage.removeItem(STORAGE_KEY);
-        location.reload();
-      }
-    };
-  </script>
+  state[box.dataset.id].title=c.innerText.trim();
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+}
+</script>
 </body>
 </html>
