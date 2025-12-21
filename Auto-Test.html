@@ -6,14 +6,15 @@
 
 <style>
 :root{
-  --sky1:#dff3ff;
-  --sky2:#b9e6ff;
-  --glass:rgba(255,255,255,.55);
-  --border:rgba(255,255,255,.9);
-  --blue:#2b8cff;
-  --red:#ff4b4b;
-  --text:#0b1a2b;
-  --radius:20px;
+  --skyTop:#e9f7ff;
+  --skyBottom:#bfe7ff;
+  --glass1:rgba(255,255,255,.85);
+  --glass2:rgba(255,255,255,.55);
+  --border:rgba(255,255,255,.95);
+  --blue:#1f8cff;
+  --red:#ff3b3b;
+  --text:#0a1a2f;
+  --radius:22px;
 }
 
 *{box-sizing:border-box}
@@ -24,59 +25,60 @@ body{
   height:100vh;
   font-family:"Segoe UI",Tahoma,sans-serif;
   background:
-    radial-gradient(circle at 20% 20%, #ffffff 0%, transparent 40%),
-    linear-gradient(160deg,var(--sky1),var(--sky2));
+    linear-gradient(to bottom,var(--skyTop),var(--skyBottom));
   color:var(--text);
 }
 
-/* ===== PANNEAU GAUCHE ===== */
+/* ===== PANNEAU ===== */
 aside{
-  width:310px;
-  padding:20px;
-  background:linear-gradient(
-    to bottom,
-    rgba(255,255,255,.75),
-    rgba(255,255,255,.45)
-  );
-  backdrop-filter:blur(14px);
+  width:320px;
+  padding:22px;
+  background:
+    linear-gradient(to bottom,var(--glass1),var(--glass2));
+  backdrop-filter:blur(16px);
   border-right:1px solid var(--border);
-  box-shadow:6px 0 30px rgba(0,0,0,.15);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    6px 0 30px rgba(0,0,0,.18);
 }
 
 aside h3{
-  margin-top:0;
-  font-size:17px;
+  margin:0 0 6px;
+  font-size:18px;
   text-shadow:0 1px 0 #fff;
 }
 
 aside p{
   font-size:12px;
-  color:#35526b;
+  color:#355b78;
+  margin-bottom:18px;
 }
 
 /* ===== SLIDERS ===== */
 .control{
-  margin-bottom:16px;
+  margin-bottom:18px;
   font-size:12px;
 }
 
 input[type=range]{
   width:100%;
-  height:6px;
+  height:7px;
   border-radius:10px;
-  background:linear-gradient(to right,#93c5fd,#60a5fa);
+  background:linear-gradient(to right,#7dd3fc,#38bdf8);
   appearance:none;
 }
 
 input[type=range]::-webkit-slider-thumb{
   appearance:none;
-  width:18px;
-  height:18px;
+  width:20px;
+  height:20px;
   border-radius:50%;
   background:
     radial-gradient(circle at 30% 30%, #ffffff, #dbeafe);
   border:1px solid #93c5fd;
-  box-shadow:0 2px 6px rgba(0,0,0,.3);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 3px 8px rgba(0,0,0,.35);
 }
 
 /* ===== SCÈNE ===== */
@@ -93,51 +95,43 @@ canvas{
 /* ===== ÉTAT ===== */
 #etat{
   position:absolute;
-  top:16px;
-  right:16px;
+  top:18px;
+  right:18px;
   background:
-    linear-gradient(
-      to bottom,
-      rgba(255,255,255,.9),
-      rgba(255,255,255,.6)
-    );
-  padding:14px 22px;
+    linear-gradient(to bottom,var(--glass1),var(--glass2));
+  padding:16px 26px;
   border-radius:var(--radius);
   border:1px solid var(--border);
   box-shadow:
     inset 0 1px 0 #fff,
-    0 10px 25px rgba(0,0,0,.2);
+    0 12px 30px rgba(0,0,0,.25);
   font-weight:600;
-  font-size:15px;
+  font-size:16px;
   text-align:center;
 }
 
 /* ===== LÉGENDE ===== */
 #legende{
   position:absolute;
-  bottom:16px;
-  left:16px;
+  bottom:18px;
+  left:18px;
   background:
-    linear-gradient(
-      to bottom,
-      rgba(255,255,255,.85),
-      rgba(255,255,255,.55)
-    );
-  padding:12px 16px;
+    linear-gradient(to bottom,var(--glass1),var(--glass2));
+  padding:14px 18px;
   border-radius:var(--radius);
   border:1px solid var(--border);
   box-shadow:
     inset 0 1px 0 #fff,
-    0 10px 25px rgba(0,0,0,.2);
+    0 12px 30px rgba(0,0,0,.25);
   font-size:12px;
 }
 
 #legende span{
   display:inline-block;
-  width:10px;
-  height:10px;
+  width:12px;
+  height:12px;
   border-radius:50%;
-  margin-right:6px;
+  margin-right:8px;
 }
 
 .bleu{background:var(--blue)}
@@ -145,7 +139,7 @@ canvas{
 
 .axe{
   margin-top:6px;
-  color:#35526b;
+  color:#355b78;
   font-style:italic;
 }
 </style>
@@ -154,10 +148,10 @@ canvas{
 <body>
 
 <aside>
-<h3>🌱 Facteurs du bonheur</h3>
+<h3>🌈 État émotionnel</h3>
 <p>
-Les curseurs influencent la ligne bleue.<br>
-La stimulation évolue librement.
+Le bonheur est influencé par les facteurs.<br>
+La stimulation suit son propre rythme.
 </p>
 
 <div class="control">Sommeil<input id="sommeil" type="range" min="0" max="1" step="0.01" value="0.5"></div>
@@ -195,7 +189,7 @@ resize();
 addEventListener("resize", resize);
 
 const mid = () => c.clientHeight/2;
-const seuil = 40;
+const seuil = 42;
 
 let x = 0;
 let t = 0;
@@ -205,20 +199,20 @@ let prevBonheur = yBonheur;
 
 function bonheurImpact(){
   let d = 0;
-  d += (sommeil.value-0.5)*1.4;
-  d += (soleil.value-0.5)*1.3;
-  d += (nourriture.value-0.5)*1.1;
+  d += (sommeil.value-0.5)*1.2;
+  d += (soleil.value-0.5)*1.1;
+  d += (nourriture.value-0.5)*1.0;
   d += (musique.value-0.5)*0.6;
   d += (sport.value-0.5)*0.5;
-  d -= (imprevu.value-0.5)*0.9;
-  d += (mid()-yBonheur)/1000;
-  return d*0.35;
+  d -= (imprevu.value-0.5)*0.8;
+  d += (mid()-yBonheur)/1200;
+  return d*0.32;
 }
 
 function stimulationY(){
   return mid()
-    + Math.sin(t*0.3)*95
-    + Math.sin(t*0.12)*22;
+    + Math.sin(t*0.28)*100
+    + Math.sin(t*0.11)*26;
 }
 
 function signe(y){
@@ -234,38 +228,41 @@ function definirEtat(b,s){
   if(b==="-"&&s==="-") return "Abattement";
   if(b==="0"&&s==="0") return "Stabilité";
   if(b==="+") return "Heureux";
-  if(b==="−") return "Tristesse";
   if(s==="+") return "Stimulé";
   if(s==="-") return "Fatigue";
   return "—";
 }
 
 function loop(){
-  ctx.fillStyle = "rgba(223,243,255,0.10)";
+  ctx.fillStyle = "rgba(233,247,255,0.10)";
   ctx.fillRect(0,0,c.clientWidth,c.clientHeight);
 
-  ctx.strokeStyle = "rgba(255,255,255,.8)";
-  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = "rgba(255,255,255,.85)";
+  ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(0,mid());
   ctx.lineTo(c.clientWidth,mid());
   ctx.stroke();
 
   yBonheur += bonheurImpact();
-  yBonheur = Math.max(30,Math.min(c.clientHeight-30,yBonheur));
+  yBonheur = Math.max(40,Math.min(c.clientHeight-40,yBonheur));
 
   const yStim = stimulationY();
-  t += 0.007;
+  t += 0.006;
 
-  ctx.strokeStyle = "#2b8cff";
-  ctx.lineWidth = 3.2;
+  /* COURBE BONHEUR – ÉPAISSE */
+  ctx.strokeStyle = "#1f8cff";
+  ctx.lineWidth = 6.5;
+  ctx.lineCap = "round";
   ctx.beginPath();
   ctx.moveTo(x-1,prevBonheur);
   ctx.lineTo(x,yBonheur);
   ctx.stroke();
 
-  ctx.strokeStyle = "#ff4b4b";
-  ctx.lineWidth = 3;
+  /* COURBE STIMULATION – ÉPAISSE */
+  ctx.strokeStyle = "#ff3b3b";
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
   ctx.beginPath();
   ctx.moveTo(x,yStim);
   ctx.lineTo(x+1,yStim);
@@ -276,7 +273,7 @@ function loop(){
 
   etatBox.innerHTML = `
     <div>${definirEtat(b,s)}</div>
-    <div style="font-size:11px;color:#35526b;margin-top:4px">
+    <div style="font-size:11px;color:#355b78;margin-top:4px">
       Bonheur ${b} | Stimulation ${s}
     </div>
   `;
