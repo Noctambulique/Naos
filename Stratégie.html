@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Frutiger Aero Space</title>
+
+<style>
+/* =====================
+   BASE FRUTIGER AERO
+===================== */
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Segoe UI", "Tahoma", system-ui, sans-serif;
+}
+
+/* Fond Windows 7 / Aero */
+body {
+  background:
+    radial-gradient(circle at top, rgba(255,255,255,0.35), transparent 60%),
+    linear-gradient(180deg, #6fa8dc, #1e3c72);
+}
+
+/* Lueur douce globale */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.35), transparent 40%),
+    radial-gradient(circle at 80% 10%, rgba(255,255,255,0.25), transparent 45%);
+  pointer-events: none;
+}
+
+/* =====================
+   RECTANGLES AERO
+===================== */
+
+.rect {
+  position: absolute;
+  border-radius: 18px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.6),
+      rgba(255,255,255,0.15)
+    );
+  border: 1px solid rgba(255,255,255,0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.7),
+    0 12px 30px rgba(0,0,0,0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 18px;
+  color: #0a2540;
+  font-size: 18px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+/* Effet hover subtil */
+.rect:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.8),
+    0 16px 40px rgba(0,0,0,0.3);
+}
+
+/* =====================
+   CONTENEUR
+===================== */
+
+#scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+</style>
+</head>
+
+<body>
+
+<div id="scene"></div>
+
+<script>
+/* =====================
+   PERSONNALISATION
+   (TU NE TOUCHES QU'ICI)
+===================== */
+
+const RECTANGLES = [
+  {
+    x: 80,
+    y: 120,
+    w: 320,
+    h: 160,
+    text: "Bienvenue dans mon espace",
+    blur: 14,
+    opacity: 0.55
+  },
+  {
+    x: 480,
+    y: 300,
+    w: 260,
+    h: 140,
+    text: "Idées\nNotes\nFragments",
+    blur: 18,
+    opacity: 0.6
+  }
+]
+
+/* =====================
+   GÉNÉRATION AUTOMATIQUE
+=
