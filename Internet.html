@@ -2,118 +2,135 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Interface Frutiger Aero</title>
+<title>Interface Organique Numérique</title>
 
 <style>
-    /* --------- BASE GLOBALE --------- */
-    body {
-        margin: 0;
-        padding: 60px;
-        font-family: "Segoe UI", "Frutiger", Arial, sans-serif;
-        background: linear-gradient(180deg, #cfe9ff 0%, #e8f6ff 40%, #ffffff 100%);
-        color: #1b1b1b;
-    }
+/* ------------------ FOND GÉNÉRAL ------------------ */
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    color: #0a2a1f;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.35), transparent 40%),
+        radial-gradient(circle at 80% 60%, rgba(255,255,255,0.25), transparent 45%),
+        linear-gradient(to bottom, #bfe8ff 0%, #c6f2c6 60%, #8fd6a3 100%);
+    overflow-x: hidden;
+}
 
-    /* --------- CONTAINER PRINCIPAL --------- */
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 24px;
-        max-width: 1200px;
-        margin: auto;
-    }
+/* ------------------ DÉCOR AQUATIQUE ------------------ */
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    border: 1px solid rgba(255,255,255,0.4);
+    filter: blur(0.5px);
+}
 
-    /* --------- CASE FRUTIGER --------- */
-    .tile {
-        position: relative;
-        padding: 18px 16px;
-        border-radius: 14px;
+.bubble.b1 { width: 80px; height: 80px; top: 20%; left: 10%; }
+.bubble.b2 { width: 40px; height: 40px; top: 65%; left: 70%; }
+.bubble.b3 { width: 120px; height: 120px; top: 40%; left: 80%; }
 
-        background: linear-gradient(
-            180deg,
-            rgba(255,255,255,0.85),
-            rgba(220,240,255,0.85)
-        );
+.fish {
+    position: absolute;
+    width: 60px;
+    height: 20px;
+    background: linear-gradient(to right, #4fd1c5, #81e6d9);
+    border-radius: 20px 40px 40px 20px;
+    opacity: 0.6;
+}
+.fish::after {
+    content: "";
+    position: absolute;
+    right: -10px;
+    top: 5px;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 10px solid #4fd1c5;
+}
+.fish.f1 { top: 30%; left: 60%; }
+.fish.f2 { top: 55%; left: 20%; }
 
-        border: 1px solid rgba(255,255,255,0.9);
-        box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.9),
-            0 6px 18px rgba(0, 90, 160, 0.15);
+/* ------------------ CONTENEUR DES CASES ------------------ */
+.container {
+    position: relative;
+    max-width: 900px;
+    margin: 80px auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
 
-        backdrop-filter: blur(4px);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
+/* ------------------ CASES ------------------ */
+.box {
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.55),
+        rgba(230,255,240,0.65)
+    );
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow:
+        inset 0 0 10px rgba(255,255,255,0.6),
+        0 8px 20px rgba(0,0,0,0.08);
+    backdrop-filter: blur(6px);
+    transition: transform 0.2s ease;
+}
 
-    .tile:hover {
-        transform: translateY(-2px);
-        box-shadow:
-            inset 0 1px 0 rgba(255,255,255,1),
-            0 10px 22px rgba(0, 90, 160, 0.25);
-    }
+.box:hover {
+    transform: translateY(-4px);
+}
 
-    /* --------- TEXTE --------- */
-    .tile h3 {
-        margin: 0 0 8px 0;
-        font-size: 15px;
-        font-weight: 600;
-        color: #1c3f5e;
-    }
-
-    .tile p {
-        margin: 0;
-        font-size: 13px;
-        line-height: 1.4;
-        color: #2b2b2b;
-    }
-
-    /* --------- LIEN --------- */
-    .tile a {
-        display: inline-block;
-        margin-top: 10px;
-        font-size: 12px;
-        color: #0a5fd4;
-        text-decoration: none;
-    }
-
-    .tile a:hover {
-        text-decoration: underline;
-    }
+.box a {
+    text-decoration: none;
+    color: #0c3b2e;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.4;
+}
 </style>
 </head>
 
 <body>
 
-<div class="grid">
+<!-- éléments décoratifs -->
+<div class="bubble b1"></div>
+<div class="bubble b2"></div>
+<div class="bubble b3"></div>
 
-    <!-- CASE 1 -->
-    <div class="tile">
-        <h3>Journal cognitif</h3>
-        <p>Notes quotidiennes sur l’état mental, la clarté et la charge cognitive.</p>
-        <a href="journal.html">Ouvrir</a>
+<div class="fish f1"></div>
+<div class="fish f2"></div>
+
+<!-- CONTENU -->
+<div class="container">
+
+    <div class="box">
+        <a href="https://example.com">
+            Archive personnelle – journal cognitif
+        </a>
     </div>
 
-    <!-- CASE 2 -->
-    <div class="tile">
-        <h3>Cartographie émotionnelle</h3>
-        <p>Visualisation de tendances internes et variations d’humeur.</p>
-        <a href="emotions.html">Explorer</a>
+    <div class="box">
+        <a href="https://example.com">
+            Cartographie émotionnelle quotidienne
+        </a>
     </div>
 
-    <!-- CASE 3 -->
-    <div class="tile">
-        <h3>Archives personnelles</h3>
-        <p>Stockage structuré d’éléments de vie, pensées, fragments.</p>
-        <a href="archives.html">Accéder</a>
+    <div class="box">
+        <a href="https://example.com">
+            Notes sur l’observation du comportement
+        </a>
     </div>
 
-    <!-- AJOUTE AUTANT DE CASES QUE TU VEUX CI-DESSOUS -->
-    <!--
-    <div class="tile">
-        <h3>Titre</h3>
-        <p>Description</p>
-        <a href="lien.html">Lien</a>
+    <!-- Duplique simplement ce bloc pour en ajouter -->
+    <div class="box">
+        <a href="https://example.com">
+            Dossier expérimental n°12
+        </a>
     </div>
-    -->
 
 </div>
 
