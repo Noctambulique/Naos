@@ -2,131 +2,100 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Interface Organique – Aero Nature</title>
+<title>Interface Aero</title>
 
 <style>
-/* ====== BASE GLOBALE ====== */
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: "Segoe UI", "Tahoma", sans-serif;
-    background: linear-gradient(
-        180deg,
-        #cfefff 0%,
-        #a8d8c9 40%,
-        #e6f5dc 100%
-    );
-    overflow: hidden;
-}
+    body {
+        margin: 0;
+        padding: 40px;
+        font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+        background: linear-gradient(180deg, #cfe9ff 0%, #e9f4ff 40%, #ffffff 100%);
+        background-attachment: fixed;
+        color: #1a1a1a;
+    }
 
-/* ====== FOND NATURE / AÉRIEN ====== */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image:
-        url("https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=1920");
-    background-size: cover;
-    background-position: center;
-    filter: blur(2px) saturate(1.2);
-    opacity: 0.45;
-    z-index: -2;
-}
+    /* Conteneur général */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 18px;
+        max-width: 1200px;
+        margin: auto;
+    }
 
-/* voile lumineux type Aero */
-body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at top,
-        rgba(255,255,255,0.55),
-        rgba(255,255,255,0.05)
-    );
-    z-index: -1;
-}
+    /* Case style Windows 7 */
+    .tile {
+        background: linear-gradient(
+            180deg,
+            rgba(255,255,255,0.75),
+            rgba(230,240,255,0.9)
+        );
+        border: 1px solid rgba(120,160,200,0.6);
+        border-radius: 6px;
+        padding: 14px;
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.7),
+            0 4px 10px rgba(0,0,0,0.15);
+        backdrop-filter: blur(3px);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
 
-/* ====== CONTENEUR PRINCIPAL ====== */
-.container {
-    width: 90%;
-    max-width: 1100px;
-    margin: 60px auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 18px;
-}
+    .tile:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.9),
+            0 6px 14px rgba(0,0,0,0.25);
+    }
 
-/* ====== CASES (BLOCS) ====== */
-.tile {
-    background: linear-gradient(
-        145deg,
-        rgba(255,255,255,0.85),
-        rgba(210,235,255,0.65)
-    );
-    border-radius: 12px;
-    padding: 14px;
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.7),
-        0 6px 18px rgba(0,0,0,0.12);
-    border: 1px solid rgba(255,255,255,0.6);
-    backdrop-filter: blur(6px);
-    color: #1a2a2f;
-    font-size: 14px;
-    line-height: 1.4;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+    .tile h3 {
+        margin: 0 0 6px 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #1b3f6b;
+    }
 
-.tile:hover {
-    transform: translateY(-2px);
-    box-shadow:
-        0 10px 24px rgba(0,0,0,0.18),
-        inset 0 1px 0 rgba(255,255,255,0.8);
-}
+    .tile p {
+        font-size: 13px;
+        line-height: 1.4;
+        margin: 0 0 8px 0;
+        color: #2a2a2a;
+    }
 
-/* TITRES DANS LES CASES */
-.tile h3 {
-    margin: 0 0 6px 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: #1f3b44;
-}
+    .tile a {
+        font-size: 12px;
+        color: #0a4fa3;
+        text-decoration: none;
+    }
 
-/* LIENS */
-.tile a {
-    color: #2a6fa5;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.tile a:hover {
-    text-decoration: underline;
-}
+    .tile a:hover {
+        text-decoration: underline;
+    }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="grid">
 
     <!-- CASE 1 -->
     <div class="tile">
-        <h3>Journal interne</h3>
-        <p>Notes personnelles sur les états mentaux quotidiens.</p>
+        <h3>Journal personnel</h3>
+        <p>Notes internes et fragments quotidiens.</p>
         <a href="journal.html">Ouvrir</a>
     </div>
 
     <!-- CASE 2 -->
     <div class="tile">
-        <h3>Cartographie émotionnelle</h3>
-        <p>Données subjectives organisées par intensité et fréquence.</p>
-        <a href="cartographie.html">Accéder</a>
+        <h3>Archives mentales</h3>
+        <p>Cartographie des idées et états internes.</p>
+        <a href="archives.html">Accéder</a>
     </div>
 
     <!-- CASE 3 -->
     <div class="tile">
-        <h3>Archives cognitives</h3>
-        <p>Fragments, idées, schémas, observations.</p>
-        <a href="archives.html">Explorer</a>
+        <h3>Données</h3>
+        <p>Enregistrements, listes, structures.</p>
+        <a href="donnees.html">Voir</a>
     </div>
 
     <!-- AJOUTER D'AUTRES CASES ICI -->
