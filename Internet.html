@@ -2,97 +2,141 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Interface Frutiger – Style Windows 7</title>
+<title>Interface Éco-Tech</title>
 
 <style>
+    /* --- RESET --- */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+
     body {
-        margin: 0;
-        padding: 40px;
-        font-family: "Segoe UI", Tahoma, sans-serif;
-        background: linear-gradient(#f2f5f7, #dfe4e8);
-        color: #1e1e1e;
+        background: linear-gradient(135deg, #e6f5ef, #cfeee3);
+        color: #0f2a22;
+        min-height: 100vh;
+        padding: 60px;
     }
 
-    .container {
-        max-width: 1100px;
-        margin: auto;
+    /* --- CONTENEUR PRINCIPAL --- */
+    .dashboard {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 18px;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 24px;
     }
 
-    .tile {
-        background: linear-gradient(#ffffff, #e9edf1);
-        border: 1px solid #b9c2cc;
-        box-shadow: inset 0 1px 0 #ffffff;
-        padding: 16px;
-        min-height: 110px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        transition: background 0.2s ease;
+    /* --- CARTES --- */
+    .panel {
+        background: linear-gradient(
+            145deg,
+            rgba(255,255,255,0.85),
+            rgba(220,255,235,0.65)
+        );
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow:
+            0 8px 20px rgba(0, 90, 60, 0.15),
+            inset 0 0 0 1px rgba(255,255,255,0.6);
+        backdrop-filter: blur(6px);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
-    .tile:hover {
-        background: linear-gradient(#f7f9fb, #e2e7ec);
+    .panel:hover {
+        transform: translateY(-4px);
+        box-shadow:
+            0 14px 30px rgba(0, 90, 60, 0.25),
+            inset 0 0 0 1px rgba(255,255,255,0.8);
     }
 
-    .tile h3 {
-        margin: 0 0 8px 0;
-        font-size: 15px;
+    /* --- TITRE --- */
+    .panel h2 {
+        font-size: 1.1rem;
         font-weight: 600;
-        color: #2a2a2a;
+        margin-bottom: 10px;
+        color: #0b3a2d;
+        letter-spacing: 0.4px;
     }
 
-    .tile p {
-        font-size: 13px;
-        line-height: 1.4;
-        color: #3b3b3b;
-        margin: 0;
+    /* --- TEXTE --- */
+    .panel p {
+        font-size: 0.95rem;
+        line-height: 1.45;
+        color: #214a3b;
     }
 
-    .tile a {
-        margin-top: 10px;
-        font-size: 12px;
-        color: #1a5fb4;
+    /* --- LIEN --- */
+    .panel a {
+        display: inline-block;
+        margin-top: 12px;
+        font-size: 0.85rem;
+        color: #1f7f63;
         text-decoration: none;
+        border-bottom: 1px solid rgba(31,127,99,0.4);
+        transition: color 0.2s ease, border-color 0.2s ease;
     }
 
-    .tile a:hover {
-        text-decoration: underline;
+    .panel a:hover {
+        color: #0b5c46;
+        border-color: #0b5c46;
+    }
+
+    /* --- EN-TÊTE --- */
+    header {
+        margin-bottom: 40px;
+    }
+
+    header h1 {
+        font-size: 2.2rem;
+        font-weight: 500;
+        color: #0b3a2d;
+        letter-spacing: 1px;
+    }
+
+    header p {
+        margin-top: 8px;
+        max-width: 600px;
+        color: #356b5a;
+        font-size: 1rem;
     }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<header>
+    <h1>Interface Éco-Technologique</h1>
+    <p>Système modulaire inspiré d’un futur calme, organique et informé.</p>
+</header>
 
-    <!-- CASE 1 -->
-    <div class="tile">
-        <h3>Module Alpha</h3>
-        <p>Description textuelle libre. Contenu modifiable uniquement dans le code.</p>
-        <a href="https://example.com">Ouvrir</a>
+<section class="dashboard">
+
+    <div class="panel">
+        <h2>Climat local</h2>
+        <p>Analyse qualitative des variations environnementales et biologiques perçues.</p>
+        <a href="#">Accéder aux données</a>
     </div>
 
-    <!-- CASE 2 -->
-    <div class="tile">
-        <h3>Module Beta</h3>
-        <p>Bloc d’information statique. Aucun réglage utilisateur.</p>
-        <a href="https://example.com">Accéder</a>
+    <div class="panel">
+        <h2>État du système</h2>
+        <p>Indicateurs synthétiques de stabilité, flux et régénération.</p>
+        <a href="#">Ouvrir le module</a>
     </div>
 
-    <!-- CASE 3 -->
-    <div class="tile">
-        <h3>Données internes</h3>
-        <p>Zone prévue pour affichage descriptif ou référentiel.</p>
-        <a href="https://example.com">Voir plus</a>
+    <div class="panel">
+        <h2>Journal écologique</h2>
+        <p>Entrées quotidiennes liées à l’environnement et aux cycles naturels.</p>
+        <a href="#">Consulter</a>
     </div>
 
-    <!-- AJOUTER D'AUTRES CASES ICI -->
-    <!-- Copier / coller un bloc .tile -->
+    <div class="panel">
+        <h2>Réseau vivant</h2>
+        <p>Cartographie abstraite des interactions entre éléments du système.</p>
+        <a href="#">Explorer</a>
+    </div>
 
-</div>
+</section>
 
 </body>
 </html>
