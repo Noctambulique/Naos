@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Frutiger Aero – Interface Dense</title>
+<title>Frutiger Aero Interface</title>
 
 <style>
 html, body {
@@ -10,42 +10,47 @@ html, body {
     padding: 0;
     height: 100%;
     font-family: "Segoe UI", Tahoma, sans-serif;
-    background: linear-gradient(#9fd3ff, #c6f2b5);
+    background:
+        linear-gradient(to bottom, #7cc7ff 0%, #bfe7c2 55%, #e6f5ec 100%);
+    overflow-x: hidden;
 }
 
-/* GRILLE DE FOND */
+/* LÉGER MOTIF DE GRILLE DISCRET */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     background-image:
-        linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px);
-    background-size: 60px 60px;
+        linear-gradient(rgba(255,255,255,0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.18) 1px, transparent 1px);
+    background-size: 64px 64px;
     pointer-events: none;
 }
 
-/* CONTENEUR PRINCIPAL */
+/* CONTAINER PRINCIPAL */
 .interface {
     width: 960px;
-    margin: 70px auto;
-    padding: 40px;
-    border-radius: 28px;
-    background: linear-gradient(145deg, #e2f4ff, #b7e4c7);
+    margin: 80px auto;
+    padding: 42px;
+    border-radius: 24px;
+    background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.85),
+        rgba(220,240,255,0.75)
+    );
     box-shadow:
-        inset 0 0 20px rgba(255,255,255,0.9),
-        inset 0 -10px 20px rgba(0,0,0,0.08),
-        0 30px 60px rgba(0,0,0,0.25);
-    border: 2px solid rgba(255,255,255,0.7);
+        inset 0 1px 0 rgba(255,255,255,0.9),
+        0 20px 50px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.8);
 }
 
 /* TITRE */
 .title {
     font-size: 28px;
     letter-spacing: 2px;
-    color: #1b4f72;
-    text-shadow: 0 1px 0 #fff;
-    margin-bottom: 30px;
+    color: #2a5f8a;
+    margin-bottom: 28px;
+    text-shadow: 0 1px 0 #ffffff;
 }
 
 /* GRILLE */
@@ -55,60 +60,34 @@ body::before {
     gap: 22px;
 }
 
-/* MODULE */
+/* CASES */
 .panel {
-    position: relative;
-    padding: 22px;
-    border-radius: 22px;
-    background:
-        linear-gradient(160deg, #f5fdff, #9dd9ff);
+    background: linear-gradient(
+        180deg,
+        #f7fcff 0%,
+        #cfe8f8 100%
+    );
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(160,200,230,0.8);
     box-shadow:
-        inset 0 0 12px rgba(255,255,255,0.9),
-        inset 0 -8px 18px rgba(0,0,0,0.12),
-        0 14px 28px rgba(0,0,0,0.25);
-    color: #0b2e3d;
+        inset 0 1px 0 rgba(255,255,255,0.9),
+        0 6px 18px rgba(0,0,0,0.18);
+    color: #123a52;
 }
 
-/* BULLE PRINCIPALE */
-.panel::before {
-    content: "";
-    position: absolute;
-    width: 38px;
-    height: 38px;
-    top: 12px;
-    right: 14px;
-    border-radius: 50%;
-    background:
-        radial-gradient(circle at 30% 30%, #ffffff, #66c7ff 70%);
-    box-shadow:
-        inset -4px -4px 8px rgba(255,255,255,0.6),
-        inset 4px 4px 10px rgba(0,80,120,0.4),
-        0 0 12px rgba(80,180,255,0.9);
-}
-
-/* PETITES BULLES DÉCORATIVES */
-.panel::after {
-    content: "";
-    position: absolute;
-    bottom: 14px;
-    left: 18px;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #ffffff, #79cfff);
-    box-shadow: 18px -10px 0 rgba(140,210,255,0.8);
-}
-
-/* TEXTE */
+/* TITRES DE BLOCS */
 .panel h3 {
     margin: 0 0 10px;
-    font-size: 16px;
+    font-size: 15px;
     letter-spacing: 1px;
 }
 
+/* TEXTE */
 .panel p {
+    margin: 0;
     font-size: 13.5px;
-    line-height: 1.55;
+    line-height: 1.5;
 }
 </style>
 </head>
@@ -122,32 +101,32 @@ body::before {
     <div class="grid">
         <div class="panel">
             <h3>Module 01</h3>
-            <p>Structure dense et lisible, pensée comme un panneau physique intégré à un environnement naturel.</p>
+            <p>Structure claire inspirée des interfaces Windows Vista / 7.</p>
         </div>
 
         <div class="panel">
             <h3>Module 02</h3>
-            <p>Chaque élément semble moulé dans une matière vitreuse et lumineuse.</p>
+            <p>Esthétique lumineuse, naturelle, sans effets décoratifs inutiles.</p>
         </div>
 
         <div class="panel">
             <h3>Module 03</h3>
-            <p>Le style privilégie la présence, le poids visuel et la lisibilité.</p>
+            <p>Lisibilité maximale, équilibre entre technologie et calme visuel.</p>
         </div>
 
         <div class="panel">
             <h3>Module 04</h3>
-            <p>Inspiré des interfaces Windows Vista / 7 idéalisées.</p>
+            <p>Chaque bloc représente une unité fonctionnelle autonome.</p>
         </div>
 
         <div class="panel">
             <h3>Module 05</h3>
-            <p>Les bulles ne sont plus décoratives mais structurelles.</p>
+            <p>Style inspiré des interfaces systèmes des années 2006–2012.</p>
         </div>
 
         <div class="panel">
             <h3>Module 06</h3>
-            <p>Conçu pour accueillir des données, pas juste une ambiance.</p>
+            <p>Base idéale pour un tableau d’information ou journal visuel.</p>
         </div>
     </div>
 
