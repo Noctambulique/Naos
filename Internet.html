@@ -10,38 +10,54 @@ html, body {
     padding: 0;
     height: 100%;
     font-family: "Segoe UI", Tahoma, sans-serif;
-    background:
-        linear-gradient(to bottom, #7cc7ff 0%, #bfe7c2 55%, #e6f5ec 100%);
-    overflow-x: hidden;
+
+    /* IMAGE DE FOND */
+    background-image: url("D hiver/1742978370834.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
-/* LÉGER MOTIF DE GRILLE DISCRET */
+/* VOILE ATMOSPHÉRIQUE FRUTIGER */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
+    background: linear-gradient(
+        rgba(255,255,255,0.30),
+        rgba(200,230,255,0.35)
+    );
+    pointer-events: none;
+}
+
+/* GRILLE LÉGÈRE */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
     background-image:
-        linear-gradient(rgba(255,255,255,0.18) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.18) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px);
     background-size: 64px 64px;
     pointer-events: none;
 }
 
-/* CONTAINER PRINCIPAL */
+/* CONTENEUR PRINCIPAL */
 .interface {
     width: 960px;
     margin: 80px auto;
     padding: 42px;
-    border-radius: 24px;
+    border-radius: 26px;
     background: linear-gradient(
         180deg,
         rgba(255,255,255,0.85),
-        rgba(220,240,255,0.75)
+        rgba(215,235,255,0.75)
     );
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.9),
-        0 20px 50px rgba(0,0,0,0.25);
-    border: 1px solid rgba(255,255,255,0.8);
+        0 25px 60px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.7);
 }
 
 /* TITRE */
@@ -60,7 +76,7 @@ body::before {
     gap: 22px;
 }
 
-/* CASES */
+/* BLOCS */
 .panel {
     background: linear-gradient(
         180deg,
@@ -76,14 +92,13 @@ body::before {
     color: #123a52;
 }
 
-/* TITRES DE BLOCS */
+/* TEXTE */
 .panel h3 {
     margin: 0 0 10px;
     font-size: 15px;
     letter-spacing: 1px;
 }
 
-/* TEXTE */
 .panel p {
     margin: 0;
     font-size: 13.5px;
@@ -106,28 +121,39 @@ body::before {
 
         <div class="panel">
             <h3>Module 02</h3>
-            <p>Esthétique lumineuse, naturelle, sans effets décoratifs inutiles.</p>
+            <p>Fond paysager réel combiné à une interface nette et lisible.</p>
         </div>
 
         <div class="panel">
             <h3>Module 03</h3>
-            <p>Lisibilité maximale, équilibre entre technologie et calme visuel.</p>
+            <p>Équilibre entre esthétique naturelle et lisibilité fonctionnelle.</p>
         </div>
 
         <div class="panel">
             <h3>Module 04</h3>
-            <p>Chaque bloc représente une unité fonctionnelle autonome.</p>
+            <p>Chaque bloc agit comme un panneau système autonome.</p>
         </div>
 
         <div class="panel">
             <h3>Module 05</h3>
-            <p>Style inspiré des interfaces systèmes des années 2006–2012.</p>
+            <p>Interface calme, lumineuse, sans surcharge visuelle.</p>
         </div>
 
         <div class="panel">
             <h3>Module 06</h3>
-            <p>Base idéale pour un tableau d’information ou journal visuel.</p>
+            <p>Base idéale pour journal, dashboard ou cartographie personnelle.</p>
         </div>
+
+                <div class="panel">
+            <h3>Module 07</h3>
+            <p>Interface calme, lumineuse, sans surcharge visuelle.</p>
+        </div>
+
+        <div class="panel">
+            <h3>Module 08</h3>
+            <p>Base idéale pour journal, dashboard ou cartographie personnelle.</p>
+        </div>
+        
     </div>
 
 </div>
