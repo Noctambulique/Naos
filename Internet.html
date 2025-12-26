@@ -2,111 +2,94 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Interface Aero</title>
+<title>Interface Windows Classique</title>
 
 <style>
     body {
+        background-color: #c0c0c0;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
         margin: 0;
-        padding: 40px;
-        font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-        background: linear-gradient(180deg, #cfe9ff 0%, #e9f4ff 40%, #ffffff 100%);
-        background-attachment: fixed;
-        color: #1a1a1a;
+        padding: 30px;
     }
 
-    /* Conteneur général */
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 18px;
-        max-width: 1200px;
+    .window {
+        background: #d4d0c8;
+        border: 2px solid #000;
+        box-shadow: inset -2px -2px 0 #808080,
+                    inset 2px 2px 0 #ffffff;
+        padding: 16px;
+        width: 900px;
         margin: auto;
     }
 
-    /* Case style Windows 7 */
-    .tile {
-        background: linear-gradient(
-            180deg,
-            rgba(255,255,255,0.75),
-            rgba(230,240,255,0.9)
-        );
-        border: 1px solid rgba(120,160,200,0.6);
-        border-radius: 6px;
-        padding: 14px;
+    .titlebar {
+        background: linear-gradient(to right, #0a246a, #3a6ea5);
+        color: white;
+        font-weight: bold;
+        padding: 6px 10px;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 10px;
+    }
+
+    .box {
+        background: #e4e4e4;
+        border: 2px solid #000;
         box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.7),
-            0 4px 10px rgba(0,0,0,0.15);
-        backdrop-filter: blur(3px);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .tile:hover {
-        transform: translateY(-2px);
-        box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.9),
-            0 6px 14px rgba(0,0,0,0.25);
-    }
-
-    .tile h3 {
-        margin: 0 0 6px 0;
-        font-size: 15px;
-        font-weight: 600;
-        color: #1b3f6b;
-    }
-
-    .tile p {
+            inset -2px -2px 0 #7f7f7f,
+            inset 2px 2px 0 #ffffff;
+        padding: 10px;
         font-size: 13px;
-        line-height: 1.4;
-        margin: 0 0 8px 0;
-        color: #2a2a2a;
+        line-height: 1.3;
     }
 
-    .tile a {
-        font-size: 12px;
-        color: #0a4fa3;
-        text-decoration: none;
-    }
-
-    .tile a:hover {
+    .box a {
+        color: #0000ee;
         text-decoration: underline;
+    }
+
+    .box a:visited {
+        color: #551a8b;
     }
 </style>
 </head>
 
 <body>
 
-<div class="grid">
+<div class="window">
+    <div class="titlebar">Dossier — Informations</div>
 
-    <!-- CASE 1 -->
-    <div class="tile">
-        <h3>Journal personnel</h3>
-        <p>Notes internes et fragments quotidiens.</p>
-        <a href="journal.html">Ouvrir</a>
+    <div class="grid">
+
+        <!-- CASE 1 -->
+        <div class="box">
+            Texte libre ici.<br>
+            <a href="https://example.com">Lien externe</a>
+        </div>
+
+        <!-- CASE 2 -->
+        <div class="box">
+            Autre contenu.<br>
+            Tu peux écrire ce que tu veux.
+        </div>
+
+        <!-- CASE 3 -->
+        <div class="box">
+            Notes personnelles.<br>
+            <a href="#">Lien interne</a>
+        </div>
+
+        <!-- AJOUTE AUTANT DE BLOCS QUE TU VEUX -->
+        <div class="box">
+            Nouvelle case ajoutée dans le code.
+        </div>
+
     </div>
-
-    <!-- CASE 2 -->
-    <div class="tile">
-        <h3>Archives mentales</h3>
-        <p>Cartographie des idées et états internes.</p>
-        <a href="archives.html">Accéder</a>
-    </div>
-
-    <!-- CASE 3 -->
-    <div class="tile">
-        <h3>Données</h3>
-        <p>Enregistrements, listes, structures.</p>
-        <a href="donnees.html">Voir</a>
-    </div>
-
-    <!-- AJOUTER D'AUTRES CASES ICI -->
-    <!--
-    <div class="tile">
-        <h3>Titre</h3>
-        <p>Description</p>
-        <a href="lien.html">Lien</a>
-    </div>
-    -->
-
 </div>
 
 </body>
