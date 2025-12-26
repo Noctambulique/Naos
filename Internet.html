@@ -1,38 +1,36 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Grille Aero</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grille Aero+</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --bg1:#eaf2fb;
-  --bg2:#cfdff1;
+  --bg1:#e8f1fb;
+  --bg2:#cbdcf2;
 
-  --glass: rgba(255,255,255,0.55);
-  --glass-strong: rgba(255,255,255,0.72);
+  --glass: rgba(255,255,255,.55);
+  --glass-soft: rgba(255,255,255,.35);
+  --glass-strong: rgba(255,255,255,.75);
 
-  --border: rgba(255,255,255,0.65);
-  --border-dark: rgba(120,160,210,0.45);
+  --border: rgba(140,180,230,.45);
+  --highlight: rgba(255,255,255,.9);
 
-  --highlight: rgba(255,255,255,0.85);
-  --shadow: 0 12px 30px rgba(0,60,120,0.25);
+  --shadow-strong: 0 22px 40px rgba(0,60,120,.35);
+  --shadow-soft: 0 10px 22px rgba(0,60,120,.22);
 
-  --box-size:140px;
-  --gap:14px;
-  --radius:14px;
-
+  --radius:16px;
   --text:#0b2a44;
-  --muted:#4c6a88;
+  --muted:#5f7c99;
 }
 
 html{
   height:100%;
   background:
-    radial-gradient(circle at top, #f6fbff, transparent 60%),
+    radial-gradient(circle at top, #f7fbff 0%, transparent 65%),
     linear-gradient(180deg, var(--bg1), var(--bg2));
 }
 
@@ -41,186 +39,131 @@ html::before{
   position:fixed;
   inset:0;
   background:url("https://uploads-ssl.webflow.com/5fbd9e08b4374f52b8cf23a0/6032e8dce1e52e2b63d72692_noise.png");
-  opacity:.06;
+  opacity:.05;
   pointer-events:none;
 }
 
 body{
   margin:0;
-  padding:28px;
+  padding:20px 24px;
   font-family:"Inter", system-ui, sans-serif;
   color:var(--text);
-  height:100%;
 }
+
+/* ───────────── GRILLES ───────────── */
 
 .grid-wrap{
-  display:flex;
-  justify-content:center;
+  max-width:1200px;
+  margin:auto;
 }
 
-.grid{
+.grid-main{
   display:grid;
-  grid-template-columns:repeat(var(--cols),var(--box-size));
-  gap:var(--gap);
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:18px;
+  margin-bottom:26px;
 }
+
+.grid-secondary{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
+  gap:12px;
+  opacity:.92;
+}
+
+/* ───────────── CASES PRINCIPALES ───────────── */
 
 .box{
-  width:var(--box-size);
-  height:var(--box-size);
   position:relative;
+  height:140px;
   border-radius:var(--radius);
-
   background:
-    linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.35)),
+    linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.35)),
     var(--glass);
-
   backdrop-filter: blur(14px) saturate(1.4);
   border:1px solid var(--border);
   box-shadow:
     inset 0 1px 0 var(--highlight),
-    inset 0 -1px 0 rgba(255,255,255,.25),
-    var(--shadow);
-
+    var(--shadow-strong);
   display:flex;
   align-items:center;
   justify-content:center;
+  text-align:center;
   cursor:pointer;
-  user-select:none;
-
-  transition:
-    transform .18s ease,
-    box-shadow .18s ease,
-    background .2s;
-
-  will-change:transform,box-shadow;
-  contain:layout paint;
-  transform:translateZ(0);
+  transition:.25s ease;
 }
 
-.box::before{
+.box::after{
   content:"";
   position:absolute;
   inset:2px;
   border-radius:inherit;
-  background:linear-gradient(
-    180deg,
-    rgba(255,255,255,.55),
-    rgba(255,255,255,0)
-  );
+  background:linear-gradient(135deg,rgba(255,255,255,.35),transparent 60%);
   pointer-events:none;
 }
 
 .box:hover{
-  transform:translateY(-3px);
-  box-shadow:
-    inset 0 1px 0 #fff,
-    0 18px 38px rgba(0,80,160,.35);
-}
-
-.box:active{
-  transform:translateY(1px);
+  transform:translateY(-4px);
+  box-shadow:0 25px 45px rgba(0,80,160,.45);
 }
 
 .content{
-  text-align:center;
-  font-size:22px;
+  font-size:20px;
   font-weight:500;
-  line-height:1.2;
-  padding:10px;
-  outline:none;
-  color:var(--text);
+  padding:12px;
 }
 
-.placeholder{
-  color:var(--muted);
-  font-style:italic;
-}
+/* ───────────── CASES SECONDAIRES ───────────── */
 
-.editing{
+.small{
+  height:90px;
+  border-radius:12px;
   background:
-    linear-gradient(180deg,#ffffff,#dfeeff),
-    var(--glass-strong);
-  border-color:var(--border-dark);
+    linear-gradient(180deg,rgba(255,255,255,.65),rgba(255,255,255,.25));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.7),
+    0 8px 18px rgba(0,60,120,.25);
+  font-size:15px;
 }
 
-@media(max-width:640px){
-  :root{ --box-size:100px; --cols:3; }
-  .content{ font-size:14px; }
+.small .content{
+  font-size:15px;
+  color:var(--muted);
 }
+
+/* Interaction */
+.box:active{ transform:translateY(1px); }
 </style>
 </head>
 
 <body>
+
 <div class="grid-wrap">
-  <div id="grid" class="grid"></div>
+
+  <!-- PRINCIPAL -->
+  <div class="grid-main">
+    <div class="box" onclick="openSite('https://mail.google.com')"><div class="content">Mail</div></div>
+    <div class="box" onclick="openSite('https://calendar.google.com')"><div class="content">Calendrier</div></div>
+    <div class="box" onclick="openSite('https://chatgpt.com')"><div class="content">ChatGPT</div></div>
+    <div class="box" onclick="openSite('https://www.reddit.com')"><div class="content">Reddit</div></div>
+    <div class="box" onclick="openSite('https://github.com')"><div class="content">GitHub</div></div>
+  </div>
+
+  <!-- SECONDAIRE -->
+  <div class="grid-secondary">
+    <div class="box small" onclick="openSite('https://pdf24.org')"><div class="content">PDF24</div></div>
+    <div class="box small" onclick="openSite('https://framapad.org')"><div class="content">Framapad</div></div>
+    <div class="box small" onclick="openSite('https://lelscans.net')"><div class="content">Scans</div></div>
+    <div class="box small" onclick="openSite('https://drive.google.com')"><div class="content">Drive</div></div>
+  </div>
+
 </div>
 
 <script>
-const BOXES = [
-  { id:'b1', title:'Calendrier', url:'https://calendar.google.com' },
-  { id:'b2', title:'Mail', url:'https://mail.google.com' },
-  { id:'b3', title:'Reddit', url:'https://www.reddit.com' },
-  { id:'b4', title:'YouTube', url:'https://www.youtube.com' },
-  { id:'b5', title:'Framapad', url:'https://framapad.org' },
-  { id:'b6', title:'PDF24', url:'https://tools.pdf24.org' },
-  { id:'b7', title:'GitHub', url:'https://github.com' },
-  { id:'b8', title:'Scans', url:'https://lelscans.net' },
-  { id:'b9', title:'ChatGPT', url:'https://chatgpt.com' }
-];
-
-const STORAGE_KEY='aero-grid:v2';
-const cols=Math.ceil(Math.sqrt(BOXES.length));
-document.documentElement.style.setProperty('--cols',cols);
-
-const state=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
-const grid=document.getElementById('grid');
-
-BOXES.forEach(b=>{
-  state[b.id]=state[b.id]||{title:b.title,url:b.url};
-
-  const box=document.createElement('div');
-  box.className='box';
-  box.dataset.id=b.id;
-  box.dataset.url=state[b.id].url;
-
-  const content=document.createElement('div');
-  content.className='content';
-  content.tabIndex=0;
-  content.innerText=state[b.id].title;
-
-  box.appendChild(content);
-  grid.appendChild(box);
-
-  box.onclick=()=>{
-    if(!box.classList.contains('editing'))
-      window.open(box.dataset.url,'_blank');
-  };
-
-  box.ondblclick=()=>edit(box);
-
-  content.onkeydown=e=>{
-    if(e.key==='Enter'){ e.preventDefault(); save(box); }
-  };
-
-  content.onblur=()=>save(box);
-});
-
-function edit(box){
-  box.classList.add('editing');
-  const c=box.querySelector('.content');
-  c.contentEditable=true;
-  c.focus();
-}
-
-function save(box){
-  if(!box.classList.contains('editing'))return;
-  const c=box.querySelector('.content');
-  c.contentEditable=false;
-  box.classList.remove('editing');
-
-  state[box.dataset.id].title=c.innerText.trim();
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+function openSite(url){
+  window.open(url,'_blank');
 }
 </script>
+
 </body>
 </html>
