@@ -2,129 +2,95 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Windows 6 — Nature Interface</title>
+<title>Interface Frutiger – Style Windows 7</title>
 
 <style>
-    /* ===== FOND GLOBAL ===== */
     body {
         margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-        background: linear-gradient(
-            180deg,
-            #cfe9f3 0%,
-            #dff5e3 40%,
-            #bfe3c6 100%
-        );
-        background-attachment: fixed;
-        color: #1b2a1f;
+        padding: 40px;
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        background: linear-gradient(#f2f5f7, #dfe4e8);
+        color: #1e1e1e;
     }
 
-    /* LÉGER FLOU LUMINEUX AMBIANT */
-    body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background: radial-gradient(circle at top, rgba(255,255,255,0.5), transparent 70%);
-        pointer-events: none;
-    }
-
-    /* CONTENEUR PRINCIPAL */
-    .desktop {
+    .container {
         max-width: 1100px;
-        margin: 80px auto;
+        margin: auto;
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 22px;
-        padding: 20px;
+        gap: 18px;
     }
 
-    /* CASES */
     .tile {
-        background: linear-gradient(
-            180deg,
-            rgba(255,255,255,0.75),
-            rgba(220,240,225,0.85)
-        );
-        border-radius: 10px;
-        border: 1px solid rgba(120,160,130,0.35);
-        box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.6),
-            0 6px 16px rgba(0,0,0,0.12);
+        background: linear-gradient(#ffffff, #e9edf1);
+        border: 1px solid #b9c2cc;
+        box-shadow: inset 0 1px 0 #ffffff;
         padding: 16px;
-        min-height: 120px;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        min-height: 110px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: background 0.2s ease;
     }
 
     .tile:hover {
-        transform: translateY(-3px);
-        box-shadow:
-            0 10px 22px rgba(0,0,0,0.18),
-            inset 0 1px 0 rgba(255,255,255,0.8);
+        background: linear-gradient(#f7f9fb, #e2e7ec);
     }
 
     .tile h3 {
-        margin: 0 0 6px 0;
-        font-size: 16px;
+        margin: 0 0 8px 0;
+        font-size: 15px;
         font-weight: 600;
-        color: #1e3a2a;
+        color: #2a2a2a;
     }
 
     .tile p {
         font-size: 13px;
         line-height: 1.4;
-        color: #2f4a3a;
+        color: #3b3b3b;
+        margin: 0;
     }
 
     .tile a {
-        display: inline-block;
-        margin-top: 8px;
+        margin-top: 10px;
         font-size: 12px;
-        color: #1b5f3a;
+        color: #1a5fb4;
         text-decoration: none;
-        border-bottom: 1px solid rgba(27,95,58,0.4);
     }
 
     .tile a:hover {
-        color: #0f3b24;
-        border-bottom-color: #0f3b24;
+        text-decoration: underline;
     }
 </style>
 </head>
 
 <body>
 
-<div class="desktop">
+<div class="container">
 
     <!-- CASE 1 -->
     <div class="tile">
-        <h3>Journal interne</h3>
-        <p>Notes quotidiennes sur l’état mental, la perception et l’énergie cognitive.</p>
-        <a href="#">Ouvrir</a>
+        <h3>Module Alpha</h3>
+        <p>Description textuelle libre. Contenu modifiable uniquement dans le code.</p>
+        <a href="https://example.com">Ouvrir</a>
     </div>
 
     <!-- CASE 2 -->
     <div class="tile">
-        <h3>Cartographie émotionnelle</h3>
-        <p>Fragments d’observations émotionnelles classées par intensité.</p>
-        <a href="#">Explorer</a>
+        <h3>Module Beta</h3>
+        <p>Bloc d’information statique. Aucun réglage utilisateur.</p>
+        <a href="https://example.com">Accéder</a>
     </div>
 
     <!-- CASE 3 -->
     <div class="tile">
-        <h3>Archive biologique</h3>
-        <p>Données lentes, cycles, rythmes, stabilité corporelle.</p>
-        <a href="#">Accéder</a>
+        <h3>Données internes</h3>
+        <p>Zone prévue pour affichage descriptif ou référentiel.</p>
+        <a href="https://example.com">Voir plus</a>
     </div>
 
-    <!-- AJOUTER D’AUTRES CASES ICI -->
-    <!--
-    <div class="tile">
-        <h3>Titre</h3>
-        <p>Texte descriptif</p>
-        <a href="#">Lien</a>
-    </div>
-    -->
+    <!-- AJOUTER D'AUTRES CASES ICI -->
+    <!-- Copier / coller un bloc .tile -->
 
 </div>
 
