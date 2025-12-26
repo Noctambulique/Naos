@@ -3,35 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Grille Aero+</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Aero Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
+/* ─────────────────────────── BASE ─────────────────────────── */
+
 :root{
-  --bg1:#e8f1fb;
-  --bg2:#cbdcf2;
+  --sky1:#eaf4ff;
+  --sky2:#bcd6f3;
 
-  --glass: rgba(255,255,255,.55);
-  --glass-soft: rgba(255,255,255,.35);
-  --glass-strong: rgba(255,255,255,.75);
+  --glass-main: rgba(255,255,255,0.72);
+  --glass-soft: rgba(255,255,255,0.45);
+  --glass-hard: rgba(255,255,255,0.9);
 
-  --border: rgba(140,180,230,.45);
-  --highlight: rgba(255,255,255,.9);
+  --border-light: rgba(255,255,255,0.9);
+  --border-dark: rgba(80,120,170,0.35);
 
-  --shadow-strong: 0 22px 40px rgba(0,60,120,.35);
-  --shadow-soft: 0 10px 22px rgba(0,60,120,.22);
+  --shadow-deep: 0 30px 60px rgba(0,40,90,0.35);
+  --shadow-soft: 0 12px 25px rgba(0,60,120,0.25);
 
-  --radius:16px;
-  --text:#0b2a44;
-  --muted:#5f7c99;
+  --text-main:#0c2a44;
+  --text-soft:#476b8d;
 }
 
 html{
   height:100%;
   background:
-    radial-gradient(circle at top, #f7fbff 0%, transparent 65%),
-    linear-gradient(180deg, var(--bg1), var(--bg2));
+    radial-gradient(circle at top, #f7fbff 0%, transparent 60%),
+    linear-gradient(180deg,var(--sky1),var(--sky2));
 }
 
 html::before{
@@ -39,130 +41,140 @@ html::before{
   position:fixed;
   inset:0;
   background:url("https://uploads-ssl.webflow.com/5fbd9e08b4374f52b8cf23a0/6032e8dce1e52e2b63d72692_noise.png");
-  opacity:.05;
+  opacity:.06;
   pointer-events:none;
 }
 
 body{
   margin:0;
-  padding:20px 24px;
-  font-family:"Inter", system-ui, sans-serif;
-  color:var(--text);
+  padding:28px;
+  font-family:"Segoe UI", system-ui, sans-serif;
+  color:var(--text-main);
 }
 
-/* ───────────── GRILLES ───────────── */
+/* ───────────── STRUCTURE ───────────── */
 
-.grid-wrap{
-  max-width:1200px;
+.dashboard{
+  max-width:1250px;
   margin:auto;
-}
-
-.grid-main{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-  gap:18px;
-  margin-bottom:26px;
-}
-
-.grid-secondary{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
-  gap:12px;
-  opacity:.92;
-}
-
-/* ───────────── CASES PRINCIPALES ───────────── */
-
-.box{
-  position:relative;
-  height:140px;
-  border-radius:var(--radius);
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.35)),
-    var(--glass);
-  backdrop-filter: blur(14px) saturate(1.4);
-  border:1px solid var(--border);
-  box-shadow:
-    inset 0 1px 0 var(--highlight),
-    var(--shadow-strong);
   display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  cursor:pointer;
-  transition:.25s ease;
+  flex-direction:column;
+  gap:34px;
 }
 
-.box::after{
+/* ───────────── BLOCS PRINCIPAUX ───────────── */
+
+.main-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:22px;
+}
+
+.tile{
+  position:relative;
+  height:150px;
+  border-radius:20px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.45)),
+    var(--glass-main);
+  backdrop-filter: blur(18px) saturate(1.4);
+  border:1px solid var(--border-dark);
+  box-shadow:
+    inset 0 1px 0 var(--border-light),
+    var(--shadow-deep);
+  cursor:pointer;
+  transition: all .28s ease;
+  overflow:hidden;
+}
+
+.tile::before{
   content:"";
   position:absolute;
-  inset:2px;
-  border-radius:inherit;
-  background:linear-gradient(135deg,rgba(255,255,255,.35),transparent 60%);
+  inset:3px;
+  border-radius:16px;
+  background:
+    linear-gradient(135deg,
+      rgba(255,255,255,.55),
+      rgba(255,255,255,0) 55%);
   pointer-events:none;
 }
 
-.box:hover{
-  transform:translateY(-4px);
-  box-shadow:0 25px 45px rgba(0,80,160,.45);
+.tile:hover{
+  transform:translateY(-6px);
+  box-shadow:0 40px 70px rgba(0,60,120,.45);
 }
 
-.content{
+.tile:active{
+  transform:translateY(1px);
+}
+
+/* Texte */
+.tile span{
+  position:absolute;
+  bottom:18px;
+  left:18px;
+  right:18px;
   font-size:20px;
   font-weight:500;
-  padding:12px;
+  text-shadow:0 1px 0 #fff;
 }
 
-/* ───────────── CASES SECONDAIRES ───────────── */
+/* ───────────── SECONDAIRE ───────────── */
+
+.secondary{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+  gap:14px;
+}
 
 .small{
   height:90px;
-  border-radius:12px;
+  border-radius:14px;
   background:
-    linear-gradient(180deg,rgba(255,255,255,.65),rgba(255,255,255,.25));
+    linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.3));
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.7),
-    0 8px 18px rgba(0,60,120,.25);
-  font-size:15px;
+    inset 0 1px 0 rgba(255,255,255,.8),
+    0 10px 22px rgba(0,60,120,.22);
+  backdrop-filter: blur(12px);
+  transition:.2s;
 }
 
-.small .content{
-  font-size:15px;
-  color:var(--muted);
+.small:hover{
+  transform:translateY(-3px);
 }
 
-/* Interaction */
-.box:active{ transform:translateY(1px); }
+.small span{
+  display:block;
+  padding:14px;
+  font-size:14px;
+  color:var(--text-soft);
+}
 </style>
 </head>
 
 <body>
 
-<div class="grid-wrap">
+<div class="dashboard">
 
-  <!-- PRINCIPAL -->
-  <div class="grid-main">
-    <div class="box" onclick="openSite('https://mail.google.com')"><div class="content">Mail</div></div>
-    <div class="box" onclick="openSite('https://calendar.google.com')"><div class="content">Calendrier</div></div>
-    <div class="box" onclick="openSite('https://chatgpt.com')"><div class="content">ChatGPT</div></div>
-    <div class="box" onclick="openSite('https://www.reddit.com')"><div class="content">Reddit</div></div>
-    <div class="box" onclick="openSite('https://github.com')"><div class="content">GitHub</div></div>
+  <div class="main-grid">
+    <div class="tile" onclick="open('https://mail.google.com')"><span>Mail</span></div>
+    <div class="tile" onclick="open('https://calendar.google.com')"><span>Calendrier</span></div>
+    <div class="tile" onclick="open('https://chatgpt.com')"><span>ChatGPT</span></div>
+    <div class="tile" onclick="open('https://github.com')"><span>GitHub</span></div>
+    <div class="tile" onclick="open('https://www.reddit.com')"><span>Reddit</span></div>
   </div>
 
-  <!-- SECONDAIRE -->
-  <div class="grid-secondary">
-    <div class="box small" onclick="openSite('https://pdf24.org')"><div class="content">PDF24</div></div>
-    <div class="box small" onclick="openSite('https://framapad.org')"><div class="content">Framapad</div></div>
-    <div class="box small" onclick="openSite('https://lelscans.net')"><div class="content">Scans</div></div>
-    <div class="box small" onclick="openSite('https://drive.google.com')"><div class="content">Drive</div></div>
+  <div class="secondary">
+    <div class="small" onclick="open('https://pdf24.org')"><span>PDF24</span></div>
+    <div class="small" onclick="open('https://framapad.org')"><span>Framapad</span></div>
+    <div class="small" onclick="open('https://drive.google.com')"><span>Drive</span></div>
+    <div class="small" onclick="open('https://lelscans.net')"><span>Scans</span></div>
   </div>
 
 </div>
 
 <script>
-function openSite(url){
-  window.open(url,'_blank');
-}
+function open(url){ window.open(url,'_blank'); }
 </script>
 
 </body>
