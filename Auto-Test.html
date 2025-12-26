@@ -1,118 +1,103 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>État émotionnel</title>
+<meta charset="UTF-8">
+<title>État interne</title>
 
-    <style>
-        body {
-            font-family: serif;
-            background: #ffffff;
-            color: #111;
-            max-width: 600px;
-            margin: 60px auto;
-            line-height: 1.6;
-        }
+<style>
+    body {
+        font-family: serif;
+        background: #ffffff;
+        color: #111;
+        max-width: 700px;
+        margin: 80px auto;
+        text-align: center;
+    }
 
-        h1 {
-            font-weight: normal;
-            font-size: 22px;
-            margin-bottom: 30px;
-        }
+    h1 {
+        font-weight: normal;
+        margin-bottom: 40px;
+    }
 
-        .item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 14px;
-            cursor: pointer;
-        }
+    .bar-container {
+        width: 100%;
+        height: 12px;
+        background: #eee;
+        position: relative;
+        margin: 40px 0;
+    }
 
-        input[type="checkbox"] {
-            margin-right: 12px;
-            transform: scale(1.1);
-        }
+    .bar {
+        height: 100%;
+        width: 50%;
+        background: #000;
+        transition: width 0.4s ease;
+    }
 
-        .label {
-            font-size: 15px;
-        }
+    .buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 30px;
+    }
 
-        .bar-container {
-            margin-top: 40px;
-            height: 8px;
-            background: #eee;
-            position: relative;
-        }
+    button {
+        background: none;
+        border: 1px solid #000;
+        padding: 10px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
 
-        .bar {
-            height: 100%;
-            width: 0%;
-            background: #000;
-            transition: width 0.4s ease;
-        }
+    button:hover {
+        background: #000;
+        color: #fff;
+    }
 
-        .value {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #444;
-        }
-    </style>
+    .label {
+        margin-top: 15px;
+        font-size: 14px;
+        color: #444;
+    }
+</style>
 </head>
 
 <body>
 
-<h1>État émotionnel</h1>
-
-<div id="items"></div>
+<h1>État intérieur</h1>
 
 <div class="bar-container">
-    <div class="bar" id="bar"></div>
+    <div id="bar" class="bar"></div>
 </div>
 
-<div class="value" id="valueText">Niveau : 0%</div>
+<div class="label" id="value">Niveau : 50%</div>
+
+<div class="buttons">
+    <!-- Positifs -->
+    <button onclick="changeState(8)">Bon sommeil</button>
+    <button onclick="changeState(6)">Clarté mentale</button>
+    <button onclick="changeState(5)">Mouvement physique</button>
+    <button onclick="changeState(4)">Moment de calme</button>
+
+    <!-- Négatifs -->
+    <button onclick="changeState(-7)">Fatigue</button>
+    <button onclick="changeState(-6)">Surcharge mentale</button>
+    <button onclick="changeState(-5)">Manque de sens</button>
+    <button onclick="changeState(-4)">Tension corporelle</button>
+</div>
 
 <script>
-    // --- CONFIGURATION PRINCIPALE ---
-    const factors = [
-        { label: "Sommeil réparateur", weight: 25 },
-        { label: "Clarté mentale", weight: 20 },
-        { label: "Mouvement / activité physique", weight: 15 },
-        { label: "Stabilité émotionnelle", weight: 20 },
-        { label: "Connexion sociale", weight: 10 },
-        { label: "Sensation de sens", weight: 10 }
-    ];
+    let value = 50;
 
-    const container = document.getElementById("items");
-    const bar = document.getElementById("bar");
-    const valueText = document.getElementById("valueText");
+    function changeState(amount) {
+        value += amount;
+        if (value > 100) value = 100;
+        if (value < 0) value = 0;
 
-    function updateScore() {
-        let score = 0;
-        document.querySelectorAll("input[type='checkbox']").forEach(cb => {
-            if (cb.checked) score += parseInt(cb.dataset.weight);
-        });
-
-        score = Math.min(score, 100);
-        bar.style.width = score + "%";
-        valueText.textContent = "Niveau : " + score + "%";
+        document.getElementById("bar").style.width = value + "%";
+        document.getElementById("value").textContent = "Niveau : " + value + "%";
     }
-
-    factors.forEach(factor => {
-        const row = document.createElement("div");
-        row.className = "item";
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.dataset.weight = factor.weight;
-        checkbox.addEventListener("change", updateScore);
-
-        const label = document.createElement("span");
-        label.className = "label";
-        label.textContent = factor.label;
-
-        row.appendChild(checkbox);
-        row.appendChild(label);
-        container.appendChild(row);
-    });
 </script>
 
 </body>
