@@ -2,180 +2,120 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>Aero Dashboard</title>
+<title>Interface Frutiger Neutre</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-/* ─────────────────────────── BASE ─────────────────────────── */
 
-:root{
-  --sky1:#eaf4ff;
-  --sky2:#bcd6f3;
+/* ───────────────────────── BASE ───────────────────────── */
 
-  --glass-main: rgba(255,255,255,0.72);
-  --glass-soft: rgba(255,255,255,0.45);
-  --glass-hard: rgba(255,255,255,0.9);
-
-  --border-light: rgba(255,255,255,0.9);
-  --border-dark: rgba(80,120,170,0.35);
-
-  --shadow-deep: 0 30px 60px rgba(0,40,90,0.35);
-  --shadow-soft: 0 12px 25px rgba(0,60,120,0.25);
-
-  --text-main:#0c2a44;
-  --text-soft:#476b8d;
-}
-
-html{
-  height:100%;
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: "Segoe UI", system-ui, sans-serif;
   background:
-    radial-gradient(circle at top, #f7fbff 0%, transparent 60%),
-    linear-gradient(180deg,var(--sky1),var(--sky2));
+    radial-gradient(circle at 50% 0%, #f1f1f1 0%, #d9d9d9 60%, #cfcfcf 100%);
+  color:#1f1f1f;
+  overflow:hidden;
 }
 
-html::before{
+/* grain très fin */
+body::before{
   content:"";
   position:fixed;
   inset:0;
   background:url("https://uploads-ssl.webflow.com/5fbd9e08b4374f52b8cf23a0/6032e8dce1e52e2b63d72692_noise.png");
-  opacity:.06;
+  opacity:.04;
   pointer-events:none;
 }
 
-body{
-  margin:0;
-  padding:28px;
-  font-family:"Segoe UI", system-ui, sans-serif;
-  color:var(--text-main);
-}
+/* ───────────────────────── CONTENEUR ───────────────────────── */
 
-/* ───────────── STRUCTURE ───────────── */
-
-.dashboard{
-  max-width:1250px;
-  margin:auto;
-  display:flex;
-  flex-direction:column;
-  gap:34px;
-}
-
-/* ───────────── BLOCS PRINCIPAUX ───────────── */
-
-.main-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:22px;
-}
-
-.tile{
-  position:relative;
-  height:150px;
-  border-radius:20px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.45)),
-    var(--glass-main);
-  backdrop-filter: blur(18px) saturate(1.4);
-  border:1px solid var(--border-dark);
-  box-shadow:
-    inset 0 1px 0 var(--border-light),
-    var(--shadow-deep);
-  cursor:pointer;
-  transition: all .28s ease;
-  overflow:hidden;
-}
-
-.tile::before{
-  content:"";
+.panel {
   position:absolute;
-  inset:3px;
+  inset:60px 80px;
+  border-radius:26px;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.85),
+      rgba(240,240,240,0.85)
+    );
+
+  border:1px solid rgba(255,255,255,0.6);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.8),
+    0 30px 60px rgba(0,0,0,0.25);
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* ───────────────────────── GRILLE ───────────────────────── */
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(3, 220px);
+  gap:28px;
+}
+
+/* ───────────────────────── TUILES ───────────────────────── */
+
+.tile {
+  height:110px;
   border-radius:16px;
   background:
-    linear-gradient(135deg,
-      rgba(255,255,255,.55),
-      rgba(255,255,255,0) 55%);
-  pointer-events:none;
+    linear-gradient(180deg,
+      rgba(255,255,255,0.95),
+      rgba(230,230,230,0.85)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 12px 24px rgba(0,0,0,0.25);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:18px;
+  font-weight:500;
+  color:#1e1e1e;
+
+  transition:all .25s ease;
 }
 
 .tile:hover{
-  transform:translateY(-6px);
-  box-shadow:0 40px 70px rgba(0,60,120,.45);
-}
-
-.tile:active{
-  transform:translateY(1px);
-}
-
-/* Texte */
-.tile span{
-  position:absolute;
-  bottom:18px;
-  left:18px;
-  right:18px;
-  font-size:20px;
-  font-weight:500;
-  text-shadow:0 1px 0 #fff;
-}
-
-/* ───────────── SECONDAIRE ───────────── */
-
-.secondary{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
-  gap:14px;
-}
-
-.small{
-  height:90px;
-  border-radius:14px;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.3));
+  transform:translateY(-4px);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.8),
-    0 10px 22px rgba(0,60,120,.22);
-  backdrop-filter: blur(12px);
-  transition:.2s;
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 20px 40px rgba(0,0,0,0.35);
 }
 
-.small:hover{
-  transform:translateY(-3px);
-}
-
-.small span{
+/* OPTION : texte plus discret */
+.tile small {
   display:block;
-  padding:14px;
-  font-size:14px;
-  color:var(--text-soft);
+  font-size:13px;
+  opacity:.65;
 }
+
 </style>
 </head>
 
 <body>
 
-<div class="dashboard">
-
-  <div class="main-grid">
-    <div class="tile" onclick="open('https://mail.google.com')"><span>Mail</span></div>
-    <div class="tile" onclick="open('https://calendar.google.com')"><span>Calendrier</span></div>
-    <div class="tile" onclick="open('https://chatgpt.com')"><span>ChatGPT</span></div>
-    <div class="tile" onclick="open('https://github.com')"><span>GitHub</span></div>
-    <div class="tile" onclick="open('https://www.reddit.com')"><span>Reddit</span></div>
+<div class="panel">
+  <div class="grid">
+    <div class="tile">Mail</div>
+    <div class="tile">Calendrier</div>
+    <div class="tile">Chat</div>
+    <div class="tile">Documents</div>
+    <div class="tile">Archives</div>
+    <div class="tile">Paramètres</div>
   </div>
-
-  <div class="secondary">
-    <div class="small" onclick="open('https://pdf24.org')"><span>PDF24</span></div>
-    <div class="small" onclick="open('https://framapad.org')"><span>Framapad</span></div>
-    <div class="small" onclick="open('https://drive.google.com')"><span>Drive</span></div>
-    <div class="small" onclick="open('https://lelscans.net')"><span>Scans</span></div>
-  </div>
-
 </div>
-
-<script>
-function open(url){ window.open(url,'_blank'); }
-</script>
 
 </body>
 </html>
