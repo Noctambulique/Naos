@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>État interne</title>
+<title>État intérieur</title>
 
 <style>
     body {
@@ -12,15 +12,14 @@
         margin: 80px auto;
         text-align: center;
 
-        /* IMAGE DE FOND */
         background-image: url("Map/télécharger (35).jpg");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
 
-        /* Effet de lisibilité */
-        background-color: rgba(255, 255, 255, 0.85);
-        background-blend-mode: lighten;
+        /* voile léger pour lisibilité */
+        background-color: rgba(255, 255, 255, 0.65);
+        background-blend-mode: overlay;
     }
 
     h1 {
@@ -31,8 +30,7 @@
     .bar-container {
         width: 100%;
         height: 12px;
-        background: #eee;
-        position: relative;
+        background: rgba(0,0,0,0.15);
         margin: 40px 0;
     }
 
@@ -45,45 +43,40 @@
 
     .buttons {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
         margin-top: 30px;
     }
 
-.buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-top: 30px;
-}
+    button {
+        height: 50px;
+        background: rgba(255,255,255,0.75);
+        border: 1px solid rgba(0,0,0,0.4);
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(2px);
+    }
 
-button {
-    width: 100%;
-    height: 48px;
-    background: rgba(255,255,255,0.85);
-    border: 1px solid #000;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
+    button:hover {
+        background: rgba(0,0,0,0.85);
+        color: white;
+    }
 
-button:hover {
-    background: #000;
-    color: #fff;
-}
-
+    button.active {
+        background: #000;
+        color: #fff;
+    }
 
     .label {
         margin-top: 15px;
         font-size: 14px;
-        color: #333;
+        color: #222;
     }
 </style>
-
 </head>
 
 <body>
@@ -97,32 +90,32 @@ button:hover {
 <div class="label" id="value">Niveau : 50%</div>
 
 <div class="buttons">
-    <!-- Positifs -->
-<div class="buttons">
-<div class="buttons">
-    <button onclick="changeState(8)">Bon sommeil</button>
-    <button onclick="changeState(3)">Bonne nourriture</button>
-    <button onclick="changeState(4)">Musique</button>
-    <button onclick="changeState(5)">Soleil</button>
-    <button onclick="changeState(5)">Sport</button>
+    <button data-value="25">Bon sommeil</button>
+    <button data-value="15">Bonne nourriture</button>
+    <button data-value="25">Musique</button>
+    <button data-value="25">Soleil</button>
+    <button data-value="15">Sport</button>
 
-    <button onclick="changeState(-5)">Imprévu</button>
-    <button onclick="changeState(-8)">Fatigue</button>
-    <button onclick="changeState(-5)">Manque de temps</button>
+    <button data-value="-35">Imprévu</button>
+    <button data-value="-48">Fatigue</button>
+    <button data-value="-20">Manque de temps</button>
 </div>
-
 
 <script>
     let value = 50;
 
-    function changeState(amount) {
-        value += amount;
-        if (value > 100) value = 100;
-        if (value < 0) value = 0;
+    document.querySelectorAll("button").forEach(button => {
+        button.addEventListener("click", () => {
+            const delta = parseInt(button.dataset.value);
+            const active = button.classList.toggle("active");
 
-        document.getElementById("bar").style.width = value + "%";
-        document.getElementById("value").textContent = "Niveau : " + value + "%";
-    }
+            value += active ? delta : -delta;
+            value = Math.max(0, Math.min(100, value));
+
+            document.getElementById("bar").style.width = value + "%";
+            document.getElementById("value").textContent = "Niveau : " + value + "%";
+        });
+    });
 </script>
 
 </body>
