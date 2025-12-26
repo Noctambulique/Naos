@@ -1,295 +1,119 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<title>État mental dynamique</title>
+    <meta charset="UTF-8">
+    <title>État émotionnel</title>
 
-<style>
-:root{
-  --skyTop:#e9f7ff;
-  --skyBottom:#bfe7ff;
-  --glass1:rgba(255,255,255,.85);
-  --glass2:rgba(255,255,255,.55);
-  --border:rgba(255,255,255,.95);
-  --blue:#1f8cff;
-  --red:#ff3b3b;
-  --text:#0a1a2f;
-  --radius:22px;
-}
+    <style>
+        body {
+            font-family: serif;
+            background: #ffffff;
+            color: #111;
+            max-width: 600px;
+            margin: 60px auto;
+            line-height: 1.6;
+        }
 
-*{box-sizing:border-box}
+        h1 {
+            font-weight: normal;
+            font-size: 22px;
+            margin-bottom: 30px;
+        }
 
-body{
-  margin:0;
-  display:flex;
-  height:100vh;
-  font-family:"Segoe UI",Tahoma,sans-serif;
-  background:
-    linear-gradient(to bottom,var(--skyTop),var(--skyBottom));
-  color:var(--text);
-}
+        .item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 14px;
+            cursor: pointer;
+        }
 
-/* ===== PANNEAU ===== */
-aside{
-  width:320px;
-  padding:22px;
-  background:
-    linear-gradient(to bottom,var(--glass1),var(--glass2));
-  backdrop-filter:blur(16px);
-  border-right:1px solid var(--border);
-  box-shadow:
-    inset 0 1px 0 #fff,
-    6px 0 30px rgba(0,0,0,.18);
-}
+        input[type="checkbox"] {
+            margin-right: 12px;
+            transform: scale(1.1);
+        }
 
-aside h3{
-  margin:0 0 6px;
-  font-size:18px;
-  text-shadow:0 1px 0 #fff;
-}
+        .label {
+            font-size: 15px;
+        }
 
-aside p{
-  font-size:12px;
-  color:#355b78;
-  margin-bottom:18px;
-}
+        .bar-container {
+            margin-top: 40px;
+            height: 8px;
+            background: #eee;
+            position: relative;
+        }
 
-/* ===== SLIDERS ===== */
-.control{
-  margin-bottom:18px;
-  font-size:12px;
-}
+        .bar {
+            height: 100%;
+            width: 0%;
+            background: #000;
+            transition: width 0.4s ease;
+        }
 
-input[type=range]{
-  width:100%;
-  height:7px;
-  border-radius:10px;
-  background:linear-gradient(to right,#7dd3fc,#38bdf8);
-  appearance:none;
-}
-
-input[type=range]::-webkit-slider-thumb{
-  appearance:none;
-  width:20px;
-  height:20px;
-  border-radius:50%;
-  background:
-    radial-gradient(circle at 30% 30%, #ffffff, #dbeafe);
-  border:1px solid #93c5fd;
-  box-shadow:
-    inset 0 1px 0 #fff,
-    0 3px 8px rgba(0,0,0,.35);
-}
-
-/* ===== SCÈNE ===== */
-main{
-  flex:1;
-  position:relative;
-}
-
-canvas{
-  width:100%;
-  height:100%;
-}
-
-/* ===== ÉTAT ===== */
-#etat{
-  position:absolute;
-  top:18px;
-  right:18px;
-  background:
-    linear-gradient(to bottom,var(--glass1),var(--glass2));
-  padding:16px 26px;
-  border-radius:var(--radius);
-  border:1px solid var(--border);
-  box-shadow:
-    inset 0 1px 0 #fff,
-    0 12px 30px rgba(0,0,0,.25);
-  font-weight:600;
-  font-size:16px;
-  text-align:center;
-}
-
-/* ===== LÉGENDE ===== */
-#legende{
-  position:absolute;
-  bottom:18px;
-  left:18px;
-  background:
-    linear-gradient(to bottom,var(--glass1),var(--glass2));
-  padding:14px 18px;
-  border-radius:var(--radius);
-  border:1px solid var(--border);
-  box-shadow:
-    inset 0 1px 0 #fff,
-    0 12px 30px rgba(0,0,0,.25);
-  font-size:12px;
-}
-
-#legende span{
-  display:inline-block;
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  margin-right:8px;
-}
-
-.bleu{background:var(--blue)}
-.rouge{background:var(--red)}
-
-.axe{
-  margin-top:6px;
-  color:#355b78;
-  font-style:italic;
-}
-</style>
+        .value {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #444;
+        }
+    </style>
 </head>
 
 <body>
 
-<aside>
-<h3>🌈 État émotionnel</h3>
-<p>
-Le bonheur est influencé par les facteurs.<br>
-La stimulation suit son propre rythme.
-</p>
+<h1>État émotionnel</h1>
 
-<div class="control">Sommeil<input id="sommeil" type="range" min="0" max="1" step="0.01" value="0.5"></div>
-<div class="control">Nourriture<input id="nourriture" type="range" min="0" max="1" step="0.01" value="0.5"></div>
-<div class="control">Soleil<input id="soleil" type="range" min="0" max="1" step="0.01" value="0.5"></div>
-<div class="control">Musique<input id="musique" type="range" min="0" max="1" step="0.01" value="0.5"></div>
-<div class="control">Sport<input id="sport" type="range" min="0" max="1" step="0.01" value="0.5"></div>
-<div class="control">Imprévu<input id="imprevu" type="range" min="0" max="1" step="0.01" value="0.5"></div>
-</aside>
+<div id="items"></div>
 
-<main>
-<canvas id="c"></canvas>
-
-<div id="etat">—</div>
-
-<div id="legende">
-  <div><span class="bleu"></span> Bonheur</div>
-  <div><span class="rouge"></span> Stimulation</div>
-  <div class="axe">Haut : + | Centre : neutre | Bas : –</div>
+<div class="bar-container">
+    <div class="bar" id="bar"></div>
 </div>
-</main>
+
+<div class="value" id="valueText">Niveau : 0%</div>
 
 <script>
-const c = document.getElementById("c");
-const ctx = c.getContext("2d");
-const etatBox = document.getElementById("etat");
+    // --- CONFIGURATION PRINCIPALE ---
+    const factors = [
+        { label: "Sommeil réparateur", weight: 25 },
+        { label: "Clarté mentale", weight: 20 },
+        { label: "Mouvement / activité physique", weight: 15 },
+        { label: "Stabilité émotionnelle", weight: 20 },
+        { label: "Connexion sociale", weight: 10 },
+        { label: "Sensation de sens", weight: 10 }
+    ];
 
-function resize(){
-  const r = devicePixelRatio || 1;
-  c.width = c.clientWidth * r;
-  c.height = c.clientHeight * r;
-  ctx.setTransform(r,0,0,r,0,0);
-}
-resize();
-addEventListener("resize", resize);
+    const container = document.getElementById("items");
+    const bar = document.getElementById("bar");
+    const valueText = document.getElementById("valueText");
 
-const mid = () => c.clientHeight/2;
-const seuil = 42;
+    function updateScore() {
+        let score = 0;
+        document.querySelectorAll("input[type='checkbox']").forEach(cb => {
+            if (cb.checked) score += parseInt(cb.dataset.weight);
+        });
 
-let x = 0;
-let t = 0;
+        score = Math.min(score, 100);
+        bar.style.width = score + "%";
+        valueText.textContent = "Niveau : " + score + "%";
+    }
 
-let yBonheur = mid();
-let prevBonheur = yBonheur;
+    factors.forEach(factor => {
+        const row = document.createElement("div");
+        row.className = "item";
 
-function bonheurImpact(){
-  let d = 0;
-  d += (sommeil.value-0.5)*1.2;
-  d += (soleil.value-0.5)*1.1;
-  d += (nourriture.value-0.5)*1.0;
-  d += (musique.value-0.5)*0.6;
-  d += (sport.value-0.5)*0.5;
-  d -= (imprevu.value-0.5)*0.8;
-  d += (mid()-yBonheur)/1200;
-  return d*0.32;
-}
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.dataset.weight = factor.weight;
+        checkbox.addEventListener("change", updateScore);
 
-function stimulationY(){
-  return mid()
-    + Math.sin(t*0.28)*100
-    + Math.sin(t*0.11)*26;
-}
+        const label = document.createElement("span");
+        label.className = "label";
+        label.textContent = factor.label;
 
-function signe(y){
-  if(y<mid()-seuil) return "+";
-  if(y>mid()+seuil) return "-";
-  return "0";
-}
-
-function definirEtat(b,s){
-  if(b==="+"&&s==="-") return "Apaisement";
-  if(b==="+"&&s==="+") return "Euphorie";
-  if(b==="-"&&s==="+") return "Tension";
-  if(b==="-"&&s==="-") return "Abattement";
-  if(b==="0"&&s==="0") return "Stabilité";
-  if(b==="+") return "Heureux";
-  if(s==="+") return "Stimulé";
-  if(s==="-") return "Fatigue";
-  return "—";
-}
-
-function loop(){
-  ctx.fillStyle = "rgba(233,247,255,0.10)";
-  ctx.fillRect(0,0,c.clientWidth,c.clientHeight);
-
-  ctx.strokeStyle = "rgba(255,255,255,.85)";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(0,mid());
-  ctx.lineTo(c.clientWidth,mid());
-  ctx.stroke();
-
-  yBonheur += bonheurImpact();
-  yBonheur = Math.max(40,Math.min(c.clientHeight-40,yBonheur));
-
-  const yStim = stimulationY();
-  t += 0.006;
-
-  /* COURBE BONHEUR – ÉPAISSE */
-  ctx.strokeStyle = "#1f8cff";
-  ctx.lineWidth = 6.5;
-  ctx.lineCap = "round";
-  ctx.beginPath();
-  ctx.moveTo(x-1,prevBonheur);
-  ctx.lineTo(x,yBonheur);
-  ctx.stroke();
-
-  /* COURBE STIMULATION – ÉPAISSE */
-  ctx.strokeStyle = "#ff3b3b";
-  ctx.lineWidth = 6;
-  ctx.lineCap = "round";
-  ctx.beginPath();
-  ctx.moveTo(x,yStim);
-  ctx.lineTo(x+1,yStim);
-  ctx.stroke();
-
-  const b = signe(yBonheur);
-  const s = signe(yStim);
-
-  etatBox.innerHTML = `
-    <div>${definirEtat(b,s)}</div>
-    <div style="font-size:11px;color:#355b78;margin-top:4px">
-      Bonheur ${b} | Stimulation ${s}
-    </div>
-  `;
-
-  prevBonheur = yBonheur;
-  x++;
-
-  if(x>c.clientWidth){
-    x=0;
-    prevBonheur=yBonheur=mid();
-  }
-
-  requestAnimationFrame(loop);
-}
-
-loop();
+        row.appendChild(checkbox);
+        row.appendChild(label);
+        container.appendChild(row);
+    });
 </script>
+
 </body>
 </html>
