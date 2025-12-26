@@ -2,102 +2,139 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>Interface Frutiger Neutre</title>
+<title>Interface Frutiger Aero</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 
-/* ───────────────────────── BASE ───────────────────────── */
+/* ───────────── BASE GLOBALE ───────────── */
 
 html, body {
   margin: 0;
   height: 100%;
   font-family: "Segoe UI", system-ui, sans-serif;
   background:
-    radial-gradient(circle at 50% 0%, #f1f1f1 0%, #d9d9d9 60%, #cfcfcf 100%);
-  color:#1f1f1f;
-  overflow:hidden;
+    radial-gradient(circle at top, #dff3ff 0%, #b7e3ff 40%, #9fd0e8 100%);
+  overflow: hidden;
+  color: #0f2a3a;
 }
 
-/* grain très fin */
-body::before{
+/* texture atmosphérique légère */
+body::before {
   content:"";
   position:fixed;
   inset:0;
-  background:url("https://uploads-ssl.webflow.com/5fbd9e08b4374f52b8cf23a0/6032e8dce1e52e2b63d72692_noise.png");
-  opacity:.04;
+  background:
+    url("https://i.imgur.com/8JZ8YwQ.png"); /* texture eau très fine */
+  opacity:0.15;
   pointer-events:none;
 }
 
-/* ───────────────────────── CONTENEUR ───────────────────────── */
+/* bulles décoratives */
+body::after {
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.35), transparent 200px),
+    radial-gradient(circle at 80% 60%, rgba(255,255,255,0.25), transparent 260px);
+  pointer-events:none;
+}
+
+/* ───────────── PANNEAU PRINCIPAL ───────────── */
 
 .panel {
   position:absolute;
-  inset:60px 80px;
-  border-radius:26px;
+  inset:70px 90px;
+  border-radius:28px;
+
   background:
-    linear-gradient(180deg,
-      rgba(255,255,255,0.85),
-      rgba(240,240,240,0.85)
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.55),
+      rgba(220,245,255,0.45)
     );
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 
   border:1px solid rgba(255,255,255,0.6);
 
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.8),
-    0 30px 60px rgba(0,0,0,0.25);
+    0 30px 70px rgba(0,80,120,0.25);
 
   display:flex;
   justify-content:center;
   align-items:center;
 }
 
-/* ───────────────────────── GRILLE ───────────────────────── */
+/* ───────────── GRILLE ───────────── */
 
 .grid {
   display:grid;
   grid-template-columns:repeat(3, 220px);
-  gap:28px;
+  gap:30px;
 }
 
-/* ───────────────────────── TUILES ───────────────────────── */
+/* ───────────── TUILES ───────────── */
 
 .tile {
-  height:110px;
-  border-radius:16px;
+  height:120px;
+  border-radius:18px;
+
   background:
-    linear-gradient(180deg,
+    linear-gradient(
+      180deg,
       rgba(255,255,255,0.95),
-      rgba(230,230,230,0.85)
+      rgba(210,240,255,0.75)
     );
 
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.9),
-    0 12px 24px rgba(0,0,0,0.25);
+    0 15px 35px rgba(0,120,180,0.35);
 
   display:flex;
   align-items:center;
   justify-content:center;
+  flex-direction:column;
 
   font-size:18px;
   font-weight:500;
-  color:#1e1e1e;
+  color:#0c3b52;
 
-  transition:all .25s ease;
+  transition:all .35s ease;
+  position:relative;
+  overflow:hidden;
 }
 
-.tile:hover{
-  transform:translateY(-4px);
+/* reflet verre */
+.tile::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    120deg,
+    rgba(255,255,255,0.65),
+    rgba(255,255,255,0.05) 60%
+  );
+  opacity:.6;
+  pointer-events:none;
+}
+
+/* effet au survol */
+.tile:hover {
+  transform: translateY(-6px) scale(1.02);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.9),
-    0 20px 40px rgba(0,0,0,0.35);
+    0 25px 60px rgba(0,140,200,0.45);
 }
 
-/* OPTION : texte plus discret */
+/* sous-texte optionnel */
 .tile small {
-  display:block;
-  font-size:13px;
+  margin-top:6px;
+  font-size:12px;
   opacity:.65;
 }
 
@@ -108,12 +145,12 @@ body::before{
 
 <div class="panel">
   <div class="grid">
-    <div class="tile">Mail</div>
-    <div class="tile">Calendrier</div>
-    <div class="tile">Chat</div>
-    <div class="tile">Documents</div>
-    <div class="tile">Archives</div>
-    <div class="tile">Paramètres</div>
+    <div class="tile">Mail<small>Messages & échanges</small></div>
+    <div class="tile">Calendrier<small>Temps & événements</small></div>
+    <div class="tile">Chat<small>Communication</small></div>
+    <div class="tile">Documents<small>Données personnelles</small></div>
+    <div class="tile">Archives<small>Mémoire numérique</small></div>
+    <div class="tile">Paramètres<small>Configuration</small></div>
   </div>
 </div>
 
