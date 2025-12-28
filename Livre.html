@@ -1,129 +1,90 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Galerie</title>
+<meta charset="UTF-8">
+<title>Images → Texte</title>
 
 <style>
-  body{
-    margin:0;
-    padding:20px;
-    background:linear-gradient(180deg, #2a80d7 0%, #0f4ea3 40%, #0e3569 100%);
-    font-family:"Segoe UI", sans-serif;
-    color:#fff;
-    overflow-x:hidden;
-  }
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        color: #111;
+    }
 
-  h2{
-    text-align:center;
-    font-size:34px;
-    font-weight:300;
-    margin-bottom:25px;
-    text-shadow:0 2px 8px rgba(0,0,0,0.7);
-  }
+    .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 40px;
+    }
 
-  /* ====== ZONE IMAGE ====== */
-  .zone{
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
-    gap:40px;
-    padding:40px;
-    border-radius:18px;
-    background:rgba(255,255,255,0.22);
-    backdrop-filter:blur(14px) saturate(150%);
-    border:1px solid rgba(255,255,255,0.55);
-  }
+    .item img {
+        width: 100%;
+        cursor: pointer;
+    }
 
-  .zone img{
-    width:100%;
-    border-radius:10px;
-    cursor:pointer;
-    box-shadow:
-      0 10px 25px rgba(0,0,0,0.55),
-      0 0 15px rgba(160,200,255,0.35);
-    transition:transform .3s, box-shadow .3s;
-  }
+    .text-view {
+        display: none;
+        padding: 60px;
+        max-width: 900px;
+        margin: auto;
+        line-height: 1.7;
+        white-space: pre-wrap; /* sécurité supplémentaire */
+    }
 
-  .zone img:hover{
-    transform:scale(1.06);
-    box-shadow:
-      0 0 25px rgba(70,150,255,0.9),
-      0 12px 35px rgba(0,0,0,0.55);
-  }
-
-  /* ===== FENÊTRE TEXTE ===== */
-  #overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.45);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:999;
-  }
-
-  #popup{
-    max-width:600px;
-    max-height:70vh;
-    padding:24px;
-    background:rgba(255,255,255,0.22);
-    backdrop-filter:blur(18px);
-    border-radius:18px;
-    overflow-y:auto;
-    color:white;
-    line-height:1.6;
-    box-shadow:0 25px 50px rgba(0,0,0,0.5);
-  }
-
-  #close{
-    position:absolute;
-    top:15px;
-    right:20px;
-    font-size:22px;
-    cursor:pointer;
-    opacity:.7;
-  }
+    .back {
+        margin-bottom: 30px;
+        cursor: pointer;
+        text-decoration: underline;
+        color: #444;
+    }
 </style>
 </head>
 
 <body>
 
-<h2>Galerie</h2>
+<div class="gallery" id="gallery">
 
-<div class="zone">
-  <img src="D hiver/20200905_151240.jpg"
-       data-text="Paysage hivernal silencieux.\n\nL’air est figé, presque immobile.">
+    <div class="item" onclick="openText(this)">
+        <img src="image1.jpg">
+        <div class="text" style="display:none;">
+Premier paragraphe\n
+Deuxième paragraphe\n
+Troisième paragraphe plus long.
+        </div>
+    </div>
 
-  <img src="D hiver/FB_IMG_1544732149112.jpg"
-       data-text="Souvenir diffus.\nTexture froide.\nTemps suspendu.">
+    <div class="item" onclick="openText(this)">
+        <img src="image2.jpg">
+        <div class="text" style="display:none;">
+Un autre texte\n
+Avec plusieurs lignes\n
+Et une vraie respiration visuelle.
+        </div>
+    </div>
 
-  <img src="D hiver/IMG_20210826_005412.jpg"
-       data-text="Moment nocturne.\nPerception ralentie.\nPrésence intérieure.">
 </div>
 
-<div id="overlay">
-  <div id="popup">
-    <div id="close">✕</div>
-    <div id="text"></div>
-  </div>
+<div class="text-view" id="textView">
+    <div class="back" onclick="closeText()">← Retour</div>
+    <div id="textContent"></div>
 </div>
 
 <script>
-  const images = document.querySelectorAll(".zone img");
-  const overlay = document.getElementById("overlay");
-  const textBox = document.getElementById("text");
-  const closeBtn = document.getElementById("close");
+function openText(element) {
+    const rawText = element.querySelector(".text").innerText;
+    const formatted = rawText.replace(/\\n/g, "<br><br>");
 
-  images.forEach(img => {
-    img.addEventListener("click", () => {
-      textBox.innerHTML = img.dataset.text.replace(/\n/g, "<br>");
-      overlay.style.display = "flex";
-    });
-  });
+    document.getElementById("textContent").innerHTML = formatted;
+    document.getElementById("gallery").style.display = "none";
+    document.getElementById("textView").style.display = "block";
+}
 
-  closeBtn.onclick = () => overlay.style.display = "none";
-  overlay.onclick = e => { if(e.target === overlay) overlay.style.display = "none"; };
+function closeText() {
+    document.getElementById("textView").style.display = "none";
+    document.getElementById("gallery").style.display = "grid";
+}
 </script>
 
 </body>
