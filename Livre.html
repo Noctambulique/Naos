@@ -62,35 +62,55 @@
     z-index:20;
   }
 
-  /* ---------- TEXTE ---------- */
-  #infoBox{
+  /* ============================
+     FENÊTRE TEXTE FLOTTANTE
+  ============================ */
+  #infoOverlay{
     position:fixed;
-    bottom:40px;
-    left:50%;
-    transform:translateX(-50%);
-    min-width:320px;
-    max-width:600px;
-    padding:22px 26px;
+    inset:0;
+    background:rgba(0,0,0,0.45);
+    backdrop-filter:blur(4px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+  }
+
+  #infoBox{
+    width:520px;
+    max-width:90vw;
+    max-height:70vh;
+    padding:26px;
     background:rgba(255,255,255,0.22);
     backdrop-filter:blur(18px) saturate(160%);
-    -webkit-backdrop-filter:blur(18px) saturate(160%);
-    border:1px solid rgba(255,255,255,0.45);
     border-radius:18px;
+    border:1px solid rgba(255,255,255,0.45);
     box-shadow:
-      0 20px 40px rgba(0,0,0,0.45),
+      0 25px 45px rgba(0,0,0,0.45),
       inset 0 0 20px rgba(255,255,255,0.25);
+    overflow-y:auto;
     color:#fff;
     font-size:16px;
     line-height:1.6;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity 0.35s ease, transform 0.35s ease;
+    animation:pop 0.25s ease;
   }
 
-  #infoBox.active{
+  @keyframes pop{
+    from{transform:scale(0.95); opacity:0;}
+    to{transform:scale(1); opacity:1;}
+  }
+
+  #closeBtn{
+    position:absolute;
+    top:12px;
+    right:16px;
+    cursor:pointer;
+    font-size:22px;
+    opacity:0.8;
+  }
+
+  #closeBtn:hover{
     opacity:1;
-    pointer-events:auto;
-    transform:translateX(-50%) translateY(-10px);
   }
 </style>
 </head>
@@ -102,66 +122,43 @@
 <div class="zone" id="zone">
 
   <img src="D hiver/20200905_151240.jpg"
-       data-text="Paysage hivernal silencieux.\nAtmosphère figée, presque irréelle.">
+       data-text="Paysage hivernal silencieux.\n\nLe monde semble suspendu, presque immobile.">
 
   <img src="D hiver/FB_IMG_1544732149112.jpg"
-       data-text="Souvenir diffus.\nTexture froide.\nTemps suspendu.">
+       data-text="Souvenir diffus.\nUne lumière froide traverse la mémoire.">
 
   <img src="D hiver/IMG_20210826_005412.jpg"
        data-text="Moment nocturne.\nPerception ralentie.\nPrésence intérieure.">
 
-  <img src="D hiver/IMG_20211024_032129.jpg"
-       data-text="Regard distant.\nLe monde devient surface.">
-
-  <img src="D hiver/IMG_20211229_003419~2.jpg"
-       data-text="Lumière d’hiver.\nSilence structuré.">
-
 </div>
 
-<div id="infoBox"><div id="infoContent"></div></div>
+<!-- Fenêtre flottante -->
+<div id="infoOverlay">
+  <div id="infoBox">
+    <div id="closeBtn">✕</div>
+    <div id="infoContent"></div>
+  </div>
+</div>
 
 <script>
-  const zone = document.getElementById("zone");
-  const imgs = [...zone.querySelectorAll("img")];
-  const infoBox = document.getElementById("infoBox");
-  const infoContent = document.getElementById("infoContent");
+  const images = document.querySelectorAll(".zone img");
+  const overlay = document.getElementById("infoOverlay");
+  const content = document.getElementById("infoContent");
+  const closeBtn = document.getElementById("closeBtn");
 
-  const cellW = 480;
-  const cellH = 480;
-  const zoneW = zone.clientWidth;
-  const cols = Math.max(1, Math.floor(zoneW / cellW));
-
-  zone.style.height = (Math.ceil(imgs.length / cols) * cellH + 300) + "px";
-
-  async function layout(){
-    let index = 0;
-    for (const img of imgs){
-      await img.decode();
-      const col = index % cols;
-      const row = Math.floor(index / cols);
-      const baseX = col * cellW;
-      const baseY = row * cellH;
-      const maxOffsetX = Math.max(0, cellW - img.width - 80);
-      const maxOffsetY = Math.max(0, cellH - img.height - 80);
-      img.style.left = (baseX + Math.random() * maxOffsetX) + "px";
-      img.style.top  = (baseY + Math.random() * maxOffsetY) + "px";
-      index++;
-    }
-  }
-
-  layout();
-
-  imgs.forEach(img => {
-    img.addEventListener("click", e => {
-      e.stopPropagation();
-      const raw = img.dataset.text || "";
-      infoContent.innerHTML = raw.replace(/\n/g, "<br>");
-      infoBox.classList.add("active");
+  images.forEach(img => {
+    img.addEventListener("click", () => {
+      content.innerHTML = img.dataset.text.replace(/\n/g, "<br>");
+      overlay.style.display = "flex";
     });
   });
 
-  document.addEventListener("click", () => {
-    infoBox.classList.remove("active");
+  closeBtn.addEventListener("click", () => {
+    overlay.style.display = "none";
+  });
+
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay) overlay.style.display = "none";
   });
 </script>
 
