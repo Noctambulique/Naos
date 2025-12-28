@@ -23,143 +23,107 @@
     text-shadow:0 2px 8px rgba(0,0,0,0.7);
   }
 
+  /* ====== ZONE IMAGE ====== */
   .zone{
-    position:relative;
-    width:100%;
-    padding:40px 0;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap:40px;
+    padding:40px;
     border-radius:18px;
     background:rgba(255,255,255,0.22);
     backdrop-filter:blur(14px) saturate(150%);
-    -webkit-backdrop-filter:blur(14px) saturate(150%);
     border:1px solid rgba(255,255,255,0.55);
-    box-shadow:
-      inset 0 0 25px rgba(255,255,255,0.33),
-      0 18px 35px rgba(0,0,0,0.45),
-      0 0 40px rgba(40,130,255,0.35);
   }
 
   .zone img{
-    position:absolute;
-    max-width:260px;
-    border-radius:8px;
-    box-shadow:
-      0 10px 25px rgba(0,0,0,0.65),
-      0 0 15px rgba(160,200,255,0.35),
-      inset 0 0 18px rgba(255,255,255,0.18);
-    transform:rotate(-1deg);
-    transition:transform 0.35s, filter 0.25s, box-shadow 0.3s;
+    width:100%;
+    border-radius:10px;
     cursor:pointer;
-    border:1px solid rgba(255,255,255,0.45);
+    box-shadow:
+      0 10px 25px rgba(0,0,0,0.55),
+      0 0 15px rgba(160,200,255,0.35);
+    transition:transform .3s, box-shadow .3s;
   }
 
   .zone img:hover{
-    transform:scale(1.2) rotate(1deg);
-    filter:brightness(1.2);
+    transform:scale(1.06);
     box-shadow:
-      0 0 22px rgba(70,150,255,0.85),
-      0 12px 35px rgba(0,0,0,0.55),
-      inset 0 0 18px rgba(255,255,255,0.28);
-    z-index:20;
+      0 0 25px rgba(70,150,255,0.9),
+      0 12px 35px rgba(0,0,0,0.55);
   }
 
-  /* ============================
-     FENÊTRE TEXTE FLOTTANTE
-  ============================ */
-  #infoOverlay{
+  /* ===== FENÊTRE TEXTE ===== */
+  #overlay{
     position:fixed;
     inset:0;
     background:rgba(0,0,0,0.45);
-    backdrop-filter:blur(4px);
     display:none;
     align-items:center;
     justify-content:center;
     z-index:999;
   }
 
-  #infoBox{
-    width:520px;
-    max-width:90vw;
+  #popup{
+    max-width:600px;
     max-height:70vh;
-    padding:26px;
+    padding:24px;
     background:rgba(255,255,255,0.22);
-    backdrop-filter:blur(18px) saturate(160%);
+    backdrop-filter:blur(18px);
     border-radius:18px;
-    border:1px solid rgba(255,255,255,0.45);
-    box-shadow:
-      0 25px 45px rgba(0,0,0,0.45),
-      inset 0 0 20px rgba(255,255,255,0.25);
     overflow-y:auto;
-    color:#fff;
-    font-size:16px;
+    color:white;
     line-height:1.6;
-    animation:pop 0.25s ease;
+    box-shadow:0 25px 50px rgba(0,0,0,0.5);
   }
 
-  @keyframes pop{
-    from{transform:scale(0.95); opacity:0;}
-    to{transform:scale(1); opacity:1;}
-  }
-
-  #closeBtn{
+  #close{
     position:absolute;
-    top:12px;
-    right:16px;
-    cursor:pointer;
+    top:15px;
+    right:20px;
     font-size:22px;
-    opacity:0.8;
-  }
-
-  #closeBtn:hover{
-    opacity:1;
+    cursor:pointer;
+    opacity:.7;
   }
 </style>
 </head>
 
 <body>
 
-<h2>Galerie Aero</h2>
+<h2>Galerie</h2>
 
-<div class="zone" id="zone">
-
+<div class="zone">
   <img src="D hiver/20200905_151240.jpg"
-       data-text="Paysage hivernal silencieux.\n\nLe monde semble suspendu, presque immobile.">
+       data-text="Paysage hivernal silencieux.\n\nL’air est figé, presque immobile.">
 
   <img src="D hiver/FB_IMG_1544732149112.jpg"
-       data-text="Souvenir diffus.\nUne lumière froide traverse la mémoire.">
+       data-text="Souvenir diffus.\nTexture froide.\nTemps suspendu.">
 
   <img src="D hiver/IMG_20210826_005412.jpg"
        data-text="Moment nocturne.\nPerception ralentie.\nPrésence intérieure.">
-
 </div>
 
-<!-- Fenêtre flottante -->
-<div id="infoOverlay">
-  <div id="infoBox">
-    <div id="closeBtn">✕</div>
-    <div id="infoContent"></div>
+<div id="overlay">
+  <div id="popup">
+    <div id="close">✕</div>
+    <div id="text"></div>
   </div>
 </div>
 
 <script>
   const images = document.querySelectorAll(".zone img");
-  const overlay = document.getElementById("infoOverlay");
-  const content = document.getElementById("infoContent");
-  const closeBtn = document.getElementById("closeBtn");
+  const overlay = document.getElementById("overlay");
+  const textBox = document.getElementById("text");
+  const closeBtn = document.getElementById("close");
 
   images.forEach(img => {
     img.addEventListener("click", () => {
-      content.innerHTML = img.dataset.text.replace(/\n/g, "<br>");
+      textBox.innerHTML = img.dataset.text.replace(/\n/g, "<br>");
       overlay.style.display = "flex";
     });
   });
 
-  closeBtn.addEventListener("click", () => {
-    overlay.style.display = "none";
-  });
-
-  overlay.addEventListener("click", e => {
-    if (e.target === overlay) overlay.style.display = "none";
-  });
+  closeBtn.onclick = () => overlay.style.display = "none";
+  overlay.onclick = e => { if(e.target === overlay) overlay.style.display = "none"; };
 </script>
 
 </body>
