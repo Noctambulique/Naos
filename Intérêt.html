@@ -4,94 +4,128 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Index</title>
+<title>Index thématique</title>
 
 <style>
 body{
   margin:0;
   height:100vh;
-  font-family: "Trebuchet MS", Arial, sans-serif;
-  background:
-    linear-gradient(#1d74c9 0%, #5fb2ff 40%, #6fcf6a 70%, #4aa04a 100%);
-  overflow:hidden;
+  font-family:"Trebuchet MS", Arial, sans-serif;
+  background:url("https://miro.medium.com/v2/resize:fit:1400/1*_zqJUXJaDneHRrXeXtR5vQ.webp") center/cover no-repeat;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-/* CIEL */
-.sky{
-  position:absolute;
-  inset:0;
-  background:
-    radial-gradient(circle at 80% 20%, #ffffff 0%, transparent 45%),
-    radial-gradient(circle at 20% 15%, #ffffff 0%, transparent 40%);
-  opacity:0.9;
-}
-
-/* SOL */
-.ground{
-  position:absolute;
-  bottom:0;
-  width:100%;
-  height:35%;
-  background:#4fb14f;
-}
-
-/* BULLES */
-.bubble{
-  position:absolute;
-  border-radius:50%;
-  background:rgba(255,255,255,0.35);
-  border:2px solid #ffffff;
-}
-
-.b1{ width:180px; height:180px; top:8%; left:12%; }
-.b2{ width:120px; height:120px; top:20%; right:15%; }
-.b3{ width:90px;  height:90px;  bottom:18%; right:28%; }
-
-/* PANNEAU */
+/* panneau principal */
 .panel{
-  position:absolute;
-  bottom:8%;
-  left:50%;
-  transform:translateX(-50%);
-  background:#eaffcc;
-  border:5px solid #5b8e2d;
+  background:#e8f2ff;
+  border:4px solid #4f8fd8;
+  width:520px;
   padding:28px;
-  width:420px;
-  box-shadow:6px 6px 0 #3f6b1e;
+  box-shadow:8px 8px 0 #2d5f9b;
 }
 
-.panel h1{
+/* titre */
+h1{
   margin:0 0 20px;
+  text-align:center;
   font-size:1.4rem;
-  color:#2e4a1a;
+  color:#1e3d63;
 }
 
+/* items */
 .item{
-  background:#d9f09a;
-  border:3px solid #6c9832;
-  padding:10px;
-  margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  margin-bottom:12px;
+  background:#d6ebff;
+  border:3px solid #7aa8d8;
+}
+
+.item input{
+  width:18px;
+  height:18px;
+  accent-color:#2f6fb2;
+}
+
+/* barre progression */
+.progress{
+  margin-top:24px;
+}
+
+.track{
+  height:16px;
+  background:#b8d6f5;
+  border:3px solid #6a9cd3;
+}
+
+.fill{
+  height:100%;
+  width:0%;
+  background:#2f6fb2;
+  transition:width 0.25s ease;
+}
+
+.percent{
+  margin-top:8px;
+  text-align:right;
+  font-weight:bold;
+  color:#1f3f63;
 }
 </style>
 </head>
 
 <body>
 
-<div class="sky"></div>
-
-<div class="bubble b1"></div>
-<div class="bubble b2"></div>
-<div class="bubble b3"></div>
-
-<div class="ground"></div>
-
 <div class="panel">
   <h1>Index thématique</h1>
-  <div class="item">Créativité obsessionnelle</div>
-  <div class="item">Ordre et chaos</div>
-  <div class="item">Anticipation mentale</div>
-  <div class="item">Extension des facultés humaines</div>
+
+  <div class="item">
+    <input type="checkbox" class="check">
+    <label>Créativité obsessionnelle</label>
+  </div>
+
+  <div class="item">
+    <input type="checkbox" class="check">
+    <label>Ordre et chaos</label>
+  </div>
+
+  <div class="item">
+    <input type="checkbox" class="check">
+    <label>Anticipation mentale</label>
+  </div>
+
+  <div class="item">
+    <input type="checkbox" class="check">
+    <label>Dépassement cognitif</label>
+  </div>
+
+  <div class="progress">
+    <div class="track">
+      <div class="fill" id="fill"></div>
+    </div>
+    <div class="percent" id="percent">0%</div>
+  </div>
 </div>
+
+<script>
+const checks = document.querySelectorAll(".check");
+const fill = document.getElementById("fill");
+const percent = document.getElementById("percent");
+
+function update(){
+  const total = checks.length;
+  const active = [...checks].filter(c => c.checked).length;
+  const value = Math.round((active / total) * 100);
+  fill.style.width = value + "%";
+  percent.textContent = value + "%";
+}
+
+checks.forEach(c => c.addEventListener("change", update));
+</script>
 
 </body>
 </html>
