@@ -4,138 +4,94 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Index thématique</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Trebuchet+MS&display=swap" rel="stylesheet">
+<title>Index</title>
 
 <style>
-  body{
-    margin:0;
-    min-height:100vh;
-    background:#6db7ff;
-    font-family:"Trebuchet MS", sans-serif;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    color:#1a1a1a;
-  }
+body{
+  margin:0;
+  height:100vh;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  background:
+    linear-gradient(#1d74c9 0%, #5fb2ff 40%, #6fcf6a 70%, #4aa04a 100%);
+  overflow:hidden;
+}
 
-  .sheet{
-    width:90%;
-    max-width:720px;
-    padding:44px;
-    background:#b8e26a;
-    border:6px solid #4f7d1c;
-    box-shadow:10px 10px 0 #3a5f15;
-  }
+/* CIEL */
+.sky{
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 80% 20%, #ffffff 0%, transparent 45%),
+    radial-gradient(circle at 20% 15%, #ffffff 0%, transparent 40%);
+  opacity:0.9;
+}
 
-  h1{
-    font-size:1.6rem;
-    margin-bottom:32px;
-    color:#1e3b0c;
-    letter-spacing:0.5px;
-  }
+/* SOL */
+.ground{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:35%;
+  background:#4fb14f;
+}
 
-  .topic{
-    display:flex;
-    align-items:flex-start;
-    gap:14px;
-    margin-bottom:18px;
-    padding:16px;
-    background:#d9f28f;
-    border:4px solid #6e9829;
-    box-shadow:4px 4px 0 #557a1c;
-  }
+/* BULLES */
+.bubble{
+  position:absolute;
+  border-radius:50%;
+  background:rgba(255,255,255,0.35);
+  border:2px solid #ffffff;
+}
 
-  .topic input{
-    margin-top:4px;
-    width:18px;
-    height:18px;
-    accent-color:#4a7c1a;
-  }
+.b1{ width:180px; height:180px; top:8%; left:12%; }
+.b2{ width:120px; height:120px; top:20%; right:15%; }
+.b3{ width:90px;  height:90px;  bottom:18%; right:28%; }
 
-  .topic label{
-    font-size:0.95rem;
-    line-height:1.45;
-  }
+/* PANNEAU */
+.panel{
+  position:absolute;
+  bottom:8%;
+  left:50%;
+  transform:translateX(-50%);
+  background:#eaffcc;
+  border:5px solid #5b8e2d;
+  padding:28px;
+  width:420px;
+  box-shadow:6px 6px 0 #3f6b1e;
+}
 
-  .progress{
-    margin-top:40px;
-  }
+.panel h1{
+  margin:0 0 20px;
+  font-size:1.4rem;
+  color:#2e4a1a;
+}
 
-  .track{
-    height:18px;
-    background:#c4e682;
-    border:4px solid #6b9630;
-  }
-
-  .fill{
-    height:100%;
-    width:0%;
-    background:#4a7c1a;
-    transition:width 0.25s ease;
-  }
-
-  .percent{
-    margin-top:10px;
-    font-size:0.9rem;
-    text-align:right;
-    color:#2e4a12;
-    font-weight:600;
-  }
+.item{
+  background:#d9f09a;
+  border:3px solid #6c9832;
+  padding:10px;
+  margin-bottom:10px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="sheet">
+<div class="sky"></div>
 
+<div class="bubble b1"></div>
+<div class="bubble b2"></div>
+<div class="bubble b3"></div>
+
+<div class="ground"></div>
+
+<div class="panel">
   <h1>Index thématique</h1>
-
-  <div class="topic">
-    <input type="checkbox" class="check">
-    <label>Ce sujet concerne des gens obsessionnels créatifs.</label>
-  </div>
-
-  <div class="topic">
-    <input type="checkbox" class="check">
-    <label>Ce sujet explore l’ordre et le chaos.</label>
-  </div>
-
-  <div class="topic">
-    <input type="checkbox" class="check">
-    <label>Ce sujet traite l’anticipation de l’esprit humain.</label>
-  </div>
-
-  <div class="topic">
-    <input type="checkbox" class="check">
-    <label>Ce sujet aborde le dépassement des facultés humaines.</label>
-  </div>
-
-  <div class="progress">
-    <div class="track">
-      <div class="fill" id="fill"></div>
-    </div>
-    <div class="percent" id="percent">0%</div>
-  </div>
-
+  <div class="item">Créativité obsessionnelle</div>
+  <div class="item">Ordre et chaos</div>
+  <div class="item">Anticipation mentale</div>
+  <div class="item">Extension des facultés humaines</div>
 </div>
-
-<script>
-  const checks = document.querySelectorAll(".check");
-  const fill = document.getElementById("fill");
-  const percent = document.getElementById("percent");
-
-  function update(){
-    const total = checks.length;
-    const active = [...checks].filter(c => c.checked).length;
-    const value = Math.round((active / total) * 100);
-    fill.style.width = value + "%";
-    percent.textContent = value + "%";
-  }
-
-  checks.forEach(c => c.addEventListener("change", update));
-</script>
 
 </body>
 </html>
