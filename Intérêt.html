@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Index de sujets</title>
+<title>Index thématique</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Trebuchet+MS&display=swap" rel="stylesheet">
 
@@ -12,83 +12,107 @@
   body{
     margin:0;
     min-height:100vh;
-    background:#ffd84d;
+    background:
+      radial-gradient(circle at 80% 20%, #b8ecff 0%, transparent 40%),
+      linear-gradient(#1f7fd4, #5fb4ff 45%, #6fd18a 70%, #4caf50 100%);
     font-family:"Trebuchet MS", sans-serif;
     display:flex;
     justify-content:center;
     align-items:center;
-    color:#222;
+    color:#0c2a3d;
+    overflow:hidden;
   }
 
   .sheet{
     width:90%;
-    max-width:700px;
-    background:#fff176;
-    border:6px solid #ff9f1c;
-    box-shadow:10px 10px 0 #d97706;
-    padding:40px;
+    max-width:720px;
+    padding:42px;
+    background:rgba(255,255,255,0.75);
+    border-radius:28px;
+    border:3px solid rgba(255,255,255,0.9);
+    box-shadow:
+      0 0 40px rgba(120,200,255,0.6),
+      inset 0 0 30px rgba(255,255,255,0.6);
+    backdrop-filter: blur(4px);
   }
 
   h1{
-    font-size:1.4rem;
-    margin-bottom:30px;
-    color:#1e1e1e;
-    text-transform:uppercase;
-    letter-spacing:1px;
+    font-size:1.6rem;
+    text-align:center;
+    margin-bottom:32px;
+    color:#0b3f66;
+    text-shadow:0 1px 0 #fff;
   }
 
   .topic{
     display:flex;
     align-items:flex-start;
     gap:14px;
-    padding:14px;
     margin-bottom:18px;
-    background:#c8f000;
-    border:4px solid #7fb800;
-    box-shadow:4px 4px 0 #567d00;
+    padding:14px 18px;
+    background:rgba(255,255,255,0.85);
+    border-radius:20px;
+    border:2px solid #b7e3ff;
+    box-shadow:
+      inset 0 0 12px rgba(255,255,255,0.8),
+      0 6px 12px rgba(0,100,180,0.2);
   }
 
   .topic input{
-    margin-top:4px;
+    margin-top:3px;
     width:18px;
     height:18px;
-    accent-color:#ff6f00;
-  }
-
-  .topic label{
-    font-size:0.95rem;
-    line-height:1.4;
+    accent-color:#2ea3ff;
   }
 
   .progress{
-    margin-top:40px;
+    margin-top:38px;
   }
 
   .track{
-    height:18px;
-    background:#ffb703;
-    border:4px solid #cc8a00;
-    box-shadow:inset 3px 3px 0 #ffd66b;
+    height:16px;
+    background:#bde7ff;
+    border-radius:999px;
+    overflow:hidden;
+    box-shadow: inset 0 0 8px rgba(255,255,255,0.9);
   }
 
   .fill{
     height:100%;
     width:0%;
-    background:#ff3d00;
-    transition:width 0.25s ease;
+    background:linear-gradient(90deg,#7ee2ff,#1e90ff);
+    box-shadow:0 0 10px rgba(60,180,255,0.8);
+    transition:width 0.35s ease;
   }
 
   .percent{
     margin-top:10px;
     font-size:0.9rem;
     text-align:right;
-    font-weight:bold;
-    color:#4a2b00;
+    color:#0a3554;
+    font-weight:600;
   }
+
+  /* bulles décoratives */
+  .bubble{
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,0.35);
+    box-shadow:0 0 25px rgba(180,230,255,0.8);
+    pointer-events:none;
+  }
+
+  .b1{ width:140px; height:140px; top:10%; left:10%; }
+  .b2{ width:90px; height:90px; top:65%; left:70%; }
+  .b3{ width:60px; height:60px; top:30%; left:80%; }
 </style>
 </head>
 
 <body>
+
+<div class="bubble b1"></div>
+<div class="bubble b2"></div>
+<div class="bubble b3"></div>
 
 <div class="sheet">
 
