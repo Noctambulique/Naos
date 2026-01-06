@@ -43,26 +43,40 @@ body {
 #viewer {
     position: fixed;
     inset: 0;
-    background: #0d0d0d;
-    color: #fff;
+    background: radial-gradient(circle at top, #141414, #0b0b0b);
+    color: #eee;
     display: none;
     flex-direction: column;
-    padding: 20px;
+    align-items: center;
+    padding: 40px 20px;
     overflow-y: auto;
 }
 
-#viewer img {
-    max-width: 400px;
-    width: 100%;
-    margin-bottom: 20px;
+#v-name {
+    font-size: 28px;
+    letter-spacing: 0.04em;
+    margin-bottom: 24px;
+    text-align: center;
 }
 
-#close {
-    position: fixed;
-    top: 10px;
-    right: 15px;
-    cursor: pointer;
-    font-size: 20px;
+#viewer img {
+    max-width: 420px;
+    width: 100%;
+    margin-bottom: 28px;
+    border: 1px solid #222;
+}
+
+#v-text {
+    max-width: 520px;
+    font-size: 15px;
+    line-height: 1.7;
+    text-align: center;
+    color: #ccc;
+    font-style: italic;
+    padding-top: 16px;
+    border-top: 1px solid #222;
+}
+
 }
 </style>
 </head>
