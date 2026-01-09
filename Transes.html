@@ -8,11 +8,12 @@
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #111;
-    color: #eee;
+    font-family: "Courier New", monospace;
+    background: #0d0d0d;
+    color: #d0d0d0;
 }
 
+/* ====== GRILLE ====== */
 #grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -20,43 +21,115 @@ body {
     padding: 20px;
 }
 
+/* ====== CARTES ====== */
 .card {
-    background: #1c1c1c;
-    border: 1px solid #333;
-    cursor: pointer;
+    background: #141414;
+    border: 1px solid #2a2a2a;
     padding: 10px;
+    cursor: pointer;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.02),
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+}
+
+.card:hover {
+    background: #1b1b1b;
 }
 
 .card img {
     width: 100%;
-    height: 140px;
-    object-fit: cover;
+    height: 130px;
+    object-fit: contain;
+    background: #000;
+    padding: 6px;
+    box-sizing: border-box;
     margin-bottom: 8px;
+    filter: contrast(1.15) brightness(0.95);
 }
 
+.card div {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: #bdbdbd;
+}
+
+/* ====== VIEWER ====== */
 #viewer {
     position: fixed;
     inset: 0;
-    background: #0b0b0b;
+    background: radial-gradient(circle at top, #141414, #070707);
     display: none;
     flex-direction: column;
     align-items: center;
-    padding: 40px 20px;
+    padding: 50px 20px;
+    overflow-y: auto;
+}
+
+#viewer::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.03),
+        rgba(255,255,255,0.03) 1px,
+        transparent 1px,
+        transparent 4px
+    );
+    pointer-events: none;
 }
 
 #close {
-    position: absolute;
+    position: fixed;
     top: 20px;
     right: 20px;
+    font-size: 26px;
     cursor: pointer;
-    font-size: 24px;
+    color: #888;
 }
 
-#viewer img {
-    max-width: 420px;
+#close:hover {
+    color: #fff;
+}
+
+#v-name {
+    font-size: 26px;
+    margin-bottom: 28px;
+    letter-spacing: 0.15em;
+    text-align: center;
+}
+
+/* images du viewer */
+.viewer-images {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.viewer-images img {
+    max-width: 380px;
     width: 100%;
-    margin-bottom: 20px;
+    max-height: 60vh;
+    object-fit: contain;
+    background: #000;
+    padding: 10px;
+    border: 1px solid #222;
+    filter: contrast(1.1);
 }
 </style>
 </head>
@@ -68,23 +141,28 @@ body {
 <div id="viewer">
     <div id="close">✕</div>
     <h1 id="v-name"></h1>
-    <img id="v-img">
+
+    <div class="viewer-images">
+        <img id="v-img-1">
+        <img id="v-img-2">
+    </div>
 </div>
 
 <script>
 const creatures = [
     {
-        name: "Trans Energie",
+        name: "TRANS ÉNERGIE",
         image1: "D hiver/Transe 1.png",
         image2: "D hiver/radar-transparent (9).png"
     },
     {
-        name: "Créature 002",
+        name: "CRÉATURE 002",
         image1: "D hiver/Transe 2.png",
         image2: "D hiver/Transe 2b.png"
     }
 ];
 
+// génération des cartes
 const grid = document.getElementById("grid");
 
 creatures.forEach(c => {
@@ -100,7 +178,8 @@ creatures.forEach(c => {
 
 function openViewer(c) {
     document.getElementById("v-name").textContent = c.name;
-    document.getElementById("v-img").src = c.image1;
+    document.getElementById("v-img-1").src = c.image1;
+    document.getElementById("v-img-2").src = c.image2;
     document.getElementById("viewer").style.display = "flex";
 }
 
