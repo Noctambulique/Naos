@@ -26,11 +26,6 @@ body {
     cursor: pointer;
     padding: 10px;
     text-align: center;
-    transition: background 0.2s;
-}
-
-.card:hover {
-    background: #262626;
 }
 
 .card img {
@@ -43,40 +38,25 @@ body {
 #viewer {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at top, #141414, #0b0b0b);
-    color: #eee;
+    background: #0b0b0b;
     display: none;
     flex-direction: column;
     align-items: center;
     padding: 40px 20px;
-    overflow-y: auto;
 }
 
-#v-name {
-    font-size: 28px;
-    letter-spacing: 0.04em;
-    margin-bottom: 24px;
-    text-align: center;
+#close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    font-size: 24px;
 }
 
 #viewer img {
     max-width: 420px;
     width: 100%;
-    margin-bottom: 28px;
-    border: 1px solid #222;
-}
-
-#v-text {
-    max-width: 520px;
-    font-size: 15px;
-    line-height: 1.7;
-    text-align: center;
-    color: #ccc;
-    font-style: italic;
-    padding-top: 16px;
-    border-top: 1px solid #222;
-}
-
+    margin-bottom: 20px;
 }
 </style>
 </head>
@@ -89,7 +69,6 @@ body {
     <div id="close">✕</div>
     <h1 id="v-name"></h1>
     <img id="v-img">
-    <p id="v-text"></p>
 </div>
 
 <script>
@@ -106,14 +85,13 @@ const creatures = [
     }
 ];
 
-// génération des cartes
 const grid = document.getElementById("grid");
 
 creatures.forEach(c => {
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
-        <img src="${c.image}">
+        <img src="${c.image1}">
         <div>${c.name}</div>
     `;
     card.onclick = () => openViewer(c);
@@ -122,8 +100,7 @@ creatures.forEach(c => {
 
 function openViewer(c) {
     document.getElementById("v-name").textContent = c.name;
-    document.getElementById("v-img").src = c.image;
-    document.getElementById("v-text").textContent = c.description;
+    document.getElementById("v-img").src = c.image1;
     document.getElementById("viewer").style.display = "flex";
 }
 
