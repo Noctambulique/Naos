@@ -8,14 +8,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap');
 
 :root{
-  --bg:#0f172a;
-  --card:#ffffff;
   --border:#cbd5f5;
   --inner:#e5e7eb;
-  --shadow:0 14px 30px rgba(0,0,0,.35);
+  --shadow:0 10px 22px rgba(0,0,0,.28);
   --red:#dc2626;
   --black:#020617;
-  --radius:16px;
+  --radius:14px;
 }
 
 *{box-sizing:border-box}
@@ -24,47 +22,30 @@ body{
   margin:0;
   background:radial-gradient(circle at top,#1e293b,#020617);
   font-family:system-ui,sans-serif;
-  padding:40px;
+  padding:32px;
   color:white;
 }
 
 /* =========================
-   STRUCTURE GÉNÉRALE
+   STRUCTURE PAR LIGNE
    ========================= */
 
 .board{
-  max-width:1300px;
+  max-width:1200px;
   margin:auto;
   display:flex;
   flex-direction:column;
-  gap:56px;
+  gap:34px;
 }
 
-.suit-section{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-
-.suit-title{
-  font-family:'Playfair Display',serif;
-  font-size:1.7rem;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  padding-left:6px;
-}
-
-.suit-title.red{ color:var(--red); }
-.suit-title.black{ color:#e5e7eb; }
-
-.suit-grid{
+.suit-row{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(95px,1fr));
-  gap:22px;
+  grid-template-columns:repeat(auto-fill,minmax(78px,1fr));
+  gap:16px;
 }
 
 /* =========================
-   CARTE
+   CARTE (COMPACTE)
    ========================= */
 
 .card{
@@ -73,23 +54,23 @@ body{
   border-radius:var(--radius);
   border:1px solid var(--border);
   box-shadow:var(--shadow);
-  aspect-ratio:2.5/3.5;
+  aspect-ratio:2.4/3.4;
   cursor:pointer;
   overflow:hidden;
-  transition:.25s ease;
+  transition:.2s ease;
 }
 
 .card:hover{
-  transform:translateY(-6px) rotate(-0.5deg);
-  box-shadow:0 22px 40px rgba(0,0,0,.45);
+  transform:translateY(-4px);
+  box-shadow:0 16px 30px rgba(0,0,0,.38);
 }
 
 .card::before{
   content:"";
   position:absolute;
-  inset:8px;
+  inset:6px;
   border:1px solid var(--inner);
-  border-radius:12px;
+  border-radius:10px;
   pointer-events:none;
 }
 
@@ -104,21 +85,18 @@ body{
   position:absolute;
   font-family:'Playfair Display',serif;
   font-weight:700;
-  font-size:1rem;
+  font-size:.75rem;
   line-height:1.05;
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
 }
 
 .corner.top{
-  top:10px;
-  left:10px;
+  top:6px;
+  left:6px;
 }
 
 .corner.bottom{
-  bottom:28px;
-  right:10px;
+  bottom:22px;
+  right:6px;
   transform:rotate(180deg);
 }
 
@@ -132,25 +110,28 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:3.2rem;
+  font-size:2.2rem;
   font-family:'Playfair Display',serif;
-  opacity:.9;
+  opacity:.85;
   pointer-events:none;
 }
 
 /* =========================
-   TITRE
+   NOM (PLUS LISIBLE)
    ========================= */
 
 .label{
   position:absolute;
-  bottom:8px;
-  left:8px;
-  right:8px;
+  bottom:0;
+  left:0;
+  right:0;
+  padding:4px 6px;
+  font-size:.65rem;
+  font-weight:600;
   text-align:center;
-  font-size:.7rem;
-  letter-spacing:.08em;
-  opacity:.7;
+  letter-spacing:.04em;
+  background:rgba(15,23,42,.08);
+  backdrop-filter:blur(4px);
 }
 </style>
 </head>
@@ -208,41 +189,26 @@ const nodes = [
    ========================= */
 
 function parseCard(label){
-  const match = label.match(/(.+),\s*(.+)\sde\s(♦️|❤️|♠️|♣️)/);
-  if(!match) return null;
-
+  const m = label.match(/(.+),\s*(.+)\sde\s(♦️|❤️|♠️|♣️)/);
+  if(!m) return null;
   return {
-    title:match[1],
-    value:match[2],
-    suit:match[3],
-    color:(match[3]==="♦️"||match[3]==="❤️")?"red":"black"
+    title:m[1],
+    value:m[2],
+    suit:m[3],
+    color:(m[3]==="♦️"||m[3]==="❤️")?"red":"black"
   };
 }
 
 /* =========================
-   RENDU PAR COULEUR
+   RENDU PAR LIGNE (SANS TITRE)
    ========================= */
 
 const board = document.getElementById("board");
+const order = ["♠️","❤️","♦️","♣️"];
 
-const suits = {
-  "♠️": { name:"Piques", class:"black" },
-  "❤️": { name:"Cœurs", class:"red" },
-  "♦️": { name:"Carreaux", class:"red" },
-  "♣️": { name:"Trèfles", class:"black" }
-};
-
-for(const suit in suits){
-
-  const section = document.createElement("section");
-  section.className = "suit-section";
-
-  const title = document.createElement("div");
-  title.className = `suit-title ${suits[suit].class}`;
-  title.textContent = `${suit} ${suits[suit].name}`;
-
-  const grid = document.createElement("div");
-  grid.className = "suit-grid";
+order.forEach(suit=>{
+  const row = document.createElement("div");
+  row.className = "suit-row";
 
   nodes.forEach(n=>{
     const d = parseCard(n.label);
@@ -259,13 +225,11 @@ for(const suit in suits){
     `;
 
     card.onclick = ()=>location.href = n.link;
-    grid.appendChild(card);
+    row.appendChild(card);
   });
 
-  section.appendChild(title);
-  section.appendChild(grid);
-  board.appendChild(section);
-}
+  board.appendChild(row);
+});
 </script>
 
 </body>
