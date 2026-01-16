@@ -81,11 +81,7 @@ body {
   - "key"   → vert foncé
 */
 
-const colors = {
-  life: "#1EA4D9",
-  mind: "#18D911",
-  create: "#067302",
-  key: "#F1F4FB"
+
 };
 
 const cellsData = [
@@ -93,7 +89,7 @@ const cellsData = [
 { label: "‎​🧸", text: "J’aime mes peluches, surtout mon ageuh et mon bilow.", color: "#1EA4D9" },
 { label: "‎1", text: "Anniversaire.", color: "#F1F4FB" },
 { label: "‎‎ ", text: "Je passe du temps avec mes jouets animaux, dinosaures", color: "#1EA4D9" },
-{ label: "‎🦖 ", text: "Grande guerre de la chèvre et de t-rex", color: "##F1F4FB" },
+{ label: "‎🦖 ", text: "Grande guerre de la chèvre et de t-rex", color: "#F1F4FB" },
 { label: "‎🐐", text: "Victoire de la Chèvre.", color: "#F1F4FB" },
 { label: "‎2", text: "Anniversaire.", color: "#1EA4D9" },
 { label: "🍯‎", text: "Perte de Bilow", color: "#1EA4D9" },
@@ -234,22 +230,55 @@ const cellsData = [
 { label: "‎ ", text: "Découvrir les associations de Reims, sortir chaque soir.", color: "#1EA4D9" },
 ];
 
+const cellsDataB = [
+  { label: "🧠", text: "Carte mentale globale", color: "#067302" },
+  { label: "📊", text: "Modèles psychométriques", color: "#49E1F2" },
+  { label: "🗺️", text: "Cartographie des états internes", color: "#1EA4D9" },
+  { label: "🔁", text: "Cycles, renaissances, phénixisation", color: "#18D911" },
+  { label: "🧩", text: "Archives fragmentaires", color: "#F1F4FB" }
+];
+
+
+
 const map = document.getElementById("map");
 const infoBox = document.getElementById("infoBox");
 
-cellsData.forEach(cell => {
-  const div = document.createElement("div");
-  div.className = "cell";
-  div.style.backgroundColor = cell.color;
-  div.textContent = cell.label;
+function renderMap(data) {
+  map.innerHTML = "";
+  infoBox.style.display = "none";
 
-  div.onclick = () => {
-    infoBox.textContent = cell.text;
-    infoBox.style.display = "block";
-  };
+  data.forEach(cell => {
+    const div = document.createElement("div");
+    div.className = "cell";
+    div.style.backgroundColor = cell.color;
+    div.textContent = cell.label;
 
-  map.appendChild(div);
+    div.onclick = () => {
+      infoBox.textContent = cell.text;
+      infoBox.style.display = "block";
+    };
+
+    map.appendChild(div);
+  });
+}
+
+let currentMap = "A";
+renderMap(cellsData);
+
+document.addEventListener("keydown", (e) => {
+  const key = e.key.toLowerCase();
+
+  if (key === "b" && currentMap !== "B") {
+    currentMap = "B";
+    renderMap(cellsDataB);
+  }
+
+  if (key === "a" && currentMap !== "A") {
+    currentMap = "A";
+    renderMap(cellsData);
+  }
 });
+
 </script>
 
 </body>
