@@ -45,6 +45,18 @@
     <div id="msg2" class="message"></div>
   </section>
 
+<!-- 🔹 SLIDER 3 -->
+<section class="block">
+  <h2>Orientation</h2>
+  <input id="slider3" type="range" min="0" max="2" step="1" value="0">
+  <div class="labels">
+    <span>M</span><span>A</span><span>N</span>
+  </div>
+  <div id="label3" class="current-label"></div>
+  <div id="msg3" class="message"></div>
+</section>
+
+  
 </main>
 
 <script>
@@ -99,6 +111,7 @@ function bindSlider(id, data){
 // Activation ✨
 bindSlider("slider1", data1);
 bindSlider("slider2", data2);
+bindSlider("slider3", data3);
 </script>
 </body>
 </html>
