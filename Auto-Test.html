@@ -17,7 +17,6 @@
         background-position: center;
         background-attachment: fixed;
 
-        /* voile léger pour lisibilité */
         background-color: rgba(255, 255, 255, 0.65);
         background-blend-mode: overlay;
     }
@@ -100,9 +99,11 @@
     <button data-value="-20">Imprévu</button>
     <button data-value="-35">Fatigue</button>
     <button data-value="-10">Manque de temps</button>
-    <button data-value="+10">Avoir Rigolé</button>
+    <button data-value="10">Avoir rigolé</button>
     <button data-value="-10">Manque de diversité</button>
 
+    <!-- 🔹 Bouton spécial -->
+    <button data-special="snap50">Réel insta</button>
 </div>
 
 <script>
@@ -110,10 +111,28 @@
 
     document.querySelectorAll("button").forEach(button => {
         button.addEventListener("click", () => {
-            const delta = parseInt(button.dataset.value);
-            const active = button.classList.toggle("active");
 
-            value += active ? delta : -delta;
+            /* 🔹 Bouton spécial : Réel insta */
+            if (button.dataset.special === "snap50") {
+                const diff = 50 - value;
+
+                if (Math.abs(diff) <= 15) {
+                    value = 50;
+                } else {
+                    value += diff > 0 ? 15 : -15;
+                }
+
+                button.classList.add("active");
+                setTimeout(() => button.classList.remove("active"), 300);
+
+            } else {
+                /* 🔹 Boutons classiques */
+                const delta = parseInt(button.dataset.value);
+                const active = button.classList.toggle("active");
+
+                value += active ? delta : -delta;
+            }
+
             value = Math.max(0, Math.min(100, value));
 
             document.getElementById("bar").style.width = value + "%";
