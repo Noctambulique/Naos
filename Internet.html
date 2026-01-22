@@ -89,6 +89,12 @@ body::after {
         inset 0 1px 0 rgba(255,255,255,0.9),
         0 6px 18px rgba(0,0,0,0.18);
     color: #123a52;
+
+    /* 🔒 FIX TEXTE QUI DÉBORDE */
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
 }
 
 /* TEXTE */
@@ -102,6 +108,7 @@ body::after {
     margin: 0;
     font-size: 13.5px;
     line-height: 1.5;
+    max-width: 100%;
 }
 </style>
 </head>
@@ -109,6 +116,30 @@ body::after {
 <body>
 
 <div class="interface">
+    <div class="title">Interface Frutiger</div>
+
+    <div class="grid">
+        <div class="panel">
+            <h3>Bloc 1</h3>
+            <p>
+                Texte normal ou trèslongmotquidepasseraitavantmaisplusmaintenantgrâceaufixcss.
+            </p>
+        </div>
+
+        <div class="panel">
+            <h3>Bloc 2</h3>
+            <p>
+                https://une-url-super-longue-qui-debordait-avant-mais-qui-est-maintenant-correctement-cassee.com
+            </p>
+        </div>
+
+        <div class="panel">
+            <h3>Bloc 3</h3>
+            <p>
+                Aucun débordement, même avec du contenu imprévisible.
+            </p>
+        </div>
+
 
     <div class="title">FRUTIGER AERO SYSTEM</div>
 
