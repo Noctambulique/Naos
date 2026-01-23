@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bibliothèque Virtuelle</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .bibliotheque {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+
+        .bibliotheque img {
+            width: 150px;
+            cursor: pointer;
+            border-radius: 8px;
+            border: 3px solid transparent;
+            transition: transform 0.2s, border 0.2s;
+        }
+
+        .bibliotheque img:hover {
+            transform: scale(1.05);
+            border: 3px solid #333;
+        }
+
+        .zone-texte {
+            background-color: white;
+            width: 70%;
+            margin: 20px auto;
+            padding: 20px;
+            min-height: 120px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            white-space: pre-line; /* IMPORTANT : gère les \n */
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<h1>📚 Bibliothèque Virtuelle</h1>
+
+<div class="bibliotheque" id="bibliotheque"></div>
+
+<div class="zone-texte" id="zoneTexte">
+Clique sur une image pour afficher le texte.
+</div>
+
+<script>
+    const bibliotheque = document.getElementById("bibliotheque");
+    const zoneTexte = document.getElementById("zoneTexte");
+
+    const livres = [
+        {
+            image: "images/livre1.jpg",
+            texte: "Titre : Livre 1\nAuteur : Auteur A\n\nCeci est un exemple de texte.\nChaque \\n crée un retour à la ligne.\n\nCeci est une bibliothèque virtuelle."
+        },
+        {
+            image: "images/livre2.jpg",
+            texte: "Titre : Livre 2\nAuteur : Auteur B\n\nUn autre contenu.\nEncore une nouvelle ligne.\n\nFacile à modifier."
+        },
+        {
+            image: "images/livre3.jpg",
+            texte: "Titre : Livre 3\nAuteur : Auteur C\n\nTu peux ajouter autant de livres que tu veux.\n\nIl suffit d'ajouter une image et un texte."
+        }
+    ];
+
+    livres.forEach(livre => {
+        const img = document.createElement("img");
+        img.src = livre.image;
+
+        img.addEventListener("click", () => {
+            zoneTexte.textContent = livre.texte;
+        });
+
+        bibliotheque.appendChild(img);
+    });
+</script>
+
+</body>
+</html>
