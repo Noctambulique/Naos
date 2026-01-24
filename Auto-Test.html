@@ -116,15 +116,15 @@ const criteriaConfig = {
         defaultState: 1,
         states: [
             {
-                label: "😴 Mauvais sommeil",
+                label: "🛏️ Mauvais sommeil",
                 impact: { adequation: -10, resilience: -20, motivation: -15, clarte: -15 }
             },
             {
-                label: "😐 Sommeil moyen",
+                label: "🛏️ Sommeil moyen",
                 impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
             },
             {
-                label: "😊 Bon sommeil",
+                label: "🛏️ Bon sommeil",
                 impact: { adequation: 10, resilience: 10, motivation: 10, clarte: 10 }
             }
         ]
@@ -134,11 +134,11 @@ const criteriaConfig = {
         defaultState: 1,
         states: [
             {
-                label: "🍟 Mauvaise alimentation",
+                label: "🥗 Mauvaise alimentation",
                 impact: { adequation: -10, resilience: -5, motivation: -10, clarte: -5 }
             },
             {
-                label: "😐 Alimentation correcte",
+                label: "🥗 Alimentation correcte",
                 impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
             },
             {
@@ -152,15 +152,15 @@ const criteriaConfig = {
         defaultState: 1,
         states: [
             {
-                label: "😶 Isolement",
+                label: "🗣️ Isolement",
                 impact: { adequation: -10, resilience: -10, motivation: -10, clarte: -5 }
             },
             {
-                label: "😐 Contacts normaux",
+                label: "🗣️ Contacts normaux",
                 impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
             },
             {
-                label: "😊 Lien social nourrissant",
+                label: "🗣️ Lien social nourrissant",
                 impact: { adequation: 15, resilience: 10, motivation: 10, clarte: 5 }
             }
                  ]
@@ -171,15 +171,15 @@ const criteriaConfig = {
         defaultState: 1,
         states: [
             {
-                label: "😶 Immobilité",
+                label: "🚶 Immobilité",
                 impact: { adequation: -10, resilience: -10, motivation: -20, clarte: -15 }
             },
             {
-                label: "😐 En Mouvement",
+                label: "🚶 En Mouvement",
                 impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
             },
             {
-                label: "😊 Haut Dynamisme",
+                label: "🚶 Haut Dynamisme",
                 impact: { adequation: 15, resilience: 15, motivation: 15, clarte: 10 }
             }
         ]
@@ -188,75 +188,75 @@ const criteriaConfig = {
         defaultState: 1,
         states: [
             {
-                label: "😶 Imprévu",
+                label: "🗺️ Imprévu",
                 impact: { adequation: -10, resilience: -20, motivation: -20, clarte: 0 }
             },
             {
-                label: "😐 Rien de prévu",
+                label: "🗺️ Rien de prévu",
                 impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
             },
             {
-                label: "😊 Plan qui se déroule bien",
+                label: "🗺️ Plan qui se déroule bien",
                 impact: { adequation: 15, resilience: 5, motivation: 5, clarte: 10 }
             },
                                 Temps: {
         defaultState: 1,
         states: [
             {
-                label: "😶 Pas de Temps",
+                label: "⏳ Pas de Temps",
                 impact: { adequation: -15, resilience: -10, motivation: 0, clarte: -5 }
             },
             {
-                label: "😐 Un peu de temps",
+                label: "⏳ Un peu de temps",
                 impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
             },
             {
-                label: "😊 Plan qui se déroule bien",
+                label: "⏳ Beaucoup de temps",
                 impact: { adequation: 5, resilience: 5, motivation: 5, clarte: 10 }
             },
             Problème: {
         defaultState: 1,
         states: [
             {
-                label: "😶 Problème Irésolu",
+                label: "❓ Problème Irésolu",
                 impact: { adequation: -15, resilience: -20, motivation: 0, clarte: -10 }
             },
             {
-                label: "😐 Un peu de temps",
-                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+                label: "❓ En recherche",
+                impact: { adequation: 10, resilience: 0, motivation: 0, clarte: 0 }
             },
             {
-                label: "😊 Tout est compris",
+                label: "❓ Tout est compris",
                 impact: { adequation: 15, resilience: 15, motivation: 0, clarte: 10 }
             },
             Musique: {
         defaultState: 1,
         states: [
             {
-                label: "😶 Pas de Musique",
+                label: "🎵 Pas de musique",
                 impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
             },
             {
-                label: "😐 Un peu de temps",
+                label: "🎵 Un peu de musique",
                 impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
             },
             {
-                label: "😊 Plan qui se déroule bien",
+                label: "🎵 Beaucoup de musique",
                 impact: { adequation: 15, resilience: 15, motivation: 15, clarte: 5 }
             },
                     Réel: {
         defaultState: 1,
         states: [
             {
-                label: "😶 Pas de réel",
+                label: "📞 Pas de réel",
                 impact: { adequation: 10, resilience: 0, motivation: 0, clarte: 0 }
             },
             {
-                label: "😐 Un peu de Réel",
+                label: "📞 Un peu de Réel",
                 impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
             },
             {
-                label: "😊 Beaucoup de Réel",
+                label: "📞 Beaucoup de Réel",
                 impact: { adequation: -5, resilience: 20, motivation: -10, clarte: -10 }
             }
         ]
