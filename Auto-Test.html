@@ -98,6 +98,9 @@
     <button data-criterion="Temps"></button>
     <button data-criterion="Problème"></button>
     <button data-criterion="Musique"></button>
+    <button data-criterion="Réel"></button>
+    <button data-criterion="Film"></button>
+
 </div>
 
 <script>
@@ -266,6 +269,23 @@ const criteriaConfig = {
             {
                 label: "📞 Beaucoup de Réel",
                 impact: { adequation: -5, resilience: 20, motivation: -10, clarte: -10 }
+            },
+        ]
+    },
+                        Cinéma: {
+        defaultState: 1,
+        states: [
+            {
+                label: "🎬 Aucun film",
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "🎬 Un épisode de série",
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "🎬 Beaucoup de cinéma",
+                impact: { adequation: -5, resilience: 10, motivation: -10, clarte: -10 }
             }
         ]
     }
