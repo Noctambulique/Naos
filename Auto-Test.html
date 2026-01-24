@@ -30,7 +30,7 @@
         width: 100%;
         height: 12px;
         background: rgba(0,0,0,0.15);
-        margin: 40px 0;
+        margin: 35px 0 8px;
     }
 
     .bar {
@@ -40,11 +40,17 @@
         transition: width 0.4s ease;
     }
 
+    .label {
+        font-size: 14px;
+        color: #222;
+        margin-bottom: 15px;
+    }
+
     .buttons {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 14px;
-        margin-top: 30px;
+        margin-top: 40px;
     }
 
     button {
@@ -69,12 +75,6 @@
         background: #000;
         color: #fff;
     }
-
-    .label {
-        margin-top: 15px;
-        font-size: 14px;
-        color: #222;
-    }
 </style>
 </head>
 
@@ -82,65 +82,132 @@
 
 <h1>État intérieur</h1>
 
+<!-- Adéquation -->
 <div class="bar-container">
-    <div id="bar" class="bar"></div>
+    <div id="adequation" class="bar"></div>
 </div>
+<div class="label">Adéquation avec soi : <span id="adequationValue">50%</span></div>
 
-<div class="label" id="value">Niveau : 50%</div>
+<!-- Résilience -->
+<div class="bar-container">
+    <div id="resilience" class="bar"></div>
+</div>
+<div class="label">Résilience : <span id="resilienceValue">50%</span></div>
 
+<!-- Motivation -->
+<div class="bar-container">
+    <div id="motivation" class="bar"></div>
+</div>
+<div class="label">Motivation : <span id="motivationValue">50%</span></div>
+
+<!-- Clarté mentale -->
+<div class="bar-container">
+    <div id="clarte" class="bar"></div>
+</div>
+<div class="label">Clarté mentale : <span id="clarteValue">50%</span></div>
+
+<!-- Boutons -->
 <div class="buttons">
-    <button data-value="20">Bon sommeil</button>
-    <button data-value="10">Bonne nourriture</button>
-    <button data-value="15">Musique</button>
-    <button data-value="25">Soleil</button>
-    <button data-value="10">Sport</button>
-    <button data-value="-25">Ne pas résoudre un problème</button>
-    <button data-value="10">Voir des gens</button>
+    <button
+        data-adequation="10"
+        data-resilience="5"
+        data-motivation="15"
+        data-clarte="5">
+        Bon sommeil
+    </button>
 
-    <button data-value="-20">Imprévu</button>
-    <button data-value="-35">Fatigue</button>
-    <button data-value="-10">Manque de temps</button>
-    <button data-value="10">Avoir rigolé</button>
-    <button data-value="-10">Manque de diversité</button>
-    <button data-value="15">Voir des amis</button>
+    <button
+        data-adequation="5"
+        data-resilience="0"
+        data-motivation="10"
+        data-clarte="15">
+        Bonne nourriture
+    </button>
 
-    <!-- 🔹 Bouton spécial -->
-    <button data-special="snap50">Réel insta</button>
+    <button
+        data-adequation="5"
+        data-resilience="10"
+        data-motivation="10"
+        data-clarte="0">
+        Sport
+    </button>
+
+    <button
+        data-adequation="0"
+        data-resilience="5"
+        data-motivation="15"
+        data-clarte="10">
+        Musique
+    </button>
+
+    <button
+        data-adequation="10"
+        data-resilience="15"
+        data-motivation="5"
+        data-clarte="10">
+        Voir des amis
+    </button>
+
+    <button
+        data-adequation="-10"
+        data-resilience="-20"
+        data-motivation="-15"
+        data-clarte="-25">
+        Fatigue
+    </button>
+
+    <button
+        data-adequation="-15"
+        data-resilience="-10"
+        data-motivation="-10"
+        data-clarte="-5">
+        Manque de temps
+    </button>
+
+    <button
+        data-adequation="-20"
+        data-resilience="-15"
+        data-motivation="-20"
+        data-clarte="-15">
+        Imprévu
+    </button>
 </div>
 
 <script>
-    let value = 50;
+    const bars = {
+        adequation: 50,
+        resilience: 50,
+        motivation: 50,
+        clarte: 50
+    };
+
+    function clamp(value) {
+        return Math.max(0, Math.min(100, value));
+    }
+
+    function updateUI() {
+        for (const key in bars) {
+            bars[key] = clamp(bars[key]);
+            document.getElementById(key).style.width = bars[key] + "%";
+            document.getElementById(key + "Value").textContent = bars[key] + "%";
+        }
+    }
 
     document.querySelectorAll("button").forEach(button => {
         button.addEventListener("click", () => {
 
-            /* 🔹 Bouton spécial : Réel insta */
-            if (button.dataset.special === "snap50") {
-                const diff = 50 - value;
+            const active = button.classList.toggle("active");
 
-                if (Math.abs(diff) <= 15) {
-                    value = 50;
-                } else {
-                    value += diff > 0 ? 15 : -15;
-                }
-
-                button.classList.add("active");
-                setTimeout(() => button.classList.remove("active"), 300);
-
-            } else {
-                /* 🔹 Boutons classiques */
-                const delta = parseInt(button.dataset.value);
-                const active = button.classList.toggle("active");
-
-                value += active ? delta : -delta;
+            for (const key in bars) {
+                const delta = parseInt(button.dataset[key] || 0);
+                bars[key] += active ? delta : -delta;
             }
 
-            value = Math.max(0, Math.min(100, value));
-
-            document.getElementById("bar").style.width = value + "%";
-            document.getElementById("value").textContent = "Niveau : " + value + "%";
+            updateUI();
         });
     });
+
+    updateUI();
 </script>
 
 </body>
