@@ -229,7 +229,7 @@ const criteriaConfig = {
         defaultState: 1,
         states: [
             {
-                label: "❓ Problème Irésolu",
+                label: "❓ Problème Irrésolu",
                 impact: { adequation: -15, resilience: -20, motivation: 0, clarte: -10, inspiration :0 }
             },
             {
@@ -321,7 +321,7 @@ document.querySelectorAll("[data-criterion]").forEach(button => {
 
         // Retirer impact actuel
         for (const key in bars) {
-            bars[key] -= currentImpact[key];
+bars[key] -= currentImpact[key] || 0;
         }
 
         // État suivant
@@ -330,7 +330,7 @@ document.querySelectorAll("[data-criterion]").forEach(button => {
 
         // Appliquer nouvel impact
         for (const key in bars) {
-            bars[key] += currentImpact[key];
+bars[key] += currentImpact[key] || 0;
         }
 
         button.textContent = config.states[index].label;
