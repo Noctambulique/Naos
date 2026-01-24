@@ -94,7 +94,6 @@
     <button data-criterion="Nourriture"></button>
     <button data-criterion="Sociabilité"></button>
     <button data-criterion="Sortir"></button>
-    <button data-criterion="Sport"></button>
     <button data-criterion="Imprévu"></button>
     <button data-criterion="Temps"></button>
     <button data-criterion="Problème"></button>
@@ -182,6 +181,83 @@ const criteriaConfig = {
             {
                 label: "😊 Haut Dynamisme",
                 impact: { adequation: 15, resilience: 15, motivation: 15, clarte: 10 }
+            }
+        ]
+    },
+                    Imprévu: {
+        defaultState: 1,
+        states: [
+            {
+                label: "😶 Imprévu",
+                impact: { adequation: -10, resilience: -20, motivation: -20, clarte: 0 }
+            },
+            {
+                label: "😐 Rien de prévu",
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "😊 Plan qui se déroule bien",
+                impact: { adequation: 15, resilience: 5, motivation: 5, clarte: 10 }
+            },
+                                Temps: {
+        defaultState: 1,
+        states: [
+            {
+                label: "😶 Pas de Temps",
+                impact: { adequation: -15, resilience: -10, motivation: 0, clarte: -5 }
+            },
+            {
+                label: "😐 Un peu de temps",
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "😊 Plan qui se déroule bien",
+                impact: { adequation: 5, resilience: 5, motivation: 5, clarte: 10 }
+            },
+            Problème: {
+        defaultState: 1,
+        states: [
+            {
+                label: "😶 Problème Irésolu",
+                impact: { adequation: -15, resilience: -20, motivation: 0, clarte: -10 }
+            },
+            {
+                label: "😐 Un peu de temps",
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "😊 Tout est compris",
+                impact: { adequation: 15, resilience: 15, motivation: 0, clarte: 10 }
+            },
+            Musique: {
+        defaultState: 1,
+        states: [
+            {
+                label: "😶 Pas de Musique",
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "😐 Un peu de temps",
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "😊 Plan qui se déroule bien",
+                impact: { adequation: 15, resilience: 15, motivation: 15, clarte: 5 }
+            },
+                    Réel: {
+        defaultState: 1,
+        states: [
+            {
+                label: "😶 Pas de réel",
+                impact: { adequation: 10, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "😐 Un peu de Réel",
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "😊 Beaucoup de Réel",
+                impact: { adequation: -5, resilience: 20, motivation: -10, clarte: -10 }
             }
         ]
     }
