@@ -7,13 +7,25 @@
 <style>
     body {
         font-family: serif;
+        color: #111;
         max-width: 700px;
         margin: 80px auto;
         text-align: center;
-        background: #f5f5f5;
+
+        /* 🔁 FOND D’ORIGINE */
+        background-image: url("Map/télécharger (35).jpg");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+
+        background-color: rgba(255, 255, 255, 0.65);
+        background-blend-mode: overlay;
     }
 
-    h1 { margin-bottom: 40px; }
+    h1 {
+        font-weight: normal;
+        margin-bottom: 40px;
+    }
 
     .bar-container {
         width: 100%;
@@ -29,7 +41,11 @@
         transition: width 0.4s ease;
     }
 
-    .label { font-size: 14px; margin-bottom: 12px; }
+    .label {
+        font-size: 14px;
+        margin-bottom: 14px;
+        color: #222;
+    }
 
     .buttons {
         display: grid;
@@ -40,15 +56,16 @@
 
     button {
         height: 52px;
+        background: rgba(255,255,255,0.75);
         border: 1px solid rgba(0,0,0,0.4);
-        background: rgba(255,255,255,0.85);
-        cursor: pointer;
-        transition: 0.25s;
         font-size: 14px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        backdrop-filter: blur(2px);
     }
 
     button:hover {
-        background: #000;
+        background: rgba(0,0,0,0.85);
         color: white;
     }
 </style>
@@ -60,7 +77,7 @@
 
 <!-- Barres -->
 <div class="bar-container"><div id="adequation" class="bar"></div></div>
-<div class="label">Adéquation : <span id="adequationValue">50%</span></div>
+<div class="label">Adéquation avec soi : <span id="adequationValue">50%</span></div>
 
 <div class="bar-container"><div id="resilience" class="bar"></div></div>
 <div class="label">Résilience : <span id="resilienceValue">50%</span></div>
@@ -87,7 +104,7 @@ const bars = {
     clarte: 50
 };
 
-/* ⚙️ CONFIGURATION DES CRITÈRES (ZONE À PERSONNALISER) */
+/* ⚙️ CONFIGURATION DES CRITÈRES (PERSONNALISATION ICI) */
 const criteriaConfig = {
 
     sleep: {
@@ -145,7 +162,7 @@ const criteriaConfig = {
     }
 };
 
-/* 🧩 LOGIQUE GÉNÉRIQUE (NE PLUS TOUCHER) */
+/* 🧩 LOGIQUE GÉNÉRIQUE */
 
 function clamp(v) {
     return Math.max(0, Math.min(100, v));
