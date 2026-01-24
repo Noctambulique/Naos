@@ -88,6 +88,9 @@
 <div class="bar-container"><div id="clarte" class="bar"></div></div>
 <div class="label">Clarté mentale : <span id="clarteValue">50%</span></div>
 
+<div class="bar-container"><div id="clarte" class="bar"></div></div>
+<div class="label">Inspiration : <span id="clarteValue">50%</span></div>
+
 <!-- Boutons multi-états -->
 <div class="buttons">
     <button data-criterion="Sommeil"></button>
@@ -110,6 +113,7 @@ const bars = {
     resilience: 50,
     motivation: 50,
     clarte: 50
+    inspiration: 50
 };
 
 /* ⚙️ CONFIGURATION DES CRITÈRES (PERSONNALISATION ICI) */
@@ -138,15 +142,15 @@ const criteriaConfig = {
         states: [
             {
                 label: "🥗 Mauvaise alimentation",
-                impact: { adequation: -10, resilience: -5, motivation: -10, clarte: -5 }
+                impact: { adequation: -10, resilience: -5, motivation: -10, clarte: -5, inspiration :0 }
             },
             {
                 label: "🥗 Alimentation correcte",
-                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0, inspiration :0 }
             },
             {
                 label: "🥗 Bonne alimentation",
-                impact: { adequation: 5, resilience: 5, motivation: 5, clarte: 10 }
+                impact: { adequation: 5, resilience: 5, motivation: 5, clarte: 10, inspiration :0 }
             }
         ]
     },
@@ -156,15 +160,15 @@ const criteriaConfig = {
         states: [
             {
                 label: "🗣️ Isolement",
-                impact: { adequation: -10, resilience: -10, motivation: -10, clarte: -5 }
+                impact: { adequation: -10, resilience: -10, motivation: -10, clarte: -5, inspiration :0 }
             },
             {
                 label: "🗣️ Contacts normaux",
-                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0, inspiration :0 }
             },
             {
                 label: "🗣️ Lien social nourrissant",
-                impact: { adequation: 15, resilience: 10, motivation: 10, clarte: 5 }
+                impact: { adequation: 15, resilience: 10, motivation: 10, clarte: 5, inspiration :0 }
             }
                  ]
     },
@@ -175,15 +179,15 @@ const criteriaConfig = {
         states: [
             {
                 label: "🚶 Immobilité",
-                impact: { adequation: -10, resilience: -10, motivation: -20, clarte: -15 }
+                impact: { adequation: -10, resilience: -10, motivation: -20, clarte: -15, inspiration :0 }
             },
             {
                 label: "🚶 En Mouvement",
-                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0, inspiration :10 }
             },
             {
                 label: "🚶 Haut Dynamisme",
-                impact: { adequation: 15, resilience: 15, motivation: 15, clarte: 10 }
+                impact: { adequation: 15, resilience: 15, motivation: 15, clarte: 10, inspiration :10 }
             }
         ]
     },
@@ -192,15 +196,15 @@ const criteriaConfig = {
         states: [
             {
                 label: "🗺️ Imprévu",
-                impact: { adequation: -10, resilience: -20, motivation: -20, clarte: 0 }
+                impact: { adequation: -10, resilience: -20, motivation: -20, clarte: 0, inspiration :0 }
             },
             {
                 label: "🗺️ Rien de prévu",
-                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0, inspiration :0 }
             },
             {
                 label: "🗺️ Plan qui se déroule bien",
-                impact: { adequation: 15, resilience: 5, motivation: 5, clarte: 10 }
+                impact: { adequation: 15, resilience: 5, motivation: 5, clarte: 10, inspiration :0 }
             }
             ]
     },
@@ -209,15 +213,15 @@ const criteriaConfig = {
         states: [
             {
                 label: "⏳ Pas de Temps",
-                impact: { adequation: -15, resilience: -10, motivation: 0, clarte: -5 }
+                impact: { adequation: -15, resilience: -10, motivation: 0, clarte: -5, inspiration :-10 }
             },
             {
                 label: "⏳ Un peu de temps",
-                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0, inspiration :5 }
             },
             {
                 label: "⏳ Beaucoup de temps",
-                impact: { adequation: 5, resilience: 5, motivation: 5, clarte: 10 }
+                impact: { adequation: 5, resilience: 5, motivation: 5, clarte: 10, inspiration :5 }
             },
                         ]
     },
@@ -226,15 +230,15 @@ const criteriaConfig = {
         states: [
             {
                 label: "❓ Problème Irésolu",
-                impact: { adequation: -15, resilience: -20, motivation: 0, clarte: -10 }
+                impact: { adequation: -15, resilience: -20, motivation: 0, clarte: -10, inspiration :0 }
             },
             {
                 label: "❓ En recherche",
-                impact: { adequation: 10, resilience: 0, motivation: 0, clarte: 0 }
+                impact: { adequation: 10, resilience: 0, motivation: 0, clarte: 0, inspiration :0 }
             },
             {
                 label: "❓ Tout est compris",
-                impact: { adequation: 15, resilience: 15, motivation: 0, clarte: 10 }
+                impact: { adequation: 15, resilience: 15, motivation: 0, clarte: 10, inspiration :0 }
             },
                         ]
     },
@@ -243,15 +247,15 @@ const criteriaConfig = {
         states: [
             {
                 label: "🎵 Pas de musique",
-                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0, inspiration :0 }
             },
             {
                 label: "🎵 Un peu de musique",
-                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0, inspiration :10 }
             },
             {
                 label: "🎵 Beaucoup de musique",
-                impact: { adequation: 15, resilience: 15, motivation: 15, clarte: 5 }
+                impact: { adequation: 15, resilience: 15, motivation: 15, clarte: 5, inspiration :5 }
             },
                         ]
     },
@@ -260,11 +264,11 @@ const criteriaConfig = {
         states: [
             {
                 label: "📞 Pas de réel",
-                impact: { adequation: 10, resilience: 0, motivation: 0, clarte: 0 }
+                impact: { adequation: 10, resilience: 0, motivation: 0, clarte: 0, inspiration :0 }
             },
             {
                 label: "📞 Un peu de Réel",
-                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0, inspiration :0 }
             },
             {
                 label: "📞 Beaucoup de Réel",
@@ -277,15 +281,15 @@ const criteriaConfig = {
         states: [
             {
                 label: "🎬 Aucun film",
-                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0, inspiration :0 }
             },
             {
                 label: "🎬 Un épisode de série",
-                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0, inspiration :5 }
             },
             {
                 label: "🎬 Beaucoup de cinéma",
-                impact: { adequation: -5, resilience: 10, motivation: -10, clarte: -10 }
+                impact: { adequation: -5, resilience: 10, motivation: -10, clarte: -10, inspiration :10 }
             }
         ]
     }
