@@ -7,30 +7,19 @@
 <style>
     body {
         font-family: serif;
-        color: #111;
         max-width: 700px;
         margin: 80px auto;
         text-align: center;
-
-        background-image: url("Map/télécharger (35).jpg");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-
-        background-color: rgba(255, 255, 255, 0.65);
-        background-blend-mode: overlay;
+        background: #f5f5f5;
     }
 
-    h1 {
-        font-weight: normal;
-        margin-bottom: 40px;
-    }
+    h1 { margin-bottom: 40px; }
 
     .bar-container {
         width: 100%;
         height: 12px;
         background: rgba(0,0,0,0.15);
-        margin: 35px 0 8px;
+        margin: 30px 0 6px;
     }
 
     .bar {
@@ -40,11 +29,7 @@
         transition: width 0.4s ease;
     }
 
-    .label {
-        font-size: 14px;
-        color: #222;
-        margin-bottom: 15px;
-    }
+    .label { font-size: 14px; margin-bottom: 12px; }
 
     .buttons {
         display: grid;
@@ -54,26 +39,17 @@
     }
 
     button {
-        height: 50px;
-        background: rgba(255,255,255,0.75);
+        height: 52px;
         border: 1px solid rgba(0,0,0,0.4);
-        font-size: 14px;
+        background: rgba(255,255,255,0.85);
         cursor: pointer;
-        transition: all 0.25s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        backdrop-filter: blur(2px);
+        transition: 0.25s;
+        font-size: 14px;
     }
 
     button:hover {
-        background: rgba(0,0,0,0.85);
-        color: white;
-    }
-
-    button.active {
         background: #000;
-        color: #fff;
+        color: white;
     }
 </style>
 </head>
@@ -82,132 +58,138 @@
 
 <h1>État intérieur</h1>
 
-<!-- Adéquation -->
-<div class="bar-container">
-    <div id="adequation" class="bar"></div>
-</div>
-<div class="label">Adéquation avec soi : <span id="adequationValue">50%</span></div>
+<!-- Barres -->
+<div class="bar-container"><div id="adequation" class="bar"></div></div>
+<div class="label">Adéquation : <span id="adequationValue">50%</span></div>
 
-<!-- Résilience -->
-<div class="bar-container">
-    <div id="resilience" class="bar"></div>
-</div>
+<div class="bar-container"><div id="resilience" class="bar"></div></div>
 <div class="label">Résilience : <span id="resilienceValue">50%</span></div>
 
-<!-- Motivation -->
-<div class="bar-container">
-    <div id="motivation" class="bar"></div>
-</div>
+<div class="bar-container"><div id="motivation" class="bar"></div></div>
 <div class="label">Motivation : <span id="motivationValue">50%</span></div>
 
-<!-- Clarté mentale -->
-<div class="bar-container">
-    <div id="clarte" class="bar"></div>
-</div>
+<div class="bar-container"><div id="clarte" class="bar"></div></div>
 <div class="label">Clarté mentale : <span id="clarteValue">50%</span></div>
 
-<!-- Boutons -->
+<!-- Boutons multi-états -->
 <div class="buttons">
-    <button
-        data-adequation="10"
-        data-resilience="5"
-        data-motivation="15"
-        data-clarte="5">
-        Bon sommeil
-    </button>
-
-    <button
-        data-adequation="5"
-        data-resilience="0"
-        data-motivation="10"
-        data-clarte="15">
-        Bonne nourriture
-    </button>
-
-    <button
-        data-adequation="5"
-        data-resilience="10"
-        data-motivation="10"
-        data-clarte="0">
-        Sport
-    </button>
-
-    <button
-        data-adequation="0"
-        data-resilience="5"
-        data-motivation="15"
-        data-clarte="10">
-        Musique
-    </button>
-
-    <button
-        data-adequation="10"
-        data-resilience="15"
-        data-motivation="5"
-        data-clarte="10">
-        Voir des amis
-    </button>
-
-    <button
-        data-adequation="-10"
-        data-resilience="-20"
-        data-motivation="-15"
-        data-clarte="-25">
-        Fatigue
-    </button>
-
-    <button
-        data-adequation="-15"
-        data-resilience="-10"
-        data-motivation="-10"
-        data-clarte="-5">
-        Manque de temps
-    </button>
-
-    <button
-        data-adequation="-20"
-        data-resilience="-15"
-        data-motivation="-20"
-        data-clarte="-15">
-        Imprévu
-    </button>
+    <button data-criterion="sleep"></button>
+    <button data-criterion="food"></button>
+    <button data-criterion="social"></button>
 </div>
 
 <script>
-    const bars = {
-        adequation: 50,
-        resilience: 50,
-        motivation: 50,
-        clarte: 50
-    };
+/* 🔢 Barres */
+const bars = {
+    adequation: 50,
+    resilience: 50,
+    motivation: 50,
+    clarte: 50
+};
 
-    function clamp(value) {
-        return Math.max(0, Math.min(100, value));
-    }
+/* ⚙️ CONFIGURATION DES CRITÈRES (ZONE À PERSONNALISER) */
+const criteriaConfig = {
 
-    function updateUI() {
-        for (const key in bars) {
-            bars[key] = clamp(bars[key]);
-            document.getElementById(key).style.width = bars[key] + "%";
-            document.getElementById(key + "Value").textContent = bars[key] + "%";
-        }
-    }
-
-    document.querySelectorAll("button").forEach(button => {
-        button.addEventListener("click", () => {
-
-            const active = button.classList.toggle("active");
-
-            for (const key in bars) {
-                const delta = parseInt(button.dataset[key] || 0);
-                bars[key] += active ? delta : -delta;
+    sleep: {
+        defaultState: 1,
+        states: [
+            {
+                label: "😴 Mauvais sommeil",
+                impact: { adequation: -15, resilience: -20, motivation: -15, clarte: -25 }
+            },
+            {
+                label: "😐 Sommeil moyen",
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "😊 Bon sommeil",
+                impact: { adequation: 10, resilience: 5, motivation: 15, clarte: 5 }
             }
+        ]
+    },
 
-            updateUI();
-        });
+    food: {
+        defaultState: 1,
+        states: [
+            {
+                label: "🍟 Mauvaise alimentation",
+                impact: { adequation: -10, resilience: -10, motivation: -5, clarte: -15 }
+            },
+            {
+                label: "😐 Alimentation correcte",
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "🥗 Bonne alimentation",
+                impact: { adequation: 5, resilience: 5, motivation: 10, clarte: 10 }
+            }
+        ]
+    },
+
+    social: {
+        defaultState: 1,
+        states: [
+            {
+                label: "😶 Isolement",
+                impact: { adequation: -15, resilience: -10, motivation: -10, clarte: -5 }
+            },
+            {
+                label: "😐 Contacts normaux",
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "😊 Lien social nourrissant",
+                impact: { adequation: 15, resilience: 10, motivation: 10, clarte: 5 }
+            }
+        ]
+    }
+};
+
+/* 🧩 LOGIQUE GÉNÉRIQUE (NE PLUS TOUCHER) */
+
+function clamp(v) {
+    return Math.max(0, Math.min(100, v));
+}
+
+function updateUI() {
+    for (const key in bars) {
+        bars[key] = clamp(bars[key]);
+        document.getElementById(key).style.width = bars[key] + "%";
+        document.getElementById(key + "Value").textContent = bars[key] + "%";
+    }
+}
+
+document.querySelectorAll("[data-criterion]").forEach(button => {
+
+    const id = button.dataset.criterion;
+    const config = criteriaConfig[id];
+    let index = config.defaultState;
+    let currentImpact = config.states[index].impact;
+
+    button.textContent = config.states[index].label;
+
+    button.addEventListener("click", () => {
+
+        // Retirer impact actuel
+        for (const key in bars) {
+            bars[key] -= currentImpact[key];
+        }
+
+        // État suivant
+        index = (index + 1) % config.states.length;
+        currentImpact = config.states[index].impact;
+
+        // Appliquer nouvel impact
+        for (const key in bars) {
+            bars[key] += currentImpact[key];
+        }
+
+        button.textContent = config.states[index].label;
+        updateUI();
     });
+});
 
-    updateUI();
+updateUI();
 </script>
 
 </body>
