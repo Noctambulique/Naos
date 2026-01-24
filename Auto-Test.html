@@ -90,9 +90,15 @@
 
 <!-- Boutons multi-états -->
 <div class="buttons">
-    <button data-criterion="sleep"></button>
-    <button data-criterion="food"></button>
-    <button data-criterion="social"></button>
+    <button data-criterion="Sommeil"></button>
+    <button data-criterion="Nourriture"></button>
+    <button data-criterion="Sociabilité"></button>
+    <button data-criterion="Sortir"></button>
+    <button data-criterion="Sport"></button>
+    <button data-criterion="Imprévu"></button>
+    <button data-criterion="Temps"></button>
+    <button data-criterion="Problème"></button>
+    <button data-criterion="Musique"></button>
 </div>
 
 <script>
@@ -107,12 +113,12 @@ const bars = {
 /* ⚙️ CONFIGURATION DES CRITÈRES (PERSONNALISATION ICI) */
 const criteriaConfig = {
 
-    sleep: {
+    Sommeil: {
         defaultState: 1,
         states: [
             {
                 label: "😴 Mauvais sommeil",
-                impact: { adequation: -15, resilience: -20, motivation: -15, clarte: -25 }
+                impact: { adequation: -10, resilience: -20, motivation: -15, clarte: -15 }
             },
             {
                 label: "😐 Sommeil moyen",
@@ -120,17 +126,17 @@ const criteriaConfig = {
             },
             {
                 label: "😊 Bon sommeil",
-                impact: { adequation: 10, resilience: 5, motivation: 15, clarte: 5 }
+                impact: { adequation: 10, resilience: 10, motivation: 10, clarte: 10 }
             }
         ]
     },
 
-    food: {
+    Nourriture: {
         defaultState: 1,
         states: [
             {
                 label: "🍟 Mauvaise alimentation",
-                impact: { adequation: -10, resilience: -10, motivation: -5, clarte: -15 }
+                impact: { adequation: -10, resilience: -5, motivation: -10, clarte: -5 }
             },
             {
                 label: "😐 Alimentation correcte",
@@ -138,17 +144,17 @@ const criteriaConfig = {
             },
             {
                 label: "🥗 Bonne alimentation",
-                impact: { adequation: 5, resilience: 5, motivation: 10, clarte: 10 }
+                impact: { adequation: 5, resilience: 5, motivation: 5, clarte: 10 }
             }
         ]
     },
 
-    social: {
+    Sociabilité: {
         defaultState: 1,
         states: [
             {
                 label: "😶 Isolement",
-                impact: { adequation: -15, resilience: -10, motivation: -10, clarte: -5 }
+                impact: { adequation: -10, resilience: -10, motivation: -10, clarte: -5 }
             },
             {
                 label: "😐 Contacts normaux",
@@ -157,12 +163,26 @@ const criteriaConfig = {
             {
                 label: "😊 Lien social nourrissant",
                 impact: { adequation: 15, resilience: 10, motivation: 10, clarte: 5 }
+            },
+                Sortir: {
+        defaultState: 1,
+        states: [
+            {
+                label: "😶 Immobilité",
+                impact: { adequation: -10, resilience: -10, motivation: -20, clarte: -15 }
+            },
+            {
+                label: "😐 En Mouvement",
+                impact: { adequation: 0, resilience: 0, motivation: 0, clarte: 0 }
+            },
+            {
+                label: "😊 Haut Dynamisme",
+                impact: { adequation: 15, resilience: 15, motivation: 15, clarte: 10 }
             }
         ]
     }
 };
 
-/* 🧩 LOGIQUE GÉNÉRIQUE */
 
 function clamp(v) {
     return Math.max(0, Math.min(100, v));
